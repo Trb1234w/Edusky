@@ -1,0 +1,66 @@
+'use server'
+
+import { createClient } from "@/lib/supabase/server";
+
+interface Profile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+}
+
+/**
+ * Récupère la liste des utilisateurs qui suivent l'utilisateur donné (followers).
+ */
+export async function getFollowers(userId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('suivis')
+    .select(`
+      follower_id,
+      follower:profiles!follower_id(
+        id,
+        full_name,
+        avatar_url,
+        bio
+      )
+    `)
+    .eq('followed_id', userId);
+
+  if (error) {
+    console.error("Erreur lors de la récupération des followers:", error);
+    return { data: null, error };
+  }
+
+  const followers = data.map(item => item.follower);
+  return { data: followers, error: null };
+}
+
+/**
+ * Récupère la liste des utilisateurs que l'utilisateur donné suit (following).
+ */
+export async function getFollowing(userId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('suivis')
+    .select(`
+      followed_id,
+      followed:profiles!followed_id(
+        id,
+        full_name,
+        avatar_url,
+        bio
+      )
+    `)
+    .eq('follower_id', userId);
+
+  if (error) {
+    console.error("Erreur lors de la récupération des abonnements:", error);
+    return { data: null, error };
+  }
+
+  const following = data.map(item => item.followed);
+  return { data: following, error: null };
+}
