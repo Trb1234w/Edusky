@@ -27,6 +27,10 @@ import {
 import { getPostsByAuthor } from "@/lib/data/posts";
 import { PostCard } from "@/components/PostCard";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
+import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs } from "@/app/dashboard/actions";
+import { EventCard } from "@/components/event-card";
+import { CourseCard } from "@/components/course-card";
+import { ClubCard } from "@/components/club-card";
 import { FollowersList } from "@/components/FollowersList";
 
 export default function DashboardPage() {
@@ -34,10 +38,16 @@ export default function DashboardPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
+  const [registeredFormations, setRegisteredFormations] = useState<any[]>([]);
+  const [registeredClubs, setRegisteredClubs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(true);
   const [followersLoading, setFollowersLoading] = useState(true);
   const [followingLoading, setFollowingLoading] = useState(true);
+  const [registeredEventsLoading, setRegisteredEventsLoading] = useState(true);
+  const [registeredFormationsLoading, setRegisteredFormationsLoading] = useState(true);
+  const [registeredClubsLoading, setRegisteredClubsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -85,6 +95,27 @@ export default function DashboardPage() {
         setFollowing(followingData);
       }
       setFollowingLoading(false);
+
+      // Charger les événements inscrits
+      const { data: registeredEventsData, error: registeredEventsError } = await getRegisteredEvents();
+      if (!registeredEventsError && registeredEventsData) {
+        setRegisteredEvents(registeredEventsData);
+      }
+      setRegisteredEventsLoading(false);
+
+      // Charger les formations inscrites
+      const { data: registeredFormationsData, error: registeredFormationsError } = await getRegisteredFormations();
+      if (!registeredFormationsError && registeredFormationsData) {
+        setRegisteredFormations(registeredFormationsData);
+      }
+      setRegisteredFormationsLoading(false);
+
+      // Charger les clubs inscrits
+      const { data: registeredClubsData, error: registeredClubsError } = await getRegisteredClubs();
+      if (!registeredClubsError && registeredClubsData) {
+        setRegisteredClubs(registeredClubsData);
+      }
+      setRegisteredClubsLoading(false);
     };
 
     fetchUserAndProfile();
@@ -202,9 +233,98 @@ export default function DashboardPage() {
                 <FollowersList profiles={following} currentUserId={profile.id} />
               )}
             </TabsContent>
-            <TabsContent value="events">Contenu des événements</TabsContent>
-            <TabsContent value="formations">Contenu des formations</TabsContent>
-            <TabsContent value="clubs">Contenu des clubs</TabsContent>
+            <TabsContent value="events" className="mt-6">
+              {registeredEventsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                </div>
+              ) : registeredEvents.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {registeredEvents.map(event => (
+                    <EventCard
+                      key={event.id}
+                      id={event.id}
+                      title={event.titre || ""}
+                      description={event.extrait || event.description || ""}
+                      date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                      location={event.lieu || event.mode || ""}
+                      category={event.categories?.nom || ""}
+                      participants={0} // Placeholder
+                      maxParticipants={event.capacite || 0}
+                      organizer={event.organisateur?.full_name || "Inconnu"}
+                      image={event.image_url || "/placeholder.png"}
+                      status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-8 text-center text-muted-foreground">
+                  Vous n'êtes inscrit à aucun événement pour le moment.
+                </Card>
+              )}
+            </TabsContent>
+            <TabsContent value="formations" className="mt-6">
+              {registeredFormationsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                </div>
+              ) : registeredFormations.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {registeredFormations.map(formation => (
+                    <CourseCard
+                      key={formation.id}
+                      id={formation.id}
+                      title={formation.titre || ""}
+                      description={formation.extrait || ""}
+                      instructor={formation.professeur_full_name || "Inconnu"}
+                      category={formation.categorie?.nom || ""}
+                      level={formation.niveau || ""}
+                      duration={formation.duree_texte || ""}
+                      students={formation.nb_avis || 0}
+                      rating={formation.note_moyenne || 0}
+                      price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
+                      image={formation.image_url || "/placeholder.png"}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-8 text-center text-muted-foreground">
+                  Vous n'êtes inscrit à aucune formation pour le moment.
+                </Card>
+              )}
+            </TabsContent>
+            <TabsContent value="clubs" className="mt-6">
+              {registeredClubsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                </div>
+              ) : registeredClubs.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {registeredClubs.map(club => (
+                    <ClubCard
+                      key={club.id}
+                      id={club.id}
+                      name={club.nom || ""}
+                      description={club.description || ""}
+                      category={club.categorie?.nom || ""}
+                      members={club.capacite || 0} // Using capacite as a proxy for members
+                      activities="Activités non spécifiées" // Placeholder
+                      president={club.leader?.full_name || "Inconnu"}
+                      image={club.image_url || "/placeholder.png"}
+                      verified={false} // Placeholder
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-8 text-center text-muted-foreground">
+                  Vous n'êtes inscrit à aucun club pour le moment.
+                </Card>
+              )}
+            </TabsContent>
             <TabsContent value="favorites">Contenu des favoris</TabsContent>
           </Tabs>
         </section>
