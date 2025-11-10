@@ -1,5 +1,3 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
 import { MobileNav } from "@/components/mobile-nav"
 import { PostCard } from "@/components/post-card"
 import { Button } from "@/components/ui/button"
@@ -71,6 +69,7 @@ export default async function FeedPage() {
       ...post,
       currentUserId: user.id,
       followingIds: followingIds,
+      authorUsername: post.authorUsername, // Corrigé
     };
     if (post.sharedPost) {
       return <SharedPostCard key={post.id} {...props} />;
@@ -80,10 +79,7 @@ export default async function FeedPage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <div className="hidden lg:block">
-        <Header />
-      </div>
-      <MobileFeedHeader /> {/* Render custom mobile header */}
+            <MobileFeedHeader /> {/* Render custom mobile header */}
 
       <main className="pt-2 lg:pt-20">        {/* Main Content */}
         <section className="container mx-auto px-0 lg:px-8 py-0 lg:py-8">
@@ -155,7 +151,7 @@ export default async function FeedPage() {
         </section>
       </main>
 
-      <Footer />
+     
       <MobileNav />
     </div>
   );

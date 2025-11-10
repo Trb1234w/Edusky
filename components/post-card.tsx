@@ -25,6 +25,7 @@ interface PostCardProps {
   author: string;
   authorRole: string;
   authorAvatar: string;
+  authorUsername: string;
   content: string;
   image: string | null;
   timestamp: string;
@@ -53,6 +54,7 @@ export function PostCard(props: PostCardProps) {
     author,
     authorRole,
     authorAvatar,
+    authorUsername,
     content,
     image,
     timestamp,
@@ -104,13 +106,19 @@ export function PostCard(props: PostCardProps) {
   const handleLikeClick = async () => {
     console.log(`handleLikeClick: Liking post ${id} as user ${currentUserId}`);
     if (!currentUserId) return;
-    setIsLiked(!isLiked);
-    setCurrentLikes(isLiked ? currentLikes - 1 : currentLikes + 1);
+
+    const previousIsLiked = isLiked;
+    const previousLikes = currentLikes;
+
+    setIsLiked(!previousIsLiked);
+    setCurrentLikes(previousIsLiked ? previousLikes - 1 : previousLikes + 1);
+
     const { error } = await toggleLike(id, currentUserId);
+
     if (error) {
       console.error("Erreur lors de l'action de like:", error);
-      setIsLiked(isLiked);
-      setCurrentLikes(currentLikes);
+      setIsLiked(previousIsLiked);
+      setCurrentLikes(previousLikes);
     }
   };
 
@@ -181,7 +189,7 @@ export function PostCard(props: PostCardProps) {
       <CardContent className="p-2 lg:p-6">
         {/* Post Header */}
         <div className="flex items-start justify-between mb-1 lg:mb-4">
-          <div className="flex items-center gap-2 lg:gap-3">
+          <Link href={`/profile/${authorUsername}`} className="flex items-center gap-2 lg:gap-3">
             <Avatar className="w-10 h-10 rounded-none lg:w-12 lg:h-12 lg:rounded-full">
               <AvatarImage src={authorAvatar || undefined} alt={author} />
               <AvatarFallback>{author[0]}</AvatarFallback>
@@ -198,7 +206,7 @@ export function PostCard(props: PostCardProps) {
                 {authorRole} • {timestamp ? formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: fr }) : ''}
               </p>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             {currentUserId !== authorId && (
               <>

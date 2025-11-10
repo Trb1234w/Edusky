@@ -45,9 +45,16 @@ export async function createPostAction(content: string, authorId: string, imageU
 }
 
 export async function toggleLike(postId: string, userId: string) {
-  const supabase = await createClient(); // Utiliser le client serveur normal
+  console.log(`[toggleLike] Action déclenchée pour postId: ${postId}, userId: ${userId}`);
+  const supabase = await createClient();
 
-  // Vérifier si l'utilisateur a déjà liké ce post
+  if (!userId) {
+    console.error("[toggleLike] Erreur: userId est manquant.");
+    return { error: "Utilisateur non identifié." };
+  }
+
+  // Étape 1: Vérifier si le like existe déjà
+  console.log("[toggleLike] Étape 1: Vérification du like existant...");
   const { data: existingLike, error: fetchError } = await supabase
     .from('likes')
     .select('id')
@@ -56,24 +63,29 @@ export async function toggleLike(postId: string, userId: string) {
     .eq('parent_type', 'post')
     .single();
 
-  if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = pas de ligne trouvée (ce qui est normal si pas encore liké)
-    console.error("Erreur lors de la vérification du like:", fetchError);
+  if (fetchError && fetchError.code !== 'PGRST116') {
+    console.error("[toggleLike] Erreur lors de la vérification du like:", fetchError);
     return { error: "Erreur lors de la vérification du like." };
   }
+  console.log(`[toggleLike] Like existant trouvé:`, existingLike);
 
   if (existingLike) {
-    // Si le like existe, le supprimer
+    // Étape 2a: Le like existe, donc on le supprime (unlike)
+    console.log(`[toggleLike] Étape 2a: Le like existe. Tentative de suppression de l'id: ${existingLike.id}`);
     const { error: deleteError } = await supabase
       .from('likes')
       .delete()
       .eq('id', existingLike.id);
 
     if (deleteError) {
-      console.error("Erreur lors de la suppression du like:", deleteError);
+      console.error("[toggleLike] Erreur lors de la suppression du like:", deleteError);
       return { error: "Erreur lors de la suppression du like." };
     }
+    console.log("[toggleLike] Succès: Like supprimé.");
+
   } else {
-    // Si le like n'existe pas, l'ajouter
+    // Étape 2b: Le like n'existe pas, donc on l'ajoute (like)
+    console.log("[toggleLike] Étape 2b: Le like n'existe pas. Tentative d'insertion.");
     const { error: insertError } = await supabase
       .from('likes')
       .insert({
@@ -83,12 +95,14 @@ export async function toggleLike(postId: string, userId: string) {
       });
 
     if (insertError) {
-      console.error("Erreur lors de l'ajout du like:", insertError);
+      console.error("[toggleLike] Erreur lors de l'ajout du like:", insertError);
       return { error: "Erreur lors de l'ajout du like." };
     }
+    console.log("[toggleLike] Succès: Like ajouté.");
   }
 
-  // Invalider le cache pour rafraîchir les pages
+  // Étape 3: Revalidation du cache
+  console.log("[toggleLike] Étape 3: Revalidation des chemins '/feed' et '/dashboard'.");
   revalidatePath("/feed");
   revalidatePath("/dashboard");
 

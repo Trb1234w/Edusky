@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CreatePost } from "@/components/CreatePost";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { MobileNav } from "@/components/mobile-nav";
+
+
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,7 +27,7 @@ import {
 import { getPostsByAuthor } from "@/lib/data/posts";
 import { PostCard } from "@/components/PostCard";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
-import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs } from "@/app/dashboard/actions";
+import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction } from "@/app/dashboard/actions";
 import { EventCard } from "@/components/event-card";
 import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
@@ -75,6 +75,8 @@ export default function DashboardPage() {
       setProfile(profileData);
       setLoading(false);
 
+      console.log(`--- DEBUG: Début du chargement des données pour l'utilisateur ${profileData.id} ---`);
+
       // Une fois le profil chargé, on charge les posts
       const { data: postsData, error: postsError } = await getPostsByAuthor(profileData.id);
       if (!postsError && postsData) {
@@ -82,14 +84,16 @@ export default function DashboardPage() {
       }
       setPostsLoading(false);
 
+      console.log(`--- DEBUG: Chargement des followers pour l'utilisateur ${profileData.id} ---`);
       // Charger les followers
+      console.log("--- About to call getFollowers ---");
       const { data: followersData, error: followersError } = await getFollowers(profileData.id);
       if (!followersError && followersData) {
         setFollowers(followersData);
       }
       setFollowersLoading(false);
 
-      // Charger les abonnements
+      console.log(`--- DEBUG: Chargement des abonnements pour l'utilisateur ${profileData.id} ---`);
       const { data: followingData, error: followingError } = await getFollowing(profileData.id);
       if (!followingError && followingData) {
         setFollowing(followingData);
@@ -131,7 +135,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <Header />
 
       <main className="pt-16 lg:pt-20">
         <section className="bg-gradient-to-br from-primary via-accent to-secondary py-12 lg:py-16">
@@ -329,9 +332,6 @@ export default function DashboardPage() {
           </Tabs>
         </section>
       </main>
-
-      <Footer />
-      <MobileNav />
     </div>
   );
 }
@@ -339,7 +339,7 @@ export default function DashboardPage() {
 function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-muted/30">
-      <Header />
+
       <main className="pt-16 lg:pt-20">
         <section className="bg-gray-200 py-12 lg:py-16 animate-pulse">
           <div className="container mx-auto px-4 lg:px-8">
@@ -360,8 +360,8 @@ function DashboardSkeleton() {
         </section>
         {/* Stats section removed */}
       </main>
-      <Footer />
-      <MobileNav />
+
+
     </div>
   );
 }

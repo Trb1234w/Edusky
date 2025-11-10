@@ -93,3 +93,8 @@ export async function getRegisteredClubs() {
 
   return { data: registeredClubs, error: null }
 }
+
+export async function testServerAction() {
+  console.log("--- TEST SERVER ACTION EXECUTED ---");
+  return "Test successful!";
+}

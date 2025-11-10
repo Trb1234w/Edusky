@@ -13,7 +13,10 @@ interface Profile {
  * Récupère la liste des utilisateurs qui suivent l'utilisateur donné (followers).
  */
 export async function getFollowers(userId: string) {
+  console.log("--- getFollowers function started ---");
+  console.log(`--- DEBUG: getFollowers pour userId: ${userId} ---`);
   const supabase = await createClient();
+  console.log("Supabase client created in getFollowers.");
 
   const { data, error } = await supabase
     .from('suivis')
@@ -29,11 +32,19 @@ export async function getFollowers(userId: string) {
     .eq('followed_id', userId);
 
   if (error) {
-    console.error("Erreur lors de la récupération des followers:", error);
+    console.error("--- ERREUR Supabase dans getFollowers ---");
+    console.error(JSON.stringify(error, null, 2));
     return { data: null, error };
   }
 
+  console.log("--- Données brutes de suivis reçues ---");
+  console.log(JSON.stringify(data, null, 2));
+
   const followers = data.map(item => item.follower);
+  console.log("--- Followers après mappage ---");
+  console.log(JSON.stringify(followers, null, 2));
+  console.log(`--- FIN DEBUG: getFollowers ---`);
+
   return { data: followers, error: null };
 }
 
