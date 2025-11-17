@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from '@supabase/supabase-js'; // Import createClient from supabase-js
 
 interface Profile {
   id: string;
@@ -9,16 +9,26 @@ interface Profile {
   bio: string | null;
 }
 
+// Helper to create supabaseAdmin client
+function getSupabaseAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    console.error("CRITICAL: Supabase environment variables missing for admin client!");
+    throw new Error("Supabase admin client configuration incomplete.");
+  }
+  return createClient(supabaseUrl, serviceKey);
+}
+
 /**
  * Récupère la liste des utilisateurs qui suivent l'utilisateur donné (followers).
  */
 export async function getFollowers(userId: string) {
-  console.log("--- getFollowers function started ---");
-  console.log(`--- DEBUG: getFollowers pour userId: ${userId} ---`);
-  const supabase = await createClient();
-  console.log("Supabase client created in getFollowers.");
+  console.log(`[DEBUG] getFollowers called for userId: ${userId}`);
+  const supabaseAdmin = getSupabaseAdminClient(); // Use admin client
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('suivis')
     .select(`
       follower_id,
@@ -32,18 +42,14 @@ export async function getFollowers(userId: string) {
     .eq('followed_id', userId);
 
   if (error) {
-    console.error("--- ERREUR Supabase dans getFollowers ---");
-    console.error(JSON.stringify(error, null, 2));
+    console.error("[DEBUG] ERREUR Supabase dans getFollowers:", JSON.stringify(error, null, 2));
     return { data: null, error };
   }
 
-  console.log("--- Données brutes de suivis reçues ---");
-  console.log(JSON.stringify(data, null, 2));
+  console.log(`[DEBUG] Raw data from Supabase for followers of userId ${userId}:`, JSON.stringify(data, null, 2));
 
   const followers = data.map(item => item.follower);
-  console.log("--- Followers après mappage ---");
-  console.log(JSON.stringify(followers, null, 2));
-  console.log(`--- FIN DEBUG: getFollowers ---`);
+  console.log(`[DEBUG] Mapped followers for userId ${userId}:`, JSON.stringify(followers, null, 2));
 
   return { data: followers, error: null };
 }
@@ -52,9 +58,10 @@ export async function getFollowers(userId: string) {
  * Récupère la liste des utilisateurs que l'utilisateur donné suit (following).
  */
 export async function getFollowing(userId: string) {
-  const supabase = await createClient();
+  console.log(`[DEBUG] getFollowing called for userId: ${userId}`);
+  const supabaseAdmin = getSupabaseAdminClient(); // Use admin client
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('suivis')
     .select(`
       followed_id,
@@ -68,10 +75,15 @@ export async function getFollowing(userId: string) {
     .eq('follower_id', userId);
 
   if (error) {
-    console.error("Erreur lors de la récupération des abonnements:", error);
+    console.error("[DEBUG] ERREUR Supabase dans getFollowing:", JSON.stringify(error, null, 2));
     return { data: null, error };
   }
 
+  console.log(`[DEBUG] Raw data from Supabase for following of userId ${userId}:`, JSON.stringify(data, null, 2));
+
   const following = data.map(item => item.followed);
+  console.log(`[DEBUG] Mapped following for userId ${userId}:`, JSON.stringify(following, null, 2));
+
   return { data: following, error: null };
 }
+
