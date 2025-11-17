@@ -136,7 +136,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-muted/30">
 
-      <main className="pt-16 lg:pt-20">
+      <main className="">
         <section className="bg-gradient-to-br from-primary via-accent to-secondary py-12 lg:py-16">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -170,7 +170,7 @@ export default function DashboardPage() {
 
         <section className="container mx-auto px-4 lg:px-8 py-12">
           <Tabs defaultValue="posts" className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-2 pb-2">
               <TabsTrigger value="posts">Publications</TabsTrigger>
               <TabsTrigger value="followers">Abonnés</TabsTrigger>
               <TabsTrigger value="following">Abonnements</TabsTrigger>

@@ -1,6 +1,29 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Custom Scrollbar Styles */
+/* Pour les navigateurs basés sur WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px; /* Largeur de la scrollbar verticale */
+  height: 8px; /* Hauteur de la scrollbar horizontale */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted); /* Couleur de fond de la piste de la scrollbar */
+  border-radius: 10px; /* Bords arrondis pour la piste */
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary); /* Couleur du "pouce" de la scrollbar */
+  border-radius: 10px; /* Bords arrondis pour le pouce */
+  border: 2px solid var(--muted); /* Bordure pour le pouce, pour le faire ressortir de la piste */
+}
+
+/* Au survol du pouce de la scrollbar */
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(from var(--primary) l c h / 0.8); /* Légèrement plus clair ou plus foncé au survol */
+}
+
 :root {
   --background: oklch(0.99 0.005 264);
   --foreground: oklch(0.15 0.01 264);

@@ -1,0 +1,404 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.articles_blog (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titre text NOT NULL,
+  slug text UNIQUE,
+  contenu text,
+  extrait text,
+  auteur_id uuid,
+  categorie_id uuid,
+  tags ARRAY,
+  image_couverture text,
+  image_url text,
+  vues integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  comment_count integer DEFAULT 0,
+  publie_at timestamp with time zone,
+  statut USER-DEFINED NOT NULL DEFAULT 'brouillon'::statut_pub,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT articles_blog_pkey PRIMARY KEY (id),
+  CONSTRAINT articles_blog_auteur_id_fkey FOREIGN KEY (auteur_id) REFERENCES public.profiles(id),
+  CONSTRAINT articles_blog_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id)
+);
+CREATE TABLE public.avis_formation (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  formation_id uuid,
+  user_id uuid,
+  note integer NOT NULL CHECK (note >= 1 AND note <= 5),
+  titre text,
+  commentaire text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT avis_formation_pkey PRIMARY KEY (id),
+  CONSTRAINT avis_formation_formation_id_fkey FOREIGN KEY (formation_id) REFERENCES public.formations(id),
+  CONSTRAINT avis_formation_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nom text NOT NULL,
+  description text,
+  slug text,
+  parent_id uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  scope text NOT NULL,
+  CONSTRAINT categories_pkey PRIMARY KEY (id),
+  CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.categories(id)
+);
+CREATE TABLE public.categories_closure (
+  ancestor uuid NOT NULL,
+  descendant uuid NOT NULL,
+  depth integer NOT NULL,
+  CONSTRAINT categories_closure_pkey PRIMARY KEY (ancestor, descendant),
+  CONSTRAINT categories_closure_ancestor_fkey FOREIGN KEY (ancestor) REFERENCES public.categories(id),
+  CONSTRAINT categories_closure_descendant_fkey FOREIGN KEY (descendant) REFERENCES public.categories(id)
+);
+CREATE TABLE public.clubs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nom text NOT NULL,
+  slug text UNIQUE,
+  description text,
+  statut USER-DEFINED NOT NULL DEFAULT 'ouvert'::statut_club,
+  categorie_id uuid,
+  tags ARRAY,
+  leader_id uuid,
+  calendrier jsonb,
+  capacite integer,
+  lieu text,
+  image_url text,
+  theme_principal text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT clubs_pkey PRIMARY KEY (id),
+  CONSTRAINT clubs_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
+  CONSTRAINT clubs_leader_id_fkey FOREIGN KEY (leader_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.commentaires (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  auteur_id uuid,
+  parent_poste uuid,
+  contenu text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT commentaires_pkey PRIMARY KEY (id),
+  CONSTRAINT commentaires_auteur_id_fkey FOREIGN KEY (auteur_id) REFERENCES public.profiles(id),
+  CONSTRAINT commentaires_parent_poste_fkey FOREIGN KEY (parent_poste) REFERENCES public.postes(id)
+);
+CREATE TABLE public.conversation_participants (
+  conversation_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  role text DEFAULT 'member'::text,
+  joined_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT conversation_participants_pkey PRIMARY KEY (conversation_id, user_id),
+  CONSTRAINT conversation_participants_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id),
+  CONSTRAINT conversation_participants_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.conversations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titre text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT conversations_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.evenements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titre text NOT NULL,
+  slug text UNIQUE,
+  description text,
+  extrait text,
+  categorie_id uuid,
+  tags ARRAY,
+  organisateur_id uuid,
+  date_debut timestamp with time zone,
+  date_fin timestamp with time zone,
+  mode USER-DEFINED DEFAULT 'en_ligne'::mode_cours,
+  pays_id uuid,
+  ville_id uuid,
+  quartier_id uuid,
+  lieu text,
+  capacite integer,
+  statut USER-DEFINED NOT NULL DEFAULT 'publie'::statut_pub,
+  image_url text,
+  type_evenement text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT evenements_pkey PRIMARY KEY (id),
+  CONSTRAINT evenements_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
+  CONSTRAINT evenements_organisateur_id_fkey FOREIGN KEY (organisateur_id) REFERENCES public.profiles(id),
+  CONSTRAINT evenements_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT evenements_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id),
+  CONSTRAINT evenements_quartier_id_fkey FOREIGN KEY (quartier_id) REFERENCES public.quartiers(id)
+);
+CREATE TABLE public.favoris (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  type_item text NOT NULL,
+  item_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT favoris_pkey PRIMARY KEY (id),
+  CONSTRAINT favoris_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.formations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titre text NOT NULL,
+  slug text UNIQUE,
+  description text,
+  extrait text,
+  categorie_id uuid,
+  tags ARRAY,
+  professeur_id uuid,
+  mode USER-DEFINED NOT NULL DEFAULT 'en_ligne'::mode_cours,
+  pays_id uuid,
+  ville_id uuid,
+  quartier_id uuid,
+  duree_heures integer,
+  duree_texte text,
+  niveau text,
+  capacite integer,
+  prix_indicatif numeric,
+  curriculum jsonb,
+  ressources jsonb,
+  certificat boolean DEFAULT false,
+  jobs_relies ARRAY,
+  statut USER-DEFINED NOT NULL DEFAULT 'brouillon'::statut_pub,
+  date_publication timestamp with time zone,
+  image_url text,
+  video_intro_url text,
+  note_moyenne numeric DEFAULT 0,
+  nb_avis integer DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT formations_pkey PRIMARY KEY (id),
+  CONSTRAINT formations_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
+  CONSTRAINT formations_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT formations_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id),
+  CONSTRAINT formations_quartier_id_fkey FOREIGN KEY (quartier_id) REFERENCES public.quartiers(id),
+  CONSTRAINT formations_professeur_id_fkey FOREIGN KEY (professeur_id) REFERENCES public.professeurs(id)
+);
+CREATE TABLE public.inscriptions_club (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  club_id uuid,
+  user_id uuid,
+  nom text,
+  prenom text,
+  email text,
+  telephone text,
+  message text,
+  statut text DEFAULT 'en_attente'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT inscriptions_club_pkey PRIMARY KEY (id),
+  CONSTRAINT inscriptions_club_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
+  CONSTRAINT inscriptions_club_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.inscriptions_evenement (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  evenement_id uuid,
+  user_id uuid,
+  nom text,
+  prenom text,
+  email text,
+  telephone text,
+  pays_id uuid,
+  ville_id uuid,
+  message text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT inscriptions_evenement_pkey PRIMARY KEY (id),
+  CONSTRAINT inscriptions_evenement_evenement_id_fkey FOREIGN KEY (evenement_id) REFERENCES public.evenements(id),
+  CONSTRAINT inscriptions_evenement_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT inscriptions_evenement_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT inscriptions_evenement_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id)
+);
+CREATE TABLE public.inscriptions_formation (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  formation_id uuid,
+  session_id uuid,
+  user_id uuid,
+  nom text,
+  prenom text,
+  email text,
+  telephone text,
+  pays_id uuid,
+  ville_id uuid,
+  quartier_id uuid,
+  message text,
+  statut text DEFAULT 'en_attente'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT inscriptions_formation_pkey PRIMARY KEY (id),
+  CONSTRAINT inscriptions_formation_formation_id_fkey FOREIGN KEY (formation_id) REFERENCES public.formations(id),
+  CONSTRAINT inscriptions_formation_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.sessions_formation(id),
+  CONSTRAINT inscriptions_formation_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT inscriptions_formation_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT inscriptions_formation_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id),
+  CONSTRAINT inscriptions_formation_quartier_id_fkey FOREIGN KEY (quartier_id) REFERENCES public.quartiers(id)
+);
+CREATE TABLE public.journal_actions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  action text NOT NULL,
+  table_cible text,
+  record_id uuid,
+  metadata jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT journal_actions_pkey PRIMARY KEY (id),
+  CONSTRAINT journal_actions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  parent_type text NOT NULL,
+  parent_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT likes_pkey PRIMARY KEY (id),
+  CONSTRAINT likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  conversation_id uuid,
+  auteur_id uuid,
+  contenu text,
+  metadata jsonb,
+  lu boolean DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT messages_pkey PRIMARY KEY (id),
+  CONSTRAINT messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id),
+  CONSTRAINT messages_auteur_id_fkey FOREIGN KEY (auteur_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.notifications (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  type text NOT NULL,
+  ref_table text,
+  ref_id uuid,
+  contenu text,
+  metadata jsonb,
+  lu boolean DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT notifications_pkey PRIMARY KEY (id),
+  CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.pays (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  code_iso character varying,
+  nom text NOT NULL,
+  CONSTRAINT pays_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.postes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  auteur_id uuid,
+  contenu text,
+  media jsonb,
+  partage_de uuid,
+  statut USER-DEFINED NOT NULL DEFAULT 'publie'::statut_pub,
+  visibilite text DEFAULT 'public'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT postes_pkey PRIMARY KEY (id),
+  CONSTRAINT postes_partage_de_fkey FOREIGN KEY (partage_de) REFERENCES public.postes(id),
+  CONSTRAINT postes_auteur_id_fkey FOREIGN KEY (auteur_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.professeurs (
+  id uuid NOT NULL,
+  titre character varying,
+  presentation text,
+  specialites ARRAY,
+  annees_experience integer,
+  tarif_indicatif numeric,
+  tarif_horaire_min numeric,
+  tarif_horaire_max numeric,
+  nb_etudiants_formes integer DEFAULT 0,
+  disponibilite jsonb,
+  portfolio jsonb,
+  is_publie boolean DEFAULT false,
+  note_moyenne numeric DEFAULT 0,
+  nb_notes integer DEFAULT 0,
+  certifications jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT professeurs_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  username text,
+  prenom text,
+  nom text,
+  full_name text,
+  email text,
+  telephone text,
+  pays_id uuid,
+  ville_id uuid,
+  quartier_id uuid,
+  adresse text,
+  avatar_url text,
+  bio text,
+  date_naissance date,
+  genre text,
+  langues ARRAY,
+  competences ARRAY,
+  diplomes jsonb,
+  formations_parcours jsonb,
+  linkedin_url text,
+  site_web text,
+  role USER-DEFINED NOT NULL DEFAULT 'utilisateur'::role_utilisateur,
+  statut_compte USER-DEFINED DEFAULT 'actif'::statut_compte,
+  is_verified boolean DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id),
+  CONSTRAINT profiles_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT profiles_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id),
+  CONSTRAINT profiles_quartier_id_fkey FOREIGN KEY (quartier_id) REFERENCES public.quartiers(id)
+);
+CREATE TABLE public.quartiers (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nom text NOT NULL,
+  ville_id uuid,
+  CONSTRAINT quartiers_pkey PRIMARY KEY (id),
+  CONSTRAINT quartiers_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id)
+);
+CREATE TABLE public.sessions_formation (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  formation_id uuid,
+  debut timestamp with time zone,
+  fin timestamp with time zone,
+  lieu text,
+  capacite integer,
+  places_reservees integer DEFAULT 0,
+  statut USER-DEFINED DEFAULT 'publie'::statut_pub,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT sessions_formation_pkey PRIMARY KEY (id),
+  CONSTRAINT sessions_formation_formation_id_fkey FOREIGN KEY (formation_id) REFERENCES public.formations(id)
+);
+CREATE TABLE public.stats_globales (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cle text NOT NULL,
+  valeur numeric,
+  meta jsonb,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT stats_globales_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.suivis (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  follower_id uuid,
+  followed_id uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT suivis_pkey PRIMARY KEY (id),
+  CONSTRAINT suivis_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES public.profiles(id),
+  CONSTRAINT suivis_followed_id_fkey FOREIGN KEY (followed_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.tags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nom text NOT NULL UNIQUE,
+  CONSTRAINT tags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.villes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nom text NOT NULL,
+  pays_id uuid,
+  CONSTRAINT villes_pkey PRIMARY KEY (id),
+  CONSTRAINT villes_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id)
+);

@@ -80,3 +80,98 @@ export async function getFormationById(id: string) {
   console.log("--- SUCCÈS: Données finales combinées ---");
   return { data: finalData, error: null };
 }
+
+export async function getFormationsByProfessorId(professorId: string) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    console.error("CRITICAL: Variables d'environnement Supabase manquantes pour getFormationsByProfessorId !");
+    return { data: null, error: { message: "Configuration Supabase incomplète côté serveur." } };
+  }
+
+  const supabaseAdmin = createClient(supabaseUrl, serviceKey);
+
+  const { data, error } = await supabaseAdmin
+    .from("formations")
+    .select(
+      `
+        *,
+        categorie:categorie_id(nom),
+        professeur:professeurs(id, titre, note_moyenne, nb_etudiants_formes, profiles(full_name, avatar_url))
+      `
+    )
+    .eq("professeur_id", professorId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching formations by professor ID:", error);
+    return { data: null, error };
+  }
+
+  return { data, error };
+}
+
+export async function getRegisteredFormationsByUserId(userId: string) {
+  console.log(`[DEBUG] getRegisteredFormationsByUserId called with userId: ${userId}`);
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabaseAdmin
+    .from('inscriptions_formation')
+    .select(
+      `
+        formation:formation_id(*,
+          categorie:categorie_id(nom),
+          professeur:professeurs(*)
+        )
+      `
+    )
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error("[DEBUG] Error fetching registered formations by user ID:", error);
+    return { data: [], error };
+  }
+
+  console.log(`[DEBUG] Raw data from Supabase for userId ${userId} (formations):`, JSON.stringify(data, null, 2));
+
+  const registeredFormations = await Promise.all(data.map(async (inscription: any) => {
+    const formation = inscription.formation;
+    if (formation && formation.professeur) {
+      // Fetch professor's profile separately
+      const { data: profileData, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', formation.professeur.id)
+        .single();
+
+      if (profileError) {
+        console.error(`[DEBUG] Error fetching profile for professor ${formation.professeur.id}:`, profileError);
+        // Continue without profile data if there's an error
+        return {
+          ...formation,
+          professeur: {
+            ...formation.professeur,
+            profiles: null,
+          },
+        };
+      }
+
+      return {
+        ...formation,
+        professeur: {
+          ...formation.professeur,
+          profiles: profileData,
+        },
+      };
+    }
+    return formation;
+  }));
+
+  console.log(`[DEBUG] Mapped registered formations for userId ${userId}:`, JSON.stringify(registeredFormations, null, 2));
+
+  return { data: registeredFormations, error: null };
+}
