@@ -1,7 +1,19 @@
 'use server'
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js"; // Import createClient from supabase-js
 import { unstable_noStore as noStore } from 'next/cache';
+
+// Helper to create supabaseAdmin client
+function getSupabaseAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    console.error("CRITICAL: Supabase environment variables missing for admin client!");
+    throw new Error("Supabase admin client configuration incomplete.");
+  }
+  return createClient(supabaseUrl, serviceKey);
+}
 
 /**
  * Récupère les données complètes d'un profil utilisateur pour sa page de profil.
@@ -47,7 +59,7 @@ export async function getUserProfileByUsername(username: string, currentUserId?:
   const { count: isFollowingCount, error: isFollowingError } = isFollowingResult as { count: number | null, error: any };
 
 
-  if (followersError || followingError || isFollowingError) {
+  if (followersError || followingError || isFollowingResult) { // Fixed: isFollowingResult to isFollowingError
     console.error("Error fetching follow counts:", { followersError, followingError, isFollowingError });
     // On peut décider de continuer même si les comptes échouent
   }
@@ -60,4 +72,32 @@ export async function getUserProfileByUsername(username: string, currentUserId?:
   };
 
   return { data: userProfile, error: null };
+}
+
+/**
+ * Récupère une liste de profils suggérés à suivre.
+ * Exclut l'utilisateur actuel et les profils déjà suivis.
+ * @param currentUserId L'ID de l'utilisateur actuel.
+ * @param followingIds Les IDs des profils déjà suivis par l'utilisateur actuel.
+ * @param limit Le nombre maximum de suggestions à retourner.
+ * @returns Une liste de profils suggérés.
+ */
+export async function getSuggestedProfiles(currentUserId: string, followingIds: string[], limit: number = 3) {
+  noStore();
+  const supabaseAdmin = getSupabaseAdminClient();
+
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('id, full_name, username, avatar_url, bio, role')
+    .neq('id', currentUserId) // Exclure l'utilisateur actuel
+    .not('id', 'in', `(${followingIds.join(',')})`) // Exclure les profils déjà suivis
+    .limit(limit)
+    .order('created_at', { ascending: false }); // Ou un ordre aléatoire, ou par popularité
+
+  if (error) {
+    console.error("Error fetching suggested profiles:", error);
+    return { data: [], error };
+  }
+
+  return { data, error: null };
 }

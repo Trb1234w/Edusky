@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server" // Import du client Supabas
 import { redirect } from "next/navigation"
 import { SharedPostCard } from "@/components/shared-post-card"
 import { FeedHeader } from "@/components/feed-header"
+import { getSuggestedProfiles } from "@/lib/data/users.server" // Import de la nouvelle fonction
 
 export const dynamic = 'force-dynamic'; // Forcer le rendu dynamique
 
@@ -37,33 +38,17 @@ export default async function FeedPage() {
 
   const { data: posts, error } = await getAllFeedPosts(user?.id);
 
-  if (error || profileError || followingError) {
+  // Récupérer les profils suggérés
+  const { data: suggestedProfiles, error: suggestedProfilesError } = await getSuggestedProfiles(user.id, followingIds);
+
+  if (error || profileError || followingError || suggestedProfilesError) {
     console.error("Error fetching data:", error || profileError || followingError);
     return <div className="text-center text-red-500">Erreur lors du chargement des données.</div>;
   }
 
-  if (!posts) {
-    return <div className="text-center text-muted-foreground">Aucun post trouvé.</div>;
-  }
-
-  const suggestions = [
-    {
-      name: "Club Robotique",
-      role: "30 membres",
-      avatar: "/robotics-club.jpg",
-    },
-    {
-      name: "Mariama Sylla",
-      role: "Entrepreneure",
-      avatar: "/african-female-professor.jpg",
-    },
-    {
-      name: "Alpha Condé",
-      role: "Musicien",
-      avatar: "/african-male-professor.png",
-    },
-  ];
-
+    if (!posts) {
+      return <div className="text-center text-muted-foreground">Aucun post trouvé.</div>;
+    }
   const renderPost = (post: any) => {
     const props = {
       ...post,
@@ -90,21 +75,25 @@ export default async function FeedPage() {
                 <CardContent className="p-6">
                   <h3 className="font-bold text-foreground mb-4">Suggestions</h3>
                   <div className="space-y-4">
-                    {suggestions.map((suggestion, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage src={suggestion.avatar || "/placeholder.svg"} alt={suggestion.name} />
-                          <AvatarFallback>{suggestion.name[0]}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-foreground truncate">{suggestion.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{suggestion.role}</p>
+                    {suggestedProfiles && suggestedProfiles.length > 0 ? (
+                      suggestedProfiles.map((suggestion: any) => (
+                        <div key={suggestion.id} className="flex items-center gap-3">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={suggestion.avatar_url || "/placeholder.svg"} alt={suggestion.full_name || suggestion.username} />
+                            <AvatarFallback>{suggestion.full_name ? suggestion.full_name[0] : suggestion.username[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm text-foreground truncate">{suggestion.full_name || suggestion.username}</p>
+                            <p className="text-xs text-muted-foreground truncate">{suggestion.role}</p>
+                          </div>
+                          <Button size="sm" variant="outline" className="text-xs bg-transparent">
+                            Suivre
+                          </Button>
                         </div>
-                        <Button size="sm" variant="outline" className="text-xs bg-transparent">
-                          Suivre
-                        </Button>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Aucune suggestion pour le moment.</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
