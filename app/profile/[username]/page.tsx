@@ -5,6 +5,7 @@ import { getRegisteredEventsByUserId } from "@/lib/data/evenements.server";
 import { getRegisteredFormationsByUserId } from "@/lib/data/formations.server";
 import { getRegisteredClubsByUserId } from "@/lib/data/clubs.server";
 import { getFavoritesByUserId } from "@/lib/data/favorites.server";
+import { getFollowers, getFollowing } from "@/lib/data/suivis.server"; // Added import
 import { notFound, redirect } from "next/navigation";
 import { PostCard } from "@/components/post-card";
 import { SharedPostCard } from "@/components/shared-post-card";
@@ -15,6 +16,7 @@ import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
 import { Card } from "@/components/ui/card"; // Added for empty states
 import { Skeleton } from "@/components/ui/skeleton"; // Added for loading states
+import { FollowersList } from "@/components/FollowersList"; // Added import
 
 // On force le rendu dynamique pour que la page soit toujours à jour
 export const dynamic = 'force-dynamic';
@@ -78,6 +80,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     console.error("Error fetching favorites for profile:", favoritesError);
   }
 
+  // Récupérer les abonnés du profil
+  const { data: followers, error: followersError } = await getFollowers(profile.id);
+  if (followersError) {
+    console.error("Error fetching followers for profile:", followersError);
+  }
+
+  // Récupérer les abonnements du profil
+  const { data: following, error: followingError } = await getFollowing(profile.id);
+  if (followingError) {
+    console.error("Error fetching following for profile:", followingError);
+  }
+
   const renderPost = (post: any) => {
     const props = {
       ...post,
@@ -120,10 +134,30 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </div>
           </TabsContent>
           <TabsContent value="abonnements" className="mt-6">
-            <p className="text-center py-12 text-muted-foreground">La liste des abonnements sera affichée ici.</p>
+            {followingError ? (
+              <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
+                Erreur lors du chargement des abonnements.
+              </Card>
+            ) : following && following.length > 0 ? (
+              <FollowersList profiles={following} currentUserId={currentUser?.id} />
+            ) : (
+              <Card className="p-8 text-center text-muted-foreground">
+                Cet utilisateur ne suit personne.
+              </Card>
+            )}
           </TabsContent>
           <TabsContent value="abonnes" className="mt-6">
-            <p className="text-center py-12 text-muted-foreground">La liste des abonnés sera affichée ici.</p>
+            {followersError ? (
+              <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
+                Erreur lors du chargement des abonnés.
+              </Card>
+            ) : followers && followers.length > 0 ? (
+              <FollowersList profiles={followers} currentUserId={currentUser?.id} />
+            ) : (
+              <Card className="p-8 text-center text-muted-foreground">
+                Cet utilisateur n'a aucun abonné.
+              </Card>
+            )}
           </TabsContent>
           <TabsContent value="events" className="mt-6">
             {registeredEventsError ? (
