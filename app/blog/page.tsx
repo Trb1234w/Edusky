@@ -4,21 +4,9 @@ import { MobileNav } from "@/components/mobile-nav"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { BookOpen } from "lucide-react"
-import { getCategories } from "@/lib/data/categories"
 import { BlogFilterWrapper } from "@/components/blog-filter-wrapper"
 
 export default async function BlogPage() {
-  const { data: allCategories, error: categoriesError } = await getCategories()
-
-  if (categoriesError) {
-    console.error("Error loading categories:", categoriesError)
-    return (
-      <p className="text-center text-red-500">
-        Erreur lors du chargement des catégories. Veuillez réessayer plus tard.
-      </p>
-    )
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -44,7 +32,6 @@ export default async function BlogPage() {
 
         {/* Le wrapper gère maintenant toute la logique */}
         <BlogFilterWrapper
-          allCategories={allCategories || []}
           gradient="from-purple-500 to-indigo-500"
         />
 

@@ -72,7 +72,7 @@ export function FormationsFilterWrapper({
         formation.titre?.toLowerCase().includes(filters.search.toLowerCase())
 
       const categoryMatch =
-        !filters.categorySlug || formation.category_slug === filters.categorySlug
+        !filters.categorySlug || formation.categorie_slug === filters.categorySlug
 
       const niveauMatch = !filters.niveau || formation.niveau === filters.niveau
 

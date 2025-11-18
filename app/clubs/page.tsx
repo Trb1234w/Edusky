@@ -3,21 +3,9 @@ import { Footer } from "@/components/footer"
 import { MobileNav } from "@/components/mobile-nav"
 import { Button } from "@/components/ui/button"
 import { Users } from "lucide-react"
-import { getCategories } from "@/lib/data/categories"
 import { ClubsFilterWrapper } from "@/components/clubs-filter-wrapper"
 
 export default async function ClubsPage() {
-  const { data: allCategories, error: categoriesError } = await getCategories()
-
-  if (categoriesError) {
-    console.error("Error loading categories:", categoriesError)
-    return (
-      <p className="text-center text-red-500">
-        Erreur lors du chargement des catégories. Veuillez réessayer plus tard.
-      </p>
-    )
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -43,7 +31,6 @@ export default async function ClubsPage() {
 
         {/* Le wrapper gère maintenant toute la logique */}
         <ClubsFilterWrapper
-          allCategories={allCategories || []}
           gradient="from-blue-500 to-cyan-500"
         />
 

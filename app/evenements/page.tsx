@@ -3,21 +3,9 @@ import { Footer } from "@/components/footer"
 import { MobileNav } from "@/components/mobile-nav"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "lucide-react"
-import { getCategories } from "@/lib/data/categories"
 import { EvenementsFilterWrapper } from "@/components/evenements-filter-wrapper"
 
 export default async function EvenementsPage() {
-  const { data: allCategories, error: categoriesError } = await getCategories()
-
-  if (categoriesError) {
-    console.error("Error loading categories:", categoriesError)
-    return (
-      <p className="text-center text-red-500">
-        Erreur lors du chargement des catégories. Veuillez réessayer plus tard.
-      </p>
-    )
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -43,7 +31,6 @@ export default async function EvenementsPage() {
 
         {/* Le wrapper gère maintenant toute la logique de filtrage et d'affichage */}
         <EvenementsFilterWrapper
-          allCategories={allCategories || []}
           gradient="from-orange-500 to-red-500"
         />
 

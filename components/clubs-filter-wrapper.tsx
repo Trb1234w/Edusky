@@ -14,6 +14,7 @@ import {
   CustomBottomSheetTrigger,
   CustomBottomSheetClose,
 } from "@/components/ui/custom-bottom-sheet"
+import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 
 const iconMap: { [key: string]: React.ElementType } = {
   Heart,
@@ -21,20 +22,18 @@ const iconMap: { [key: string]: React.ElementType } = {
 }
 
 interface ClubsFilterWrapperProps {
-  allCategories: { id: string; nom: string; slug: string }[]
   gradient: string
 }
 
 export function ClubsFilterWrapper({
-  allCategories,
   gradient,
 }: ClubsFilterWrapperProps) {
   const [allClubs, setAllClubs] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
-    categorySlug: undefined,
-    statut: "ouvert", // Default to open clubs
+    categorySlugs: undefined, // Changed
+    statut: "ouvert",
     minCapacite: undefined,
   })
 
@@ -58,8 +57,10 @@ export function ClubsFilterWrapper({
         !filters.search ||
         club.nom?.toLowerCase().includes(filters.search.toLowerCase())
 
+      // Updated category matching logic
       const categoryMatch =
-        !filters.categorySlug || club.categories.slug === filters.categorySlug
+        !filters.categorySlugs ||
+        filters.categorySlugs.includes(club.categories.slug)
 
       const statusMatch = !filters.statut || club.statut === filters.statut
 
@@ -161,31 +162,12 @@ export function ClubsFilterWrapper({
           </Button>
         </div>
 
-        {/* Barre de catégories */}
-        <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          <div className="flex gap-2 px-4 py-2 min-w-max">
-            <Button
-              key="all-categories"
-              variant={!filters.categorySlug ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap transition-all"
-              onClick={() => handleFilterChange("categorySlug", undefined)}
-            >
-              Toutes
-            </Button>
-            {allCategories.map(category => (
-              <Button
-                key={category.slug}
-                variant={filters.categorySlug === category.slug ? "default" : "outline"}
-                size="sm"
-                className="rounded-full whitespace-nowrap transition-all"
-                onClick={() => handleFilterChange("categorySlug", category.slug)}
-              >
-                {category.nom}
-              </Button>
-            ))}
-          </div>
-        </div>
+        {/* Barre de catégories (REPLACED) */}
+        <HorizontalCategoryNav
+          scope="club"
+          selectedSlugs={filters.categorySlugs}
+          onCategorySelect={(slugs) => handleFilterChange("categorySlugs", slugs)}
+        />
       </div>
 
       <div className="container mx-auto px-4 lg:px-8 py-8">
