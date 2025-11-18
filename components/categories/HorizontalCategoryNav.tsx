@@ -4,15 +4,7 @@ import * as React from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { HorizontalCategoryMenuItem } from "./HorizontalCategoryMenuItem";
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
+import { CategoryButton } from "./CategoryButton";
 
 // Types
 export type Category = {
@@ -32,7 +24,7 @@ type HorizontalCategoryNavProps = {
   onCategorySelect: (slugs: string[] | undefined) => void;
 };
 
-// Fonction pour construire l'arbre (inchangée)
+// Helper function
 function buildCategoryTree(categories: Category[]): CategoryNode[] {
   const categoryMap = new Map<string, CategoryNode>();
   const rootCategories: CategoryNode[] = [];
@@ -50,17 +42,12 @@ function buildCategoryTree(categories: Category[]): CategoryNode[] {
   return rootCategories;
 }
 
-// Fonction utilitaire pour récupérer tous les slugs descendants d'un nœud
-const getDescendantSlugs = (node: CategoryNode): string[] => {
-  return [node.slug, ...node.children.flatMap(getDescendantSlugs)];
-};
-
 export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }: HorizontalCategoryNavProps) {
   const supabase = createClient();
   const [categoryTree, setCategoryTree] = React.useState<CategoryNode[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [activeLabels, setActiveLabels] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     const fetchAndBuildTree = async () => {
@@ -82,6 +69,15 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
     };
     fetchAndBuildTree();
   }, [scope, supabase]);
+
+  const handleLabelSelect = (name: string, rootNodeId: string) => {
+    setActiveLabels(prev => ({ ...prev, [rootNodeId]: name }));
+  };
+
+  const handleReset = () => {
+    onCategorySelect(undefined);
+    setActiveLabels({});
+  };
 
   if (loading) {
     return (
@@ -105,70 +101,21 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
           variant={!selectedSlugs ? "default" : "outline"}
           size="sm"
           className="rounded-full whitespace-nowrap transition-all"
-          onClick={() => onCategorySelect(undefined)}
+          onClick={handleReset}
         >
           Toutes
         </Button>
         
-        {categoryTree.map(node => {
-          const hasChildren = node.children.length > 0;
-          const isSelected = selectedSlugs?.includes(node.slug);
-
-          if (!hasChildren) {
-            return (
-              <Button
-                key={node.id}
-                variant={isSelected ? "default" : "outline"}
-                size="sm"
-                className="rounded-full whitespace-nowrap"
-                onClick={() => onCategorySelect([node.slug])}
-              >
-                {node.nom}
-              </Button>
-            );
-          }
-
-                    return (
-
-                      <DropdownMenu key={node.id} onOpenChange={setIsDropdownOpen}>
-
-                        <DropdownMenuTrigger asChild>
-
-                          <Button
-
-                            variant={isSelected ? "default" : "outline"}
-
-                            size="sm"
-
-                            className="rounded-full whitespace-nowrap pr-2" // Adjusted padding for icon
-
-                          >
-
-                            {node.nom}
-
-                            <ChevronDown className={cn("ml-1 h-4 w-4 transition-transform duration-200", isDropdownOpen && "rotate-180")} />
-
-                          </Button>
-
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent>
-                {/* Option pour sélectionner le parent et tous ses enfants */}
-                <DropdownMenuItem onClick={() => onCategorySelect(getDescendantSlugs(node))}>
-                  Tous les articles de "{node.nom}"
-                </DropdownMenuItem>
-                <div className="my-1 border-t border-muted" />
-                {node.children.map(child => (
-                  <HorizontalCategoryMenuItem
-                    key={child.id}
-                    node={child}
-                    onSelect={onCategorySelect}
-                  />
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        })}
+        {categoryTree.map(node => (
+          <CategoryButton
+            key={node.id}
+            node={node}
+            selectedSlugs={selectedSlugs}
+            onCategorySelect={onCategorySelect}
+            onLabelSelect={(name) => handleLabelSelect(name, node.id)}
+            activeLabel={activeLabels[node.id]}
+          />
+        ))}
       </div>
     </div>
   );

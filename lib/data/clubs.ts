@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/client";
 export async function getClubs({
   limit = 10,
   offset = 0,
-  categorySlug,
   search,
   statut,
   minCapacite,
@@ -11,7 +10,6 @@ export async function getClubs({
 }: {
   limit?: number;
   offset?: number;
-  categorySlug?: string;
   search?: string;
   statut?: string;
   minCapacite?: number;
@@ -35,10 +33,6 @@ export async function getClubs({
     )
     .eq("statut", "ouvert") // Default to open clubs
     .range(offset, offset + limit - 1);
-
-  if (categorySlug) {
-    query = query.eq("categories.slug", categorySlug);
-  }
 
   if (search) {
     query = query.ilike("nom", `%${search}%`);

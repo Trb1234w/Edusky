@@ -3,24 +3,9 @@ import { Footer } from "@/components/footer"
 import { MobileNav } from "@/components/mobile-nav"
 import { Button } from "@/components/ui/button"
 import { BookOpen, Clock, Users, Award } from "lucide-react"
-import { getCategories } from "@/lib/data/categories"
 import { FormationsFilterWrapper } from "@/components/formations-filter-wrapper"
 
 export default async function FormationsPage() {
-  // Le chargement des catégories reste côté serveur, c'est efficace.
-  const { data: allCategories, error: categoriesError } = await getCategories()
-
-  if (categoriesError) {
-    console.error("Erreur lors du chargement des catégories :", categoriesError)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-center text-red-500">
-          Une erreur est survenue lors du chargement de la page. Veuillez réessayer plus tard.
-        </p>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -44,7 +29,7 @@ export default async function FormationsPage() {
         </section>
 
         {/* Le composant wrapper gère maintenant toute la logique de filtrage et d'affichage */}
-        <FormationsFilterWrapper allCategories={allCategories || []} />
+        <FormationsFilterWrapper />
 
         {/* Section d'appel à l’action */}
         <section className="bg-muted/30 py-12 lg:py-20">

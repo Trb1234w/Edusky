@@ -13,16 +13,12 @@ import { ChevronRight } from "lucide-react";
 
 type HorizontalCategoryMenuItemProps = {
   node: CategoryNode;
-  onSelect: (slugs: string[]) => void; // Fonction pour remonter les slugs
+  onSelect: (slugs: string[], name: string) => void; // Passe aussi le nom pour le label
 };
 
 // Fonction utilitaire pour récupérer tous les slugs descendants d'un nœud
 const getDescendantSlugs = (node: CategoryNode): string[] => {
-  let slugs = [node.slug];
-  for (const child of node.children) {
-    slugs = slugs.concat(getDescendantSlugs(child));
-  }
-  return slugs;
+  return [node.slug, ...node.children.flatMap(getDescendantSlugs)];
 };
 
 export function HorizontalCategoryMenuItem({ node, onSelect }: HorizontalCategoryMenuItemProps) {
@@ -30,12 +26,12 @@ export function HorizontalCategoryMenuItem({ node, onSelect }: HorizontalCategor
 
   const handleSelect = () => {
     const allSlugs = getDescendantSlugs(node);
-    onSelect(allSlugs);
+    onSelect(allSlugs, node.nom); // Remonte le nom du nœud cliqué
   };
 
   if (!hasChildren) {
     return (
-      <DropdownMenuItem onClick={handleSelect}>
+      <DropdownMenuItem onClick={() => onSelect([node.slug], node.nom)}>
         {node.nom}
       </DropdownMenuItem>
     );

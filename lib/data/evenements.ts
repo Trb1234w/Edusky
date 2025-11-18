@@ -3,14 +3,12 @@ import { createClient } from "@/lib/supabase/client";
 export async function getEvenements({
   limit = 10,
   offset = 0,
-  categorySlug,
   search,
   dateFilter,
   location,
 }: {
   limit?: number;
   offset?: number;
-  categorySlug?: string;
   search?: string;
   dateFilter?: string;
   location?: string;
@@ -36,10 +34,6 @@ export async function getEvenements({
     )
     .order("date_debut", { ascending: true })
     .range(offset, offset + limit - 1);
-
-  if (categorySlug) {
-    query = query.eq("categories.slug", categorySlug);
-  }
 
   if (search) {
     query = query.ilike("titre", `%${search}%`);

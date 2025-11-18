@@ -20,6 +20,7 @@ import {
   CustomBottomSheetTrigger,
   CustomBottomSheetClose,
 } from "@/components/ui/custom-bottom-sheet"
+import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 
 const iconMap: { [key: string]: React.ElementType } = {
   BarChartHorizontal,
@@ -28,21 +29,18 @@ const iconMap: { [key: string]: React.ElementType } = {
 }
 
 interface FormationsFilterWrapperProps {
-  allCategories: { id: string; nom: string; slug: string }[]
+  // allCategories is no longer needed
 }
 
-export function FormationsFilterWrapper({
-  allCategories,
-}: FormationsFilterWrapperProps) {
+export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
   const [allFormations, setAllFormations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
-    categorySlug: undefined,
+    categorySlugs: undefined, // Use array for slugs
     niveau: undefined,
     mode: undefined,
     certificat: undefined,
-    // Filtres secondaires dans "Tous les filtres"
     maxPrice: undefined,
     minRating: undefined,
   })
@@ -50,12 +48,13 @@ export function FormationsFilterWrapper({
   useEffect(() => {
     const fetchAllFormations = async () => {
       setIsLoading(true)
+      // Fetch all formations, filtering will be done client-side
       const { data } = await getFormations({})
       setAllFormations(data || [])
       setIsLoading(false)
     }
     fetchAllFormations()
-  }, [])
+  }, []) // Fetch only once on mount
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -63,8 +62,10 @@ export function FormationsFilterWrapper({
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    // The useEffect already handles refetching
   }
 
+  // The client-side filtering logic remains as a fallback or primary method
   const filteredFormations = useMemo(() => {
     return allFormations.filter(formation => {
       const searchMatch =
@@ -72,21 +73,18 @@ export function FormationsFilterWrapper({
         formation.titre?.toLowerCase().includes(filters.search.toLowerCase())
 
       const categoryMatch =
-        !filters.categorySlug || formation.categorie_slug === filters.categorySlug
+        !filters.categorySlugs ||
+        filters.categorySlugs.includes(formation.categorie_slug)
 
       const niveauMatch = !filters.niveau || formation.niveau === filters.niveau
-
       const modeMatch = !filters.mode || formation.mode === filters.mode
-
       const certificatMatch =
         filters.certificat === undefined ||
         (filters.certificat === "true" && formation.certificat) ||
         (filters.certificat === "false" && !formation.certificat)
-
       const ratingMatch =
         !filters.minRating ||
         (formation.note_moyenne || 0) >= parseFloat(filters.minRating)
-
       const priceMatch =
         filters.maxPrice === undefined ||
         (filters.maxPrice === 0 &&
@@ -105,72 +103,22 @@ export function FormationsFilterWrapper({
     })
   }, [filters, allFormations])
 
-  // Configuration pour les filtres principaux et secondaires
   const mainFiltersConfig = [
-    {
-      label: "Niveau",
-      name: "niveau",
-      icon: "BarChartHorizontal",
-      options: [
-        { label: "Tous", value: undefined },
-        { label: "Débutant", value: "Débutant" },
-        { label: "Intermédiaire", value: "Intermédiaire" },
-        { label: "Avancé", value: "Avancé" },
-      ],
-    },
-    {
-      label: "Mode",
-      name: "mode",
-      icon: "Computer",
-      options: [
-        { label: "Tous", value: undefined },
-        { label: "En ligne", value: "en_ligne" },
-        { label: "Présentiel", value: "presentiel" },
-        { label: "Hybride", value: "hybride" },
-      ],
-    },
-    {
-      label: "Certificat",
-      name: "certificat",
-      icon: "Award",
-      options: [
-        { label: "Tous", value: undefined },
-        { label: "Avec certificat", value: "true" },
-        { label: "Sans certificat", value: "false" },
-      ],
-    },
+    { label: "Niveau", name: "niveau", icon: "BarChartHorizontal", options: [ { label: "Tous", value: undefined }, { label: "Débutant", value: "Débutant" }, { label: "Intermédiaire", value: "Intermédiaire" }, { label: "Avancé", value: "Avancé" } ] },
+    { label: "Mode", name: "mode", icon: "Computer", options: [ { label: "Tous", value: undefined }, { label: "En ligne", value: "en_ligne" }, { label: "Présentiel", value: "presentiel" }, { label: "Hybride", value: "hybride" } ] },
+    { label: "Certificat", name: "certificat", icon: "Award", options: [ { label: "Tous", value: undefined }, { label: "Avec certificat", value: "true" }, { label: "Sans certificat", value: "false" } ] },
   ]
-
   const secondaryFiltersConfig = [
-    {
-      label: "Prix",
-      name: "maxPrice",
-      options: [
-        { label: "Tous", value: undefined },
-        { label: "Gratuit", value: 0 },
-      ],
-    },
-    {
-      label: "Popularité",
-      name: "minRating",
-      options: [
-        { label: "Toutes", value: undefined },
-        { label: "4 étoiles et +", value: 4 },
-        { label: "3 étoiles et +", value: 3 },
-      ],
-    },
+    { label: "Prix", name: "maxPrice", options: [ { label: "Tous", value: undefined }, { label: "Gratuit", value: 0 } ] },
+    { label: "Popularité", name: "minRating", options: [ { label: "Toutes", value: undefined }, { label: "4 étoiles et +", value: 4 }, { label: "3 étoiles et +", value: 3 } ] },
   ]
 
   return (
     <>
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-        {/* 1. Barre de Recherche */}
         <div className="px-4 py-2 border-b">
           <form onSubmit={handleSearchSubmit} className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              size={18}
-            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <Input
               placeholder="Rechercher une formation..."
               className="pl-10 h-10 rounded-xl border-border/50 focus:ring-2 focus:ring-primary"
@@ -180,13 +128,10 @@ export function FormationsFilterWrapper({
           </form>
         </div>
 
-        {/* 2. Barre de Filtres Principaux */}
         <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
           {mainFiltersConfig.map(filter => {
             const Icon = iconMap[filter.icon]
-            const displayValue =
-              filter.options.find(opt => opt.value === filters[filter.name])
-                ?.label || filter.label
+            const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
             return (
               <CustomBottomSheet key={filter.name}>
                 <CustomBottomSheetTrigger asChild>
@@ -197,22 +142,14 @@ export function FormationsFilterWrapper({
                 </CustomBottomSheetTrigger>
                 <CustomBottomSheetContent>
                   <CustomBottomSheetHeader>
-                    <CustomBottomSheetTitle>
-                      Filtrer par {filter.label}
-                    </CustomBottomSheetTitle>
+                    <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
                   </CustomBottomSheetHeader>
                   <div className="grid grid-cols-2 gap-2 px-4">
                     {filter.options.map(option => (
                       <CustomBottomSheetClose asChild key={option.label}>
                         <Button
-                          variant={
-                            filters[filter.name] === option.value
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() =>
-                            handleFilterChange(filter.name, option.value)
-                          }
+                          variant={filters[filter.name] === option.value ? "default" : "outline"}
+                          onClick={() => handleFilterChange(filter.name, option.value)}
                         >
                           {option.label}
                         </Button>
@@ -223,15 +160,9 @@ export function FormationsFilterWrapper({
               </CustomBottomSheet>
             )
           })}
-
-          {/* Bouton "Tous les filtres" */}
           <CustomBottomSheet>
             <CustomBottomSheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl ml-auto"
-              >
+              <Button variant="outline" size="sm" className="rounded-xl ml-auto">
                 <SlidersHorizontal size={16} />
               </Button>
             </CustomBottomSheetTrigger>
@@ -247,14 +178,8 @@ export function FormationsFilterWrapper({
                       {filter.options.map(option => (
                         <CustomBottomSheetClose asChild key={option.label}>
                           <Button
-                            variant={
-                              filters[filter.name] === option.value
-                                ? "default"
-                                : "outline"
-                            }
-                            onClick={() =>
-                              handleFilterChange(filter.name, option.value)
-                            }
+                            variant={filters[filter.name] === option.value ? "default" : "outline"}
+                            onClick={() => handleFilterChange(filter.name, option.value)}
                           >
                             {option.label}
                           </Button>
@@ -268,31 +193,11 @@ export function FormationsFilterWrapper({
           </CustomBottomSheet>
         </div>
 
-        {/* 3. Barre de Catégories */}
-        <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          <div className="flex gap-2 px-4 py-2 min-w-max">
-            <Button
-              key="all-categories"
-              variant={!filters.categorySlug ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap transition-all"
-              onClick={() => handleFilterChange("categorySlug", undefined)}
-            >
-              Toutes
-            </Button>
-            {allCategories.map(category => (
-              <Button
-                key={category.slug}
-                variant={filters.categorySlug === category.slug ? "default" : "outline"}
-                size="sm"
-                className="rounded-full whitespace-nowrap transition-all"
-                onClick={() => handleFilterChange("categorySlug", category.slug)}
-              >
-                {category.nom}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <HorizontalCategoryNav
+          scope="formation"
+          selectedSlugs={filters.categorySlugs}
+          onCategorySelect={(slugs) => handleFilterChange("categorySlugs", slugs)}
+        />
       </div>
 
       <div className="container mx-auto px-4 lg:px-8 py-8">
