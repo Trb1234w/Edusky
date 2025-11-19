@@ -17,6 +17,7 @@ import { ClubCard } from "@/components/club-card";
 import { Card } from "@/components/ui/card"; // Added for empty states
 import { Skeleton } from "@/components/ui/skeleton"; // Added for loading states
 import { FollowersList } from "@/components/FollowersList"; // Added import
+import { FavoritesList } from "@/app/dashboard/favorites-list"; // Import the new component
 
 // On force le rendu dynamique pour que la page soit toujours à jour
 export const dynamic = 'force-dynamic';
@@ -57,9 +58,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   }
 
   // Récupérer les événements auxquels l'utilisateur du profil est inscrit
-  const { data: registeredEvents, error: registeredEventsError } = await getRegisteredEventsByUserId(profile.id);
+  let { data: registeredEvents, error: registeredEventsError } = await getRegisteredEventsByUserId(profile.id);
   if (registeredEventsError) {
     console.error("Error fetching registered events for profile:", registeredEventsError);
+    registeredEvents = []; // Ensure it's an array even on error
+  } else {
+    // Dédupliquer les registeredEventsData basés sur leur 'id'
+    registeredEvents = Array.from(new Map(registeredEvents.map(event => [event.id, event])).values());
   }
 
   // Récupérer les formations auxquelles l'utilisateur du profil est inscrit
@@ -74,8 +79,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     console.error("Error fetching registered clubs for profile:", registeredClubsError);
   }
 
-  // Récupérer les favoris de l'utilisateur du profil
-  const { data: favorites, error: favoritesError } = await getFavoritesByUserId(profile.id);
+  // Récupérer les favoris de l'utilisateur du profil via la nouvelle fonction RPC
+  const { data: favorites, error: favoritesError } = await supabase.rpc('get_user_favorites', { p_user_id: profile.id });
   if (favoritesError) {
     console.error("Error fetching favorites for profile:", favoritesError);
   }
@@ -254,80 +259,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 Erreur lors du chargement des favoris.
               </Card>
             ) : favorites && favorites.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {favorites.map(fav => {
-                  if (!fav.details) return null; // Skip if details couldn't be fetched
-
-                  switch (fav.type_item) {
-                    case 'formation':
-                      return (
-                        <CourseCard
-                          key={fav.id}
-                          id={fav.details.id}
-                          title={fav.details.titre || ""}
-                          description="" // Description not fetched in favorites.server.ts for brevity
-                          instructor="" // Instructor not fetched
-                          category="" // Category not fetched
-                          level=""
-                          duration=""
-                          students={0}
-                          rating={0}
-                          price=""
-                          image={fav.details.image_url || "/placeholder.png"}
-                        />
-                      );
-                    case 'evenement':
-                      return (
-                        <EventCard
-                          key={fav.id}
-                          id={fav.details.id}
-                          title={fav.details.titre || ""}
-                          description=""
-                          date=""
-                          time=""
-                          location=""
-                          category=""
-                          participants={0}
-                          maxParticipants={0}
-                          organizer=""
-                          image={fav.details.image_url || "/placeholder.png"}
-                          status="upcoming"
-                        />
-                      );
-                    case 'club':
-                      return (
-                        <ClubCard
-                          key={fav.id}
-                          id={fav.details.id}
-                          name={fav.details.nom || ""}
-                          description=""
-                          category=""
-                          members={0}
-                          activities=""
-                          president=""
-                          image={fav.details.image_url || "/placeholder.png"}
-                          verified={false}
-                        />
-                      );
-                    case 'article':
-                      // Assuming you have an ArticleCard component or similar
-                      return (
-                        <Card key={fav.id} className="p-4">
-                          <h3 className="font-semibold">{fav.details.titre}</h3>
-                          <p className="text-sm text-muted-foreground">Article favori</p>
-                          {fav.details.image_url && <img src={fav.details.image_url} alt={fav.details.titre} className="mt-2 rounded-md" />}
-                        </Card>
-                      );
-                    default:
-                      return (
-                        <Card key={fav.id} className="p-4">
-                          <h3 className="font-semibold">Favori inconnu</h3>
-                          <p className="text-sm text-muted-foreground">Type: {fav.type_item}</p>
-                        </Card>
-                      );
-                  }
-                })}
-              </div>
+              <FavoritesList favorites={favorites} isLoading={false} />
             ) : (
               <Card className="p-8 text-center text-muted-foreground">
                 Cet utilisateur n'a aucun favori.

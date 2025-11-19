@@ -32,6 +32,7 @@ import { EventCard } from "@/components/event-card";
 import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
 import { FollowersList } from "@/components/FollowersList";
+import { FavoritesList } from "./favorites-list";
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null);
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
   const [registeredFormations, setRegisteredFormations] = useState<any[]>([]);
   const [registeredClubs, setRegisteredClubs] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(true);
   const [followersLoading, setFollowersLoading] = useState(true);
@@ -48,6 +50,7 @@ export default function DashboardPage() {
   const [registeredEventsLoading, setRegisteredEventsLoading] = useState(true);
   const [registeredFormationsLoading, setRegisteredFormationsLoading] = useState(true);
   const [registeredClubsLoading, setRegisteredClubsLoading] = useState(true);
+  const [favoritesLoading, setFavoritesLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -103,7 +106,9 @@ export default function DashboardPage() {
       // Charger les événements inscrits
       const { data: registeredEventsData, error: registeredEventsError } = await getRegisteredEvents();
       if (!registeredEventsError && registeredEventsData) {
-        setRegisteredEvents(registeredEventsData);
+        // Dédupliquer les événements basés sur leur 'id'
+        const uniqueEvents = Array.from(new Map(registeredEventsData.map(event => [event.id, event])).values());
+        setRegisteredEvents(uniqueEvents);
       }
       setRegisteredEventsLoading(false);
 
@@ -120,6 +125,13 @@ export default function DashboardPage() {
         setRegisteredClubs(registeredClubsData);
       }
       setRegisteredClubsLoading(false);
+
+      // Charger les favoris
+      const { data: favoritesData, error: favoritesError } = await supabase.rpc('get_user_favorites', { p_user_id: user.id });
+      if (!favoritesError && favoritesData) {
+        setFavorites(favoritesData);
+      }
+      setFavoritesLoading(false);
     };
 
     fetchUserAndProfile();
@@ -187,12 +199,12 @@ export default function DashboardPage() {
                   {/* Section des posts de l'utilisateur */}
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold">Mes publications</h2>
-                    {postsLoading ? (
-                      <div className="space-y-4">
-                        <Skeleton className="h-32 w-full rounded-lg" />
-                        <Skeleton className="h-32 w-full rounded-lg" />
-                      </div>
-                    ) : posts.length > 0 ? (
+                                      {postsLoading ? (
+                                        <div className="space-y-4">
+                                          {Array.from({ length: 2 }).map((_, i) => (
+                                            <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                                          ))}
+                                        </div>                    ) : posts.length > 0 ? (
                       posts.map(post => <PostCard key={post.id} post={post} />)
                     ) : (
                       <Card className="p-8 text-center text-muted-foreground">
@@ -219,8 +231,9 @@ export default function DashboardPage() {
             <TabsContent value="followers" className="mt-6">
               {followersLoading ? (
                 <div className="space-y-4">
-                  <Skeleton className="h-20 w-full rounded-lg" />
-                  <Skeleton className="h-20 w-full rounded-lg" />
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton key={i} className="h-20 w-full rounded-lg" />
+                  ))}
                 </div>
               ) : (
                 <FollowersList profiles={followers} currentUserId={profile.id} />
@@ -229,8 +242,9 @@ export default function DashboardPage() {
             <TabsContent value="following" className="mt-6">
               {followingLoading ? (
                 <div className="space-y-4">
-                  <Skeleton className="h-20 w-full rounded-lg" />
-                  <Skeleton className="h-20 w-full rounded-lg" />
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton key={i} className="h-20 w-full rounded-lg" />
+                  ))}
                 </div>
               ) : (
                 <FollowersList profiles={following} currentUserId={profile.id} />
@@ -239,8 +253,9 @@ export default function DashboardPage() {
             <TabsContent value="events" className="mt-6">
               {registeredEventsLoading ? (
                 <div className="space-y-4">
-                  <Skeleton className="h-32 w-full rounded-lg" />
-                  <Skeleton className="h-32 w-full rounded-lg" />
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                  ))}
                 </div>
               ) : registeredEvents.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -271,8 +286,9 @@ export default function DashboardPage() {
             <TabsContent value="formations" className="mt-6">
               {registeredFormationsLoading ? (
                 <div className="space-y-4">
-                  <Skeleton className="h-32 w-full rounded-lg" />
-                  <Skeleton className="h-32 w-full rounded-lg" />
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                  ))}
                 </div>
               ) : registeredFormations.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -302,8 +318,9 @@ export default function DashboardPage() {
             <TabsContent value="clubs" className="mt-6">
               {registeredClubsLoading ? (
                 <div className="space-y-4">
-                  <Skeleton className="h-32 w-full rounded-lg" />
-                  <Skeleton className="h-32 w-full rounded-lg" />
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                  ))}
                 </div>
               ) : registeredClubs.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -328,7 +345,17 @@ export default function DashboardPage() {
                 </Card>
               )}
             </TabsContent>
-            <TabsContent value="favorites">Contenu des favoris</TabsContent>
+            <TabsContent value="favorites" className="mt-6">
+              {favoritesLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <CourseCard.Skeleton key={i} />
+                  ))}
+                </div>
+              ) : (
+                <FavoritesList favorites={favorites} isLoading={favoritesLoading} />
+              )}
+            </TabsContent>
           </Tabs>
         </section>
       </main>

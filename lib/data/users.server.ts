@@ -1,6 +1,7 @@
 'use server'
 
-import { createClient } from "@supabase/supabase-js"; // Import createClient from supabase-js
+import { createClient as createServerClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { unstable_noStore as noStore } from 'next/cache';
 
 // Helper to create supabaseAdmin client
@@ -12,7 +13,7 @@ function getSupabaseAdminClient() {
     console.error("CRITICAL: Supabase environment variables missing for admin client!");
     throw new Error("Supabase admin client configuration incomplete.");
   }
-  return createClient(supabaseUrl, serviceKey);
+  return createAdminClient(supabaseUrl, serviceKey);
 }
 
 /**
@@ -23,7 +24,7 @@ function getSupabaseAdminClient() {
  */
 export async function getUserProfileByUsername(username: string, currentUserId?: string) {
   noStore();
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   // Étape 1: Récupérer le profil de base par nom d'utilisateur
   const { data: profile, error: profileError } = await supabase
