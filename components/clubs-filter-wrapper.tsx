@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from "react"
+import { createClient } from "@/lib/supabase/client" // Import client-side supabase client
 import { getClubs } from "@/lib/data/clubs"
 import { ClubsList } from "@/app/clubs/clubs-list"
 import { Button } from "@/components/ui/button"
@@ -38,13 +39,39 @@ export function ClubsFilterWrapper({
   })
 
   useEffect(() => {
-    const fetchAllClubs = async () => {
+    const fetchClubsAndFavorites = async () => {
       setIsLoading(true)
-      const { data } = await getClubs({})
-      setAllClubs(data || [])
-      setIsLoading(false)
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id;
+
+      // Fetch all clubs
+      const { data: clubsData } = await getClubs({})
+      let fetchedClubs = clubsData || [];
+
+      // If user is logged in, fetch their favorites
+      if (currentUserId) {
+        const { data: favoritesData, error: favoritesError } = await supabase
+          .from('favoris')
+          .select('item_id')
+          .eq('user_id', currentUserId)
+          .eq('type_item', 'club'); // Specify type_item for clubs
+
+        if (favoritesError) {
+          console.error("Error fetching user favorites:", favoritesError);
+        } else {
+          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id));
+          fetchedClubs = fetchedClubs.map((club: any) => ({
+            ...club,
+            is_favorited: favoriteItemIds.has(club.id)
+          }));
+        }
+      }
+      
+      setAllClubs(fetchedClubs);
+      setIsLoading(false);
     }
-    fetchAllClubs()
+    fetchClubsAndFavorites();
   }, [])
 
   const handleFilterChange = (key: string, value: any) => {

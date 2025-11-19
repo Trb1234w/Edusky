@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from "react"
+import { createClient } from "@/lib/supabase/client" // Import client-side supabase client
 import { getFormations } from "@/lib/data/formations"
 import { FormationsList } from "@/app/formations/formations-list"
 import { Button } from "@/components/ui/button"
@@ -46,14 +47,39 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
   })
 
   useEffect(() => {
-    const fetchAllFormations = async () => {
+    const fetchFormationsAndFavorites = async () => {
       setIsLoading(true)
-      // Fetch all formations, filtering will be done client-side
-      const { data } = await getFormations({})
-      setAllFormations(data || [])
-      setIsLoading(false)
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id;
+
+      // Fetch all formations
+      const { data: formationsData } = await getFormations({})
+      let fetchedFormations = formationsData || [];
+
+      // If user is logged in, fetch their favorites
+      if (currentUserId) {
+        const { data: favoritesData, error: favoritesError } = await supabase
+          .from('favoris')
+          .select('item_id')
+          .eq('user_id', currentUserId)
+          .eq('type_item', 'formation'); // Specify type_item for formations
+
+        if (favoritesError) {
+          console.error("Error fetching user favorites:", favoritesError);
+        } else {
+          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id));
+          fetchedFormations = fetchedFormations.map((formation: any) => ({
+            ...formation,
+            is_favorited: favoriteItemIds.has(formation.id)
+          }));
+        }
+      }
+      
+      setAllFormations(fetchedFormations);
+      setIsLoading(false);
     }
-    fetchAllFormations()
+    fetchFormationsAndFavorites();
   }, []) // Fetch only once on mount
 
   const handleFilterChange = (key: string, value: any) => {

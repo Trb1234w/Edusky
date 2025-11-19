@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from "react"
+import { createClient } from "@/lib/supabase/client" // Import client-side supabase client
 import { getArticles } from "@/lib/data/articles"
 import { ArticlesList } from "@/app/blog/articles-list"
 import { Button } from "@/components/ui/button"
@@ -38,13 +39,39 @@ export function BlogFilterWrapper({
   })
 
   useEffect(() => {
-    const fetchAllArticles = async () => {
+    const fetchArticlesAndFavorites = async () => {
       setIsLoading(true)
-      const { data } = await getArticles({})
-      setAllArticles(data || [])
-      setIsLoading(false)
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id;
+
+      // Fetch all articles
+      const { data: articlesData } = await getArticles({})
+      let fetchedArticles = articlesData || [];
+
+      // If user is logged in, fetch their favorites
+      if (currentUserId) {
+        const { data: favoritesData, error: favoritesError } = await supabase
+          .from('favoris')
+          .select('item_id')
+          .eq('user_id', currentUserId)
+          .eq('type_item', 'article'); // Specify type_item for articles
+
+        if (favoritesError) {
+          console.error("Error fetching user favorites:", favoritesError);
+        } else {
+          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id));
+          fetchedArticles = fetchedArticles.map((article: any) => ({
+            ...article,
+            is_favorited: favoriteItemIds.has(article.id)
+          }));
+        }
+      }
+      
+      setAllArticles(fetchedArticles);
+      setIsLoading(false);
     }
-    fetchAllArticles()
+    fetchArticlesAndFavorites();
   }, [])
 
   const handleFilterChange = (key: string, value: any) => {

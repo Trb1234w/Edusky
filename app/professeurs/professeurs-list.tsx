@@ -2,8 +2,21 @@
 
 import { ProfesseurCard } from "@/components/professeur-card"
 
+interface ProfesseurListItem {
+  id: string;
+  profiles?: { full_name?: string; avatar_url?: string }; // Assuming profiles is an object
+  titre?: string;
+  specialites?: string[];
+  note_moyenne?: number;
+  nb_etudiants_formes?: number;
+  annees_experience?: number;
+  is_publie?: boolean;
+  certifications?: any[]; // Adjust type if more specific structure is known
+  is_favorited?: boolean; // Add this prop
+}
+
 interface ProfesseursListProps {
-  professeurs: any[];
+  professeurs: ProfesseurListItem[]; // Use the new interface
   isLoading: boolean;
 }
 
@@ -38,6 +51,7 @@ export function ProfesseursList({ professeurs, isLoading }: ProfesseursListProps
           avatarUrl={professeur.profiles?.avatar_url || "/placeholder.svg"}
           isVerified={professeur.is_publie} // Assuming is_publie means verified for display
           hasCertifications={professeur.certifications && professeur.certifications.length > 0}
+          is_favorited={professeur.is_favorited || false} // Pass the new prop
         />
       ))}
     </div>

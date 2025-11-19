@@ -2,8 +2,20 @@
 
 import { ClubCard } from "@/components/club-card"
 
+interface ClubListItem {
+  id: string;
+  nom?: string;
+  description?: string;
+  categories?: { nom?: string }; // Assuming categories is an object with a nom property
+  capacite?: number;
+  theme_principal?: string;
+  leader?: { full_name?: string }; // Assuming leader is an object with full_name
+  image_url?: string;
+  is_favorited?: boolean; // Add this prop
+}
+
 interface ClubsListProps {
-  clubs: any[];
+  clubs: ClubListItem[]; // Use the new interface
   isLoading: boolean;
 }
 
@@ -37,6 +49,7 @@ export function ClubsList({ clubs, isLoading }: ClubsListProps) {
           president={club.leader?.full_name || "Inconnu"}
           image={club.image_url || "/placeholder.png"}
           verified={false} // Placeholder
+          is_favorited={club.is_favorited || false} // Pass the new prop
         />
       ))}
     </div>

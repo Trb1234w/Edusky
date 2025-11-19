@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from "react"
+import { createClient } from "@/lib/supabase/client" // Import client-side supabase client
 import { getProfesseurs } from "@/lib/data/professeurs"
 import { ProfesseursList } from "@/app/professeurs/professeurs-list"
 import { Button } from "@/components/ui/button"
@@ -42,13 +43,39 @@ export function ProfesseursFilterWrapper() {
   })
 
   useEffect(() => {
-    const fetchAllProfesseurs = async () => {
+    const fetchProfesseursAndFavorites = async () => {
       setIsLoading(true)
-      const { data } = await getProfesseurs({})
-      setAllProfesseurs(data || [])
-      setIsLoading(false)
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id;
+
+      // Fetch all professeurs
+      const { data: professeursData } = await getProfesseurs({})
+      let fetchedProfesseurs = professeursData || [];
+
+      // If user is logged in, fetch their favorites
+      if (currentUserId) {
+        const { data: favoritesData, error: favoritesError } = await supabase
+          .from('favoris')
+          .select('item_id')
+          .eq('user_id', currentUserId)
+          .eq('type_item', 'professeur'); // Specify type_item for professeur
+
+        if (favoritesError) {
+          console.error("Error fetching user favorites:", favoritesError);
+        } else {
+          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id));
+          fetchedProfesseurs = fetchedProfesseurs.map((professeur: any) => ({
+            ...professeur,
+            is_favorited: favoriteItemIds.has(professeur.id)
+          }));
+        }
+      }
+      
+      setAllProfesseurs(fetchedProfesseurs);
+      setIsLoading(false);
     }
-    fetchAllProfesseurs()
+    fetchProfesseursAndFavorites();
   }, [])
 
   const handleFilterChange = (key: string, value: any) => {

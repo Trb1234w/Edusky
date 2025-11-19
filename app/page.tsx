@@ -130,11 +130,11 @@ export default async function HomePage() {
     professeursData,
     postesData
   ] = await Promise.all([
-    supabase.rpc('get_home_page_formations'),
-    supabase.rpc('get_home_page_evenements'),
-    supabase.rpc('get_home_page_clubs'),
-    supabase.rpc('get_home_page_articles'),
-    supabase.rpc('get_home_page_professeurs'),
+    supabase.rpc('get_home_page_formations', { p_user_id: currentUserId }),
+    supabase.rpc('get_home_page_evenements', { p_user_id: currentUserId }),
+    supabase.rpc('get_home_page_clubs', { p_user_id: currentUserId }),
+    supabase.rpc('get_home_page_articles', { p_user_id: currentUserId }),
+    supabase.rpc('get_home_page_professeurs', { p_user_id: currentUserId }),
     supabase.rpc('get_home_page_postes')
   ]);
 

@@ -1,8 +1,14 @@
+'use client' // Add this line
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Star, Users, Clock, BookOpen } from "lucide-react"
+import { Star, Users, Clock, BookOpen, Heart } from "lucide-react" // Add Heart
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button" // Import Button
+import { useState, useOptimistic, useTransition } from "react" // Import hooks
+import { toggleFavoriteAction } from "@/app/actions/favorites" // Import action
+import { cn } from "@/lib/utils" // Assuming cn exists for conditional classnames
 
 interface CourseCardProps {
   id: string
@@ -16,6 +22,7 @@ interface CourseCardProps {
   rating: number
   price: string
   image: string
+  is_favorited: boolean // Add this prop
 }
 
 export function CourseCard({
@@ -30,7 +37,21 @@ export function CourseCard({
   rating,
   price,
   image,
+  is_favorited: initialIsFavorited, // Destructure with new name
 }: CourseCardProps) {
+  const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
+    initialIsFavorited,
+    (state) => !state // Toggle state optimistically
+  );
+  const [isPending, startTransition] = useTransition();
+
+  const handleToggleFavorite = () => {
+    startTransition(async () => {
+      addOptimisticFavorite(initialIsFavorited);
+      await toggleFavoriteAction('formation', id);
+    });
+  };
+
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Débutant":
@@ -65,6 +86,23 @@ export function CourseCard({
               <span>{instructor}</span>
             </Badge>
           </div>
+          {/* Favorite Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
+            onClick={(e) => {
+              e.preventDefault(); // Prevent navigating to Link
+              e.stopPropagation(); // Stop event propagation
+              handleToggleFavorite();
+            }}
+            aria-label={optimisticIsFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+          >
+            <Heart className={cn(
+                "h-5 w-5",
+                optimisticIsFavorited ? "fill-red-500 text-red-500" : "fill-none text-white"
+            )} />
+          </Button>
           <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">
             <div className="bg-white/90 backdrop-blur-sm rounded-lg px-1 lg:px-3 py-0.5 lg:py-1.5 font-bold text-primary">{price}</div>
           </div>

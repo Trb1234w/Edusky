@@ -1,10 +1,16 @@
+'use client' // Add this line
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Clock, Eye, Heart, MessageCircle } from "lucide-react"
+import { Clock, Eye, Heart, MessageCircle } from "lucide-react" // Heart already exists
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useState, useOptimistic, useTransition } from "react" // Import hooks
+import { toggleFavoriteAction } from "@/app/actions/favorites" // Import action
+import { cn } from "@/lib/utils" // Assuming cn exists for conditional classnames
+
 
 interface BlogCardProps {
   id: string
@@ -21,6 +27,7 @@ interface BlogCardProps {
   likes: number
   comments: number
   featured?: boolean
+  is_favorited: boolean // Add this prop
 }
 
 export function BlogCard({
@@ -38,7 +45,21 @@ export function BlogCard({
   likes,
   comments,
   featured = false,
+  is_favorited: initialIsFavorited, // Destructure with new name
 }: BlogCardProps) {
+  const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
+    initialIsFavorited,
+    (state) => !state // Toggle state optimistically
+  );
+  const [isPending, startTransition] = useTransition();
+
+  const handleToggleFavorite = () => {
+    startTransition(async () => {
+      addOptimisticFavorite(initialIsFavorited);
+      await toggleFavoriteAction('article', id);
+    });
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Éducation":
@@ -58,6 +79,25 @@ export function BlogCard({
     }
   }
 
+  const FavoriteButton = () => (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
+      onClick={(e) => {
+        e.preventDefault(); // Prevent navigating to Link
+        e.stopPropagation(); // Stop event propagation
+        handleToggleFavorite();
+      }}
+      aria-label={optimisticIsFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+    >
+      <Heart className={cn(
+          "h-5 w-5",
+          optimisticIsFavorited ? "fill-red-500 text-red-500" : "fill-none text-white"
+      )} />
+    </Button>
+  );
+
   if (featured) {
     return (
       <Link href={`/blog/${id}`} className="group block h-full">
@@ -72,6 +112,7 @@ export function BlogCard({
               <div className="absolute top-4 left-4">
                 <Badge className={getCategoryColor(category)}>{category}</Badge>
               </div>
+              <FavoriteButton /> {/* Add here */}
             </div>
 
             <CardContent className="p-1 lg:p-6 flex flex-col justify-between">
@@ -132,6 +173,7 @@ export function BlogCard({
           <div className="absolute top-4 left-4">
             <Badge className={getCategoryColor(category)}>{category}</Badge>
           </div>
+          <FavoriteButton /> {/* Add here */}
         </div>
 
         <CardContent className="p-2 lg:p-6 flex-1 flex flex-col">

@@ -2,8 +2,22 @@
 
 import { BlogCard } from "@/components/blog-card"
 
+interface ArticleListItem {
+  id: string;
+  titre?: string;
+  extrait?: string;
+  auteur?: { full_name?: string; avatar_url?: string }; // Assuming auteur is an object
+  categories?: { nom?: string }; // Assuming categories is an object
+  publie_at?: string;
+  image_couverture?: string;
+  vues?: number;
+  likes_count?: number;
+  comment_count?: number;
+  is_favorited?: boolean; // Add this prop
+}
+
 interface ArticlesListProps {
-  articles: any[];
+  articles: ArticleListItem[]; // Use the new interface
   isLoading: boolean;
 }
 
@@ -41,6 +55,7 @@ export function ArticlesList({ articles, isLoading }: ArticlesListProps) {
           views={article.vues || 0}
           likes={article.likes_count || 0}
           comments={article.comment_count || 0}
+          is_favorited={article.is_favorited || false} // Pass the new prop
         />
       ))}
     </div>

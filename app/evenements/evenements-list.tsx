@@ -2,8 +2,23 @@
 
 import { EventCard } from "@/components/event-card"
 
+interface EventListItem {
+  id: string;
+  titre?: string;
+  extrait?: string;
+  description?: string;
+  date_debut?: string;
+  lieu?: string;
+  mode?: string;
+  categories?: { nom?: string }; // Assuming categories is an object with a nom property
+  capacite?: number;
+  organisateur?: { full_name?: string }; // Assuming organisateur is an object with full_name
+  image_url?: string;
+  is_favorited?: boolean; // Add this prop
+}
+
 interface EvenementsListProps {
-  events: any[];
+  events: EventListItem[]; // Use the new interface
   isLoading: boolean;
 }
 
@@ -39,7 +54,8 @@ export function EvenementsList({ events, isLoading }: EvenementsListProps) {
           maxParticipants={event.capacite || 0}
           organizer={event.organisateur?.full_name || "Inconnu"}
           image={event.image_url || "/placeholder.png"}
-          status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
+          status={new Date(event.date_debut || "") > new Date() ? "upcoming" : "past"}
+          is_favorited={event.is_favorited || false} // Pass the new prop
         />
       ))}
     </div>

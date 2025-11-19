@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -5,6 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Star, Users, Briefcase, CheckCircle, Award } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Heart } from "lucide-react" // Add Heart
+import { useState, useOptimistic, useTransition } from "react" // Import hooks
+import { toggleFavoriteAction } from "@/app/actions/favorites" // Import action
+import { cn } from "@/lib/utils" // Assuming cn exists for conditional classnames
 
 interface ProfesseurCardProps {
   id: string
@@ -17,6 +23,7 @@ interface ProfesseurCardProps {
   avatarUrl: string
   isVerified: boolean
   hasCertifications: boolean
+  is_favorited: boolean // Add this prop
 }
 
 export function ProfesseurCard({
@@ -30,7 +37,21 @@ export function ProfesseurCard({
   avatarUrl,
   isVerified,
   hasCertifications,
+  is_favorited: initialIsFavorited, // Destructure with new name
 }: ProfesseurCardProps) {
+  const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
+    initialIsFavorited,
+    (state) => !state // Toggle state optimistically
+  );
+  const [isPending, startTransition] = useTransition();
+
+  const handleToggleFavorite = () => {
+    startTransition(async () => {
+      addOptimisticFavorite(initialIsFavorited);
+      await toggleFavoriteAction('professeur', id);
+    });
+  };
+
   return (
     <Link href={`/professeurs/${id}`} className="group block h-full">
       <Card className="hover:shadow-xl transition-all duration-300 border-border/50 hover:border-primary/50 overflow-hidden h-full flex flex-col">
@@ -45,6 +66,23 @@ export function ProfesseurCard({
               Vérifié
             </Badge>
           )}
+          {/* Favorite Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 left-2 z-10 text-white hover:bg-white/20" // Positioning adjusted for avatar
+            onClick={(e) => {
+              e.preventDefault(); // Prevent navigating to Link
+              e.stopPropagation(); // Stop event propagation
+              handleToggleFavorite();
+            }}
+            aria-label={optimisticIsFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+          >
+            <Heart className={cn(
+                "h-5 w-5",
+                optimisticIsFavorited ? "fill-red-500 text-red-500" : "fill-none text-white"
+            )} />
+          </Button>
         </div>
 
         <CardContent className="p-2 lg:p-6 flex-1 flex flex-col items-center text-center">

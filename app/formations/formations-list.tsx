@@ -2,8 +2,23 @@
 
 import { CourseCard } from "@/components/course-card"
 
+interface FormationListItem {
+  id: string;
+  titre?: string;
+  extrait?: string;
+  professeur_full_name?: string;
+  category_nom?: string;
+  niveau?: string;
+  duree_texte?: string;
+  nb_avis?: number;
+  note_moyenne?: number;
+  prix_indicatif?: number;
+  image_url?: string;
+  is_favorited?: boolean; // Add this prop
+}
+
 interface FormationsListProps {
-  formations: any[];
+  formations: FormationListItem[]; // Use the new interface
   isLoading: boolean;
 }
 
@@ -39,6 +54,7 @@ export function FormationsList({ formations, isLoading }: FormationsListProps) {
           rating={course.note_moyenne || 0}
           price={course.prix_indicatif ? `${course.prix_indicatif} GNF` : "Gratuit"}
           image={course.image_url || "/placeholder.png"}
+          is_favorited={course.is_favorited || false} // Pass the new prop
         />
       ))}
     </div>

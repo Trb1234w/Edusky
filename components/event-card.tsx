@@ -1,9 +1,14 @@
+'use client' // Add this line
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Clock, MapPin, Users } from "lucide-react"
+import { Calendar, Clock, MapPin, Users, Heart } from "lucide-react" // Add Heart
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useState, useOptimistic, useTransition } from "react" // Import hooks
+import { toggleFavoriteAction } from "@/app/actions/favorites" // Import action
+import { cn } from "@/lib/utils" // Assuming cn exists for conditional classnames
 
 interface EventCardProps {
   id: string
@@ -18,6 +23,7 @@ interface EventCardProps {
   organizer: string
   image: string
   status: string
+  is_favorited: boolean // Add this prop
 }
 
 export function EventCard({
@@ -33,7 +39,21 @@ export function EventCard({
   organizer,
   image,
   status,
+  is_favorited: initialIsFavorited, // Destructure with new name
 }: EventCardProps) {
+  const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
+    initialIsFavorited,
+    (state) => !state // Toggle state optimistically
+  );
+  const [isPending, startTransition] = useTransition();
+
+  const handleToggleFavorite = () => {
+    startTransition(async () => {
+      addOptimisticFavorite(initialIsFavorited);
+      await toggleFavoriteAction('evenement', id);
+    });
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Hackathon":
@@ -75,6 +95,23 @@ export function EventCard({
               </Badge>
             </div>
           )}
+          {/* Favorite Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
+            onClick={(e) => {
+              e.preventDefault(); // Prevent navigating to Link
+              e.stopPropagation(); // Stop event propagation
+              handleToggleFavorite();
+            }}
+            aria-label={optimisticIsFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+          >
+            <Heart className={cn(
+                "h-5 w-5",
+                optimisticIsFavorited ? "fill-red-500 text-red-500" : "fill-none text-white"
+            )} />
+          </Button>
         </div>
 
         <CardContent className="p-2 lg:p-6 flex-1 flex flex-col">
