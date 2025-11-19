@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { MobileNav } from "@/components/mobile-nav"
-import { HeroSlider } from "@/components/hero-slider"
-import { FeatureCard } from "@/components/feature-card"
-import { SectionPreviewCard } from "@/components/section-preview-card"
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { MobileNav } from "@/components/mobile-nav";
+import { HeroSlider } from "@/components/hero-slider";
+import { FeatureCard } from "@/components/feature-card";
+import { SectionPreviewCard } from "@/components/section-preview-card";
 import {
   GraduationCap,
   BookOpen,
@@ -16,16 +16,20 @@ import {
   Award,
   Globe,
   ArrowRight,
-  Star,
-  MapPin,
-  Clock,
-} from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+  Briefcase,
+} from "lucide-react";
 
-export default function HomePage() {
-  const features = [
+// Import Server Client and Card Components
+import { createClient } from "@/lib/supabase/server";
+import { CourseCard } from "@/components/course-card";
+import { EventCard } from "@/components/event-card";
+import { BlogCard } from "@/components/blog-card";
+import { ClubCard } from "@/components/club-card";
+import { ProfesseurCard } from "@/components/professeur-card";
+import { PostCard } from "@/components/post-card";
+
+// Keep static data that is not being replaced
+const features = [
     {
       icon: GraduationCap,
       title: "Professeurs qualifiés",
@@ -62,9 +66,9 @@ export default function HomePage() {
       description: "Partagez vos expériences et connectez-vous avec la communauté.",
       gradient: "from-accent to-secondary",
     },
-  ]
+];
 
-  const sections = [
+const sections = [
     {
       title: "Professeurs",
       description:
@@ -97,170 +101,49 @@ export default function HomePage() {
       href: "/clubs",
       gradient: "from-primary to-accent",
     },
-  ]
+];
 
-  const stats = [
+const stats = [
     { icon: Users, value: "5000+", label: "Étudiants actifs" },
     { icon: GraduationCap, value: "200+", label: "Professeurs" },
     { icon: BookOpen, value: "150+", label: "Formations" },
     { icon: Award, value: "50+", label: "Événements par an" },
-  ]
+];
 
-  const recentEvents = [
-    {
-      id: 1,
-      title: "Hackathon EduTech 2025",
-      date: "15 Janvier 2025",
-      location: "Conakry",
-      participants: 150,
-      image: "/hackathon-edutech.jpg",
-      category: "Technologie",
-    },
-    {
-      id: 2,
-      title: "Conférence IA & Éducation",
-      date: "22 Janvier 2025",
-      location: "Labé",
-      participants: 200,
-      image: "/ai-education-conference.jpg",
-      category: "Conférence",
-    },
-    {
-      id: 3,
-      title: "Concours de Mathématiques",
-      date: "28 Janvier 2025",
-      location: "Kankan",
-      participants: 80,
-      image: "/math-competition.jpg",
-      category: "Compétition",
-    },
-    {
-      id: 4,
-      title: "Atelier Robotique",
-      date: "5 Février 2025",
-      location: "Conakry",
-      participants: 45,
-      image: "/robotics-workshop.jpg",
-      category: "Atelier",
-    },
-  ]
 
-  const recentFormations = [
-    {
-      id: 1,
-      title: "Développement Web Moderne",
-      instructor: "M. Ibrahima Sow",
-      students: 312,
-      rating: 4.9,
-      duration: "12 semaines",
-      level: "Intermédiaire",
-      image: "/web-dev-course.jpg",
-    },
-    {
-      id: 2,
-      title: "Intelligence Artificielle",
-      instructor: "Dr. Mamadou Diallo",
-      students: 245,
-      rating: 4.8,
-      duration: "16 semaines",
-      level: "Avancé",
-      image: "/ai-course.jpg",
-    },
-    {
-      id: 3,
-      title: "Design UI/UX",
-      instructor: "Mme. Aissatou Bah",
-      students: 189,
-      rating: 4.9,
-      duration: "8 semaines",
-      level: "Débutant",
-      image: "/uiux-course.jpg",
-    },
-    {
-      id: 4,
-      title: "Marketing Digital",
-      instructor: "Dr. Fatoumata Camara",
-      students: 198,
-      rating: 4.7,
-      duration: "10 semaines",
-      level: "Intermédiaire",
-      image: "/digital-marketing-course.jpg",
-    },
-  ]
+export default async function HomePage() {
+  const supabase = await createClient();
+  
+  // Fetch user session for personalized content (likes on posts)
+  const { data: { session } } = await supabase.auth.getSession();
+  const currentUserId = session?.user?.id;
+  
+  // For the PostCard, we need the list of users the current user is following.
+  // This is a placeholder for now. In a real app, you'd fetch this.
+  const followingIds: string[] = [];
+  
+  const [
+    formationsData,
+    evenementsData,
+    clubsData,
+    articlesData,
+    professeursData,
+    postesData
+  ] = await Promise.all([
+    supabase.rpc('get_home_page_formations'),
+    supabase.rpc('get_home_page_evenements'),
+    supabase.rpc('get_home_page_clubs'),
+    supabase.rpc('get_home_page_articles'),
+    supabase.rpc('get_home_page_professeurs'),
+    supabase.rpc('get_home_page_postes')
+  ]);
 
-  const recentClubs = [
-    {
-      id: 1,
-      name: "Club Robotique",
-      members: 45,
-      category: "Technologie",
-      description: "Conception et programmation de robots",
-      image: "/robotics-club.jpg",
-    },
-    {
-      id: 2,
-      name: "Club Débat",
-      members: 67,
-      category: "Culture",
-      description: "Art oratoire et argumentation",
-      image: "/debate-club.jpg",
-    },
-    {
-      id: 3,
-      name: "Club Écologie",
-      members: 89,
-      category: "Environnement",
-      description: "Protection de l'environnement",
-      image: "/ecology-club.jpg",
-    },
-    {
-      id: 4,
-      name: "Club Entrepreneuriat",
-      members: 123,
-      category: "Business",
-      description: "Innovation et création d'entreprise",
-      image: "/entrepreneurship-club.jpg",
-    },
-  ]
-
-  const recentArticles = [
-    {
-      id: 1,
-      title: "L'avenir de l'éducation en Guinée",
-      author: "Dr. Mamadou Diallo",
-      date: "10 Jan 2025",
-      category: "Éducation",
-      readTime: "5 min",
-      image: "/education-future-guinea.jpg",
-    },
-    {
-      id: 2,
-      title: "10 conseils pour réussir ses examens",
-      author: "Mme. Fatoumata Camara",
-      date: "8 Jan 2025",
-      category: "Conseils",
-      readTime: "7 min",
-      image: "/exam-success-tips.jpg",
-    },
-    {
-      id: 3,
-      title: "Les métiers d'avenir en Afrique",
-      author: "M. Ibrahima Sow",
-      date: "5 Jan 2025",
-      category: "Carrière",
-      readTime: "6 min",
-      image: "/future-careers.jpg",
-    },
-    {
-      id: 4,
-      title: "Comment développer sa créativité",
-      author: "Mme. Aissatou Bah",
-      date: "3 Jan 2025",
-      category: "Développement",
-      readTime: "4 min",
-      image: "/creativity-development.jpg",
-    },
-  ]
+  const formations = formationsData.data || [];
+  const evenements = evenementsData.data || [];
+  const clubs = clubsData.data || [];
+  const articles = articlesData.data || [];
+  const professeurs = professeursData.data || [];
+  const postes = postesData.data || [];
 
   return (
     <div className="min-h-screen">
@@ -322,7 +205,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Événements récents */}
+            {/* Événements à venir */}
             <div className="mb-16">
               <div className="flex items-center justify-between mb-6" data-aos="fade-up">
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
@@ -337,46 +220,13 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentEvents.map((event, index) => (
-                  <Card
-                    key={event.id}
-                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={event.image || "/placeholder.svg"}
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">
-                        {event.category}
-                      </Badge>
-                    </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                        {event.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                        <Clock size={14} />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                        <MapPin size={14} />
-                        <span>{event.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Users size={14} />
-                        <span>{event.participants} participants</span>
-                      </div>
-                    </div>
-                  </Card>
+                {evenements.map((event) => (
+                  <EventCard key={event.id} {...event} />
                 ))}
               </div>
             </div>
 
-            {/* Formations récentes */}
+            {/* Formations populaires */}
             <div className="mb-16">
               <div className="flex items-center justify-between mb-6" data-aos="fade-up">
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
@@ -391,49 +241,34 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentFormations.map((formation, index) => (
-                  <Card
-                    key={formation.id}
-                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={formation.image || "/placeholder.svg"}
-                        alt={formation.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Badge className="absolute top-3 right-3 bg-secondary text-secondary-foreground">
-                        {formation.level}
-                      </Badge>
-                    </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-secondary transition-colors">
-                        {formation.title}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mb-3">{formation.instructor}</p>
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-1">
-                          <Star size={14} className="text-yellow-500 fill-yellow-500" />
-                          <span className="font-medium">{formation.rating}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Users size={14} />
-                          <span>{formation.students}</span>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-sm text-muted-foreground flex items-center gap-1">
-                        <Clock size={14} />
-                        <span>{formation.duration}</span>
-                      </div>
-                    </div>
-                  </Card>
+                {formations.map((formation) => (
+                    <CourseCard key={formation.id} {...formation} />
                 ))}
               </div>
             </div>
 
-            {/* Clubs récents */}
+            {/* Professeurs Vedettes - NOUVELLE SECTION */}
+            <div className="mb-16">
+              <div className="flex items-center justify-between mb-6" data-aos="fade-up">
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
+                  <Briefcase className="text-primary" size={28} />
+                  Nos Professeurs Vedettes
+                </h3>
+                <Link href="/professeurs">
+                  <Button variant="ghost" className="group">
+                    Voir plus
+                    <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {professeurs.map((prof) => (
+                  <ProfesseurCard key={prof.id} {...prof} />
+                ))}
+              </div>
+            </div>
+
+            {/* Clubs actifs */}
             <div className="mb-16">
               <div className="flex items-center justify-between mb-6" data-aos="fade-up">
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
@@ -448,38 +283,14 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentClubs.map((club, index) => (
-                  <Card
-                    key={club.id}
-                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={club.image || "/placeholder.svg"}
-                        alt={club.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">{club.category}</Badge>
-                    </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-lg mb-2 group-hover:text-accent transition-colors">
-                        {club.name}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{club.description}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Users size={14} />
-                        <span>{club.members} membres</span>
-                      </div>
-                    </div>
-                  </Card>
+                {clubs.map((club) => (
+                  <ClubCard key={club.id} {...club} />
                 ))}
               </div>
             </div>
-
+            
             {/* Articles récents */}
-            <div>
+            <div className="mb-16">
               <div className="flex items-center justify-between mb-6" data-aos="fade-up">
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
                   <Newspaper className="text-primary" size={28} />
@@ -493,43 +304,39 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentArticles.map((article, index) => (
-                  <Card
-                    key={article.id}
-                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={article.image || "/placeholder.svg"}
-                        alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Badge className="absolute top-3 right-3 bg-primary text-primary-foreground">
-                        {article.category}
-                      </Badge>
-                    </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                        {article.title}
-                      </h4>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Avatar className="w-6 h-6">
-                          <AvatarImage src="/placeholder.svg" />
-                          <AvatarFallback>{article.author[0]}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm text-muted-foreground">{article.author}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{article.date}</span>
-                        <span>{article.readTime} de lecture</span>
-                      </div>
-                    </div>
-                  </Card>
+                {articles.map((article) => (
+                  <BlogCard key={article.id} {...article} />
                 ))}
               </div>
             </div>
+
+            {/* Actualités Récentes - NOUVELLE SECTION */}
+            <div>
+              <div className="flex items-center justify-between mb-6" data-aos="fade-up">
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
+                  <TrendingUp className="text-secondary" size={28} />
+                  Dernières actualités
+                </h3>
+                <Link href="/feed">
+                  <Button variant="ghost" className="group">
+                    Voir plus
+                    <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="space-y-4 max-w-2xl mx-auto">
+                {postes.map((post) => (
+                  <PostCard 
+                    key={post.id} 
+                    {...post}
+                    liked={false} // This is now handled by the client component
+                    currentUserId={currentUserId || ''}
+                    followingIds={followingIds}
+                  />
+                ))}
+              </div>
+            </div>
+
           </div>
         </section>
 
