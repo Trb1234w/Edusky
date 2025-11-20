@@ -39,9 +39,11 @@ const formSchema = z.object({
 interface InscriptionClubModalProps {
   clubId: string
   clubName: string
+  buttonClass?: string
+  buttonText?: string
 }
 
-export function InscriptionClubModal({ clubId, clubName }: InscriptionClubModalProps) {
+export function InscriptionClubModal({ clubId, clubName, buttonClass, buttonText }: InscriptionClubModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
@@ -84,8 +86,8 @@ export function InscriptionClubModal({ clubId, clubName }: InscriptionClubModalP
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="w-full text-lg">
-          Rejoindre ce club
+        <Button size="lg" className={buttonClass || "w-full text-lg rounded-xl"}>
+          {buttonText || "Rejoindre ce club"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

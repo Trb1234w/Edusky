@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 /**
  * Fetches a paginated list of formations with their favorite status for the current user.
@@ -96,4 +97,65 @@ export async function getPaginatedFormationsAction(params: {
     console.error("Unexpected error in getPaginatedFormationsAction:", e);
     return { data: [], error: e.message || "An unexpected error occurred." };
   }
+}
+
+export async function createFormationInscription(formData: FormData) {
+  const supabase = await createClient();
+
+  const userResponse = await supabase.auth.getUser();
+  if (userResponse.error || !userResponse.data.user) {
+    return { error: "User not authenticated." };
+  }
+  const buyer_id = userResponse.data.user.id;
+
+  // Extract data from formData
+  const product_id = formData.get('product_id') as string; // Assuming formation_id is passed as product_id
+  const price = parseFloat(formData.get('price') as string);
+  const payment_method = formData.get('payment_method') as string;
+  // seller_id would need to be fetched based on product_id or passed as hidden field
+
+  if (!product_id || isNaN(price) || !payment_method) {
+    return { error: "Missing required form fields." };
+  }
+
+  // TODO: Fetch seller_id based on product_id (formation_id)
+  // For now, let's assume product_id directly maps to a product entry with an owner_id
+  const { data: productData, error: productError } = await supabase
+    .from('products') // Assuming formations are stored in the 'products' table
+    .select('owner_id')
+    .eq('product_id', product_id)
+    .single();
+
+  if (productError || !productData) {
+    console.error("Error fetching product owner:", productError);
+    return { error: "Failed to find product owner." };
+  }
+  const seller_id = productData.owner_id;
+
+
+  const { data, error } = await supabase
+    .from('orders') // Assuming 'orders' table for inscriptions
+    .insert([
+      {
+        buyer_id: buyer_id,
+        product_id: product_id,
+        seller_id: seller_id, // Replace with actual seller ID
+        price: price,
+        status: 'pending', // Default status
+        payment_method: payment_method,
+        payment_status: 'pending',
+        // delivery_address, tracking_number, delivery_status might not apply to formations
+      },
+    ])
+    .select();
+
+  if (error) {
+    console.error("Error creating formation inscription:", error);
+    return { error: error.message };
+  }
+
+  revalidatePath('/formations'); // Revalidate the formations page or related paths
+  revalidatePath(`/formations/${product_id}`); // Revalidate the specific formation page
+
+  return { data: data[0], error: null };
 }

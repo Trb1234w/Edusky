@@ -2,11 +2,16 @@ import { getArticleById } from "@/lib/data/blog.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, User, Eye, Heart, MessageSquare, BookOpen } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  Calendar, User, Eye, Heart, MessageSquare, ChevronLeft, Share2, Send, Bookmark
+} from "lucide-react";
 
 // --- Helpers ---
 
@@ -17,7 +22,14 @@ const formatDate = (dateString: string | null | undefined) => {
   });
 };
 
-// --- Page Component ---
+const calculateReadingTime = (content: string): number => {
+    if (!content) return 0;
+    const wordsPerMinute = 200;
+    const textLength = content.split(/\s+/).length;
+    return Math.ceil(textLength / wordsPerMinute);
+};
+
+// --- Page Component (Redesigné) ---
 
 export default async function ArticleDetailsPage({ params }: { params: { id: string } }) {
   const resolvedParams = await params;
@@ -27,93 +39,133 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
     console.error("Failed to fetch article or article not found:", error);
     notFound();
   }
+  
+  const readingTime = calculateReadingTime(article.contenu);
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-12">
-        
-        {/* Colonne de gauche : Contenu principal */}
-        <div className="lg:col-span-2 space-y-12">
-          {/* Fil d'ariane */}
-          <nav className="text-sm text-muted-foreground flex items-center gap-2">
-            <Link href="/blog" className="hover:text-primary transition-colors">Blog</Link>
-            {article.categorie && (
-              <>
-                <span className="mx-2">/</span>
-                <Link href={`/blog?categorie=${article.categorie.slug}`} className="hover:text-primary transition-colors">
-                  {article.categorie.nom}
-                </Link>
-              </>
-            )}
-            <span className="mx-2">/</span>
-            <span className="font-medium text-foreground">{article.titre}</span>
-          </nav>
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black">
+      <Header className="hidden lg:block" />
 
-          <header className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{article.titre}</h1>
-            <p className="text-xl text-muted-foreground">{article.extrait}</p>
-            
-            {article.auteur && (
-              <div className="flex items-center space-x-4 pt-2">
-                <Link href={`/profiles/${article.auteur.id}`} className="flex items-center space-x-3">
-                  <Avatar>
+      {/* Mobile-only Header */}
+      <div className="lg:hidden p-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between">
+        <Link href="/blog" className="p-2 -ml-2 rounded-full hover:bg-muted">
+          <ChevronLeft className="h-6 w-6" />
+        </Link>
+        {article.auteur && (
+            <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
                     <AvatarImage src={article.auteur.avatar_url || ''} alt={article.auteur.full_name || ''} />
                     <AvatarFallback>{article.auteur.full_name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold">{article.auteur.full_name}</p>
-                    <p className="text-sm text-muted-foreground">Auteur</p>
-                  </div>
+                </Avatar>
+                <p className="font-bold text-sm truncate">{article.auteur.full_name}</p>
+            </div>
+        )}
+        <Button variant="ghost" size="icon" className="rounded-full"><Share2 className="h-5 w-5" /></Button>
+      </div>
+
+      <main className="flex-1 lg:pt-24">
+        <div className="relative">
+          {/* Social Sidebar (Desktop) */}
+          <aside className="hidden lg:flex flex-col items-center gap-4 absolute top-1/2 -translate-y-1/2 left-8 xl:left-16 z-10">
+              <Button variant="outline" size="icon" className="rounded-full bg-background/50 backdrop-blur-sm border-white/20 hover:bg-background/80"><Heart className="h-5 w-5" /></Button>
+              <Button variant="outline" size="icon" className="rounded-full bg-background/50 backdrop-blur-sm border-white/20 hover:bg-background/80"><MessageSquare className="h-5 w-5" /></Button>
+              <Button variant="outline" size="icon" className="rounded-full bg-background/50 backdrop-blur-sm border-white/20 hover:bg-background/80"><Bookmark className="h-5 w-5" /></Button>
+              <Button variant="outline" size="icon" className="rounded-full bg-background/50 backdrop-blur-sm border-white/20 hover:bg-background/80"><Share2 className="h-5 w-5" /></Button>
+          </aside>
+
+          <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+            <header className="mb-12 text-center">
+              {article.categorie && (
+                <Link href={`/blog?categorie=${article.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
+                  {article.categorie.nom}
                 </Link>
-                {article.publie_at && (
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>Publié le {formatDate(article.publie_at)}</span>
-                  </div>
+              )}
+              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground mt-4 leading-tight">{article.titre}</h1>
+              <p className="text-lg md:text-xl text-muted-foreground mt-6 max-w-3xl mx-auto">{article.extrait}</p>
+              <div className="flex items-center justify-center space-x-6 mt-8">
+                {article.auteur && (
+                  <Link href={`/profiles/${article.auteur.id}`} className="flex items-center space-x-3 group">
+                    <Avatar className="h-12 w-12 border-2 border-transparent group-hover:border-primary transition-colors">
+                      <AvatarImage src={article.auteur.avatar_url || ''} alt={article.auteur.full_name || ''} />
+                      <AvatarFallback>{article.auteur.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-bold text-lg text-foreground">{article.auteur.full_name}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(article.publie_at)} · {readingTime} min de lecture</p>
+                    </div>
+                  </Link>
                 )}
               </div>
+            </header>
+            
+            {article.image_url && (
+              <div className="relative h-64 md:h-96 lg:h-[500px] w-full overflow-hidden rounded-2xl shadow-2xl mb-12">
+                <Image src={article.image_url} alt={article.titre || ''} layout="fill" objectFit="cover" className="bg-secondary" />
+              </div>
             )}
-          </header>
 
-          {/* Badges de statistiques */}
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="flex items-center gap-1.5 py-1.5 px-3"><Eye className="h-4 w-4" /><span>{article.vues || 0} vues</span></Badge>
-            <Badge variant="secondary" className="flex items-center gap-1.5 py-1.5 px-3"><Heart className="h-4 w-4" /><span>{article.likes_count || 0} likes</span></Badge>
-            <Badge variant="secondary" className="flex items-center gap-1.5 py-1.5 px-3"><MessageSquare className="h-4 w-4" /><span>{article.comment_count || 0} commentaires</span></Badge>
-          </div>
+            <div className="prose prose-lg dark:prose-invert max-w-3xl mx-auto text-foreground/90">
+                <div dangerouslySetInnerHTML={{ __html: article.contenu || 'Contenu de l\'article à venir.' }} />
+            </div>
 
-          {/* Contenu de l'article */}
-          <div className="prose prose-lg max-w-none text-foreground/90">
-            <h2 className="text-2xl font-semibold mb-4">Contenu de l'article</h2>
-            <div dangerouslySetInnerHTML={{ __html: article.contenu || '' }} />
-          </div>
+            <Separator className="my-16"/>
+
+            {/* Comments Section */}
+            <div className="max-w-3xl mx-auto">
+                <h2 className="text-2xl font-bold mb-8">{article.comment_count || 0} Commentaires</h2>
+                {/* Placeholder pour la liste des commentaires */}
+                <Card className="p-6 text-center bg-secondary/50 border-dashed">
+                    <p className="text-muted-foreground">Les commentaires ne sont pas encore activés pour cet article.</p>
+                </Card>
+
+                {/* Formulaire pour ajouter un commentaire */}
+                 <div className="mt-12">
+                    <h3 className="text-lg font-semibold mb-4">Laisser un commentaire</h3>
+                     <div className="flex items-start gap-4">
+                        <Avatar>
+                            <AvatarFallback><User /></AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 relative">
+                            <textarea
+                                placeholder="Écrivez votre commentaire..."
+                                className="w-full p-4 border rounded-lg resize-none pr-12"
+                                rows={3}
+                            ></textarea>
+                            <Button size="icon" className="absolute right-3 bottom-3 rounded-full">
+                                <Send className="h-5 w-5"/>
+                            </Button>
+                        </div>
+                     </div>
+                 </div>
+            </div>
+
+          </article>
         </div>
+      </main>
 
-        {/* Colonne de droite : Carte d'action */}
-        <div className="lg:col-span-1 mt-8 lg:mt-0">
-          <Card className="sticky top-24">
-            <CardHeader className="p-0">
-              {article.image_url ? (
-                <Image src={article.image_url} alt={article.titre || ''} width={500} height={300} className="object-cover rounded-t-lg w-full" />
-              ) : (
-                <div className="h-48 bg-secondary rounded-t-lg flex items-center justify-center"><BookOpen className="h-12 w-12 text-muted-foreground" /></div>
-              )}
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <CardTitle className="text-2xl font-bold">{article.titre}</CardTitle>
-              <Button size="lg" className="w-full text-lg">
-                Partager cet article
-              </Button>
-            </CardContent>
-            <CardFooter className="p-6 border-t">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <User className="h-5 w-5 text-primary"/>
-                    <span>Par {article.auteur?.full_name || "Inconnu"}</span>
-                </div>
-            </CardFooter>
-          </Card>
+       {/* Barre d'action "sticky" pour mobile */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-2 bg-background/90 backdrop-blur-sm border-t z-40">
+        <div className="flex items-center justify-around">
+            <Button variant="ghost" className="flex flex-col h-auto p-2 gap-1 text-muted-foreground rounded-lg">
+                <Heart className="h-5 w-5"/>
+                <span className="text-xs">{article.likes_count || 0}</span>
+            </Button>
+            <Button variant="ghost" className="flex flex-col h-auto p-2 gap-1 text-muted-foreground rounded-lg">
+                <MessageSquare className="h-5 w-5"/>
+                <span className="text-xs">{article.comment_count || 0}</span>
+            </Button>
+            <Button variant="ghost" className="flex flex-col h-auto p-2 gap-1 text-muted-foreground rounded-lg">
+                <Eye className="h-5 w-5"/>
+                <span className="text-xs">{article.vues || 0}</span>
+            </Button>
+            <Button variant="ghost" className="flex flex-col h-auto p-2 gap-1 text-muted-foreground rounded-lg">
+                <Bookmark className="h-5 w-5"/>
+                <span className="text-xs">Enregistrer</span>
+            </Button>
         </div>
       </div>
+      
+      <Footer className="hidden lg:block" />
     </div>
   );
 }

@@ -39,9 +39,11 @@ const formSchema = z.object({
 interface InscriptionModalProps {
   formationId: string
   formationTitle: string
+  buttonClass?: string
+  buttonText?: string
 }
 
-export function InscriptionModal({ formationId, formationTitle }: InscriptionModalProps) {
+export function InscriptionModal({ formationId, formationTitle, buttonClass, buttonText }: InscriptionModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
@@ -84,8 +86,8 @@ export function InscriptionModal({ formationId, formationTitle }: InscriptionMod
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="w-full font-bold text-lg py-6">
-          S'inscrire
+        <Button size="lg" className={buttonClass || "w-full font-bold text-lg py-6 rounded-xl"}>
+          {buttonText || "S'inscrire"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
