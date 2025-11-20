@@ -12,6 +12,7 @@ import {
   Award,
   Computer,
   BarChartHorizontal,
+  Clock,
 } from "lucide-react"
 import {
   CustomBottomSheet,
@@ -27,6 +28,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   BarChartHorizontal,
   Computer,
   Award,
+  Clock,
 }
 
 interface FormationsFilterWrapperProps {
@@ -42,6 +44,7 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
     niveau: undefined,
     mode: undefined,
     certificat: undefined,
+    duree_heures: undefined,
     maxPrice: undefined,
     minRating: undefined,
   })
@@ -108,6 +111,17 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
         filters.certificat === undefined ||
         (filters.certificat === "true" && formation.certificat) ||
         (filters.certificat === "false" && !formation.certificat)
+      
+      const dureeMatch = (() => {
+        if (!filters.duree_heures) return true;
+        const duree = formation.duree_heures || 0;
+        const [min, max] = filters.duree_heures.split('-').map(Number);
+        if (filters.duree_heures === "10+") {
+            return duree >= 10;
+        }
+        return duree >= min && duree < max;
+      })();
+
       const ratingMatch =
         !filters.minRating ||
         (formation.note_moyenne || 0) >= parseFloat(filters.minRating)
@@ -123,6 +137,7 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
         niveauMatch &&
         modeMatch &&
         certificatMatch &&
+        dureeMatch &&
         ratingMatch &&
         priceMatch
       )
@@ -130,13 +145,14 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
   }, [filters, allFormations])
 
   const mainFiltersConfig = [
-    { label: "Niveau", name: "niveau", icon: "BarChartHorizontal", options: [ { label: "Tous", value: undefined }, { label: "Débutant", value: "Débutant" }, { label: "Intermédiaire", value: "Intermédiaire" }, { label: "Avancé", value: "Avancé" } ] },
-    { label: "Mode", name: "mode", icon: "Computer", options: [ { label: "Tous", value: undefined }, { label: "En ligne", value: "en_ligne" }, { label: "Présentiel", value: "presentiel" }, { label: "Hybride", value: "hybride" } ] },
-    { label: "Certificat", name: "certificat", icon: "Award", options: [ { label: "Tous", value: undefined }, { label: "Avec certificat", value: "true" }, { label: "Sans certificat", value: "false" } ] },
+    { label: "Niveau", name: "niveau", icon: "BarChartHorizontal", options: [ { label: "Niveau", value: undefined }, { label: "Débutant", value: "Débutant" }, { label: "Intermédiaire", value: "Intermédiaire" }, { label: "Avancé", value: "Avancé" } ] },
+    { label: "Mode", name: "mode", icon: "Computer", options: [ { label: "Mode", value: undefined }, { label: "En ligne", value: "en_ligne" }, { label: "Présentiel", value: "presentiel" }, { label: "Hybride", value: "hybride" } ] },
+    { label: "Certificat", name: "certificat", icon: "Award", options: [ { label: "Certificat", value: undefined }, { label: "Avec certificat", value: "true" }, { label: "Sans certificat", value: "false" } ] },
+    { label: "Durée", name: "duree_heures", icon: "Clock", options: [ { label: "Durée", value: undefined }, { label: "Moins de 2h", value: "0-2" }, { label: "2h à 5h", value: "2-5" }, { label: "5h à 10h", value: "5-10" }, { label: "Plus de 10h", value: "10+" } ] },
   ]
   const secondaryFiltersConfig = [
-    { label: "Prix", name: "maxPrice", options: [ { label: "Tous", value: undefined }, { label: "Gratuit", value: 0 } ] },
-    { label: "Popularité", name: "minRating", options: [ { label: "Toutes", value: undefined }, { label: "4 étoiles et +", value: 4 }, { label: "3 étoiles et +", value: 3 } ] },
+    { label: "Prix", name: "maxPrice", options: [ { label: "Prix", value: undefined }, { label: "Gratuit", value: 0 } ] },
+    { label: "Popularité", name: "minRating", options: [ { label: "Popularité", value: undefined }, { label: "4 étoiles et +", value: 4 }, { label: "3 étoiles et +", value: 3 } ] },
   ]
 
   return (
@@ -155,40 +171,9 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
         </div>
 
         <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {mainFiltersConfig.map(filter => {
-            const Icon = iconMap[filter.icon]
-            const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
-            return (
-              <CustomBottomSheet key={filter.name}>
-                <CustomBottomSheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="rounded-xl">
-                    {Icon && <Icon size={16} className="mr-1.5" />}
-                    {displayValue}
-                  </Button>
-                </CustomBottomSheetTrigger>
-                <CustomBottomSheetContent>
-                  <CustomBottomSheetHeader>
-                    <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
-                  </CustomBottomSheetHeader>
-                  <div className="grid grid-cols-2 gap-2 px-4">
-                    {filter.options.map(option => (
-                      <CustomBottomSheetClose asChild key={option.label}>
-                        <Button
-                          variant={filters[filter.name] === option.value ? "default" : "outline"}
-                          onClick={() => handleFilterChange(filter.name, option.value)}
-                        >
-                          {option.label}
-                        </Button>
-                      </CustomBottomSheetClose>
-                    ))}
-                  </div>
-                </CustomBottomSheetContent>
-              </CustomBottomSheet>
-            )
-          })}
           <CustomBottomSheet>
             <CustomBottomSheetTrigger asChild>
-              <Button variant="outline" size="sm" className="rounded-xl ml-auto">
+              <Button variant="outline" size="sm" className="rounded-xl">
                 <SlidersHorizontal size={16} />
               </Button>
             </CustomBottomSheetTrigger>
@@ -217,6 +202,37 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
               </div>
             </CustomBottomSheetContent>
           </CustomBottomSheet>
+          {mainFiltersConfig.map(filter => {
+            const Icon = iconMap[filter.icon]
+            const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
+            return (
+              <CustomBottomSheet key={filter.name}>
+                <CustomBottomSheetTrigger asChild>
+                  <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
+                    {Icon && <Icon size={16} className="mr-1.5" />}
+                    {displayValue}
+                  </Button>
+                </CustomBottomSheetTrigger>
+                <CustomBottomSheetContent>
+                  <CustomBottomSheetHeader>
+                    <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
+                  </CustomBottomSheetHeader>
+                  <div className="grid grid-cols-2 gap-2 px-4">
+                    {filter.options.map(option => (
+                      <CustomBottomSheetClose asChild key={option.label}>
+                        <Button
+                          variant={filters[filter.name] === option.value ? "default" : "outline"}
+                          onClick={() => handleFilterChange(filter.name, option.value)}
+                        >
+                          {option.label}
+                        </Button>
+                      </CustomBottomSheetClose>
+                    ))}
+                  </div>
+                </CustomBottomSheetContent>
+              </CustomBottomSheet>
+            )
+          })}
         </div>
 
         <HorizontalCategoryNav
