@@ -6,12 +6,14 @@ import { getEvenements } from "@/lib/data/evenements"
 import { EvenementsList } from "@/app/evenements/evenements-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useRouter } from "next/navigation"
 import {
   Search,
   SlidersHorizontal,
   CalendarDays,
   MapPin,
   Tag,
+  ArrowLeft,
 } from "lucide-react"
 import {
   CustomBottomSheet,
@@ -36,6 +38,7 @@ interface EvenementsFilterWrapperProps {
 export function EvenementsFilterWrapper({
   gradient,
 }: EvenementsFilterWrapperProps) {
+  const router = useRouter();
   const [allEvents, setAllEvents] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState<Record<string, any>>({
@@ -173,6 +176,18 @@ export function EvenementsFilterWrapper({
   return (
     <>
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+        {/* Mobile-only back button */}
+        <div className="md:hidden px-4 py-2 border-b flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft size={16} />
+          </Button>
+          <span className="text-lg font-semibold ml-2">Événements</span>
+        </div>
         {/* Barre de recherche */}
         <div className="px-4 py-2 border-b">
           <form onSubmit={e => e.preventDefault()} className="relative">

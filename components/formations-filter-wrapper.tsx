@@ -6,6 +6,7 @@ import { getFormations } from "@/lib/data/formations"
 import { FormationsList } from "@/app/formations/formations-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useRouter } from "next/navigation"
 import {
   Search,
   SlidersHorizontal,
@@ -13,6 +14,7 @@ import {
   Computer,
   BarChartHorizontal,
   Clock,
+  ArrowLeft,
 } from "lucide-react"
 import {
   CustomBottomSheet,
@@ -36,6 +38,7 @@ interface FormationsFilterWrapperProps {
 }
 
 export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
+  const router = useRouter();
   const [allFormations, setAllFormations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState<Record<string, any>>({
@@ -158,6 +161,18 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
   return (
     <>
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+        {/* Mobile-only back button */}
+        <div className="md:hidden px-4 py-2 border-b flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft size={16} />
+          </Button>
+          <span className="text-lg font-semibold ml-2">Formations</span>
+        </div>
         <div className="px-4 py-2 border-b">
           <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
