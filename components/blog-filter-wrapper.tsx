@@ -6,7 +6,13 @@ import { getArticles } from "@/lib/data/articles"
 import { ArticlesList } from "@/app/blog/articles-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, SlidersHorizontal, Calendar, Flame } from "lucide-react"
+import {
+  Search,
+  SlidersHorizontal,
+  Calendar,
+  Flame,
+  ListFilter,
+} from "lucide-react"
 import {
   CustomBottomSheet,
   CustomBottomSheetContent,
@@ -20,6 +26,7 @@ import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 const iconMap: { [key: string]: React.ElementType } = {
   Calendar,
   Flame,
+  ListFilter,
 }
 
 interface BlogFilterWrapperProps {
@@ -36,13 +43,14 @@ export function BlogFilterWrapper({
     categorySlugs: undefined, // Changed
     dateFilter: undefined,
     sortBy: "new",
+    statut: undefined,
   })
 
   useEffect(() => {
     const fetchArticlesAndFavorites = async () => {
       setIsLoading(true)
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } = {} } = await supabase.auth.getUser(); // Added default empty object for destructuring
       const currentUserId = user?.id;
 
       // Fetch all articles
@@ -98,6 +106,8 @@ export function BlogFilterWrapper({
       const categoryMatch =
         !filters.categorySlugs ||
         filters.categorySlugs.includes(article.categories.slug)
+      
+      const statusMatch = !filters.statut || article.statut === filters.statut
 
       const dateMatch = (() => {
         if (!filters.dateFilter) return true
@@ -113,7 +123,7 @@ export function BlogFilterWrapper({
         }
       })()
 
-      return searchMatch && categoryMatch && dateMatch
+      return searchMatch && categoryMatch && statusMatch && dateMatch
     })
 
     // 2. Sorting
@@ -140,10 +150,20 @@ export function BlogFilterWrapper({
       icon: "Calendar",
       name: "dateFilter",
       options: [
-        { label: "Toutes", value: undefined },
+        { label: "Date", value: undefined },
         { label: "Cette semaine", value: "this_week" },
         { label: "Ce mois", value: "this_month" },
         { label: "Cette année", value: "this_year" },
+      ],
+    },
+    {
+      label: "Statut",
+      icon: "ListFilter",
+      name: "statut",
+      options: [
+        { label: "Statut", value: undefined },
+        { label: "Publié", value: "publie" },
+        { label: "Brouillon", value: "brouillon" },
       ],
     },
     {
@@ -179,6 +199,37 @@ export function BlogFilterWrapper({
 
         {/* Barre de filtres */}
         <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <CustomBottomSheet>
+            <CustomBottomSheetTrigger asChild>
+              <Button variant="outline" size="sm" className="rounded-xl">
+                <SlidersHorizontal size={16} />
+              </Button>
+            </CustomBottomSheetTrigger>
+            <CustomBottomSheetContent>
+              <CustomBottomSheetHeader>
+                <CustomBottomSheetTitle>Tous les filtres</CustomBottomSheetTitle>
+              </CustomBottomSheetHeader>
+              <div className="grid gap-4 py-4">
+                {filtersConfig.map(filter => (
+                  <div key={filter.name}>
+                    <h4 className="font-semibold mb-2">{filter.label}</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {filter.options.map(option => (
+                        <CustomBottomSheetClose asChild key={option.label}>
+                          <Button
+                            variant={filters[filter.name] === option.value ? "default" : "outline"}
+                            onClick={() => handleFilterChange(filter.name, option.value)}
+                          >
+                            {option.label}
+                          </Button>
+                        </CustomBottomSheetClose>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CustomBottomSheetContent>
+          </CustomBottomSheet>
           {filtersConfig.map(filter => {
             const Icon = iconMap[filter.icon as keyof typeof iconMap]
             const displayValue =
@@ -187,7 +238,7 @@ export function BlogFilterWrapper({
             return (
               <CustomBottomSheet key={filter.name}>
                 <CustomBottomSheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="rounded-xl">
+                  <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
                     {Icon && <Icon size={16} className="mr-1.5" />}
                     {displayValue}
                   </Button>
@@ -220,12 +271,8 @@ export function BlogFilterWrapper({
               </CustomBottomSheet>
             )
           })}
-          <Button variant="outline" size="sm" className="rounded-xl ml-auto">
-            <SlidersHorizontal size={16} />
-          </Button>
         </div>
 
-        {/* Barre de catégories (REPLACED) */}
         <HorizontalCategoryNav
           scope="blog"
           selectedSlugs={filters.categorySlugs}

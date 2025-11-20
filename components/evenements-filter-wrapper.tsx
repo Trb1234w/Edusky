@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   CalendarDays,
   MapPin,
+  Tag,
 } from "lucide-react"
 import {
   CustomBottomSheet,
@@ -25,6 +26,7 @@ import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 const iconMap: { [key: string]: React.ElementType } = {
   CalendarDays,
   MapPin,
+  Tag,
 }
 
 interface EvenementsFilterWrapperProps {
@@ -41,6 +43,7 @@ export function EvenementsFilterWrapper({
     categorySlugs: undefined, // Changed
     dateFilter: undefined,
     location: undefined,
+    type_evenement: undefined,
   })
 
   useEffect(() => {
@@ -107,6 +110,8 @@ export function EvenementsFilterWrapper({
 
       const locationMatch =
         !filters.location || event.mode === filters.location
+      
+      const typeMatch = !filters.type_evenement || event.type_evenement === filters.type_evenement
 
       const dateMatch = (() => {
         if (!filters.dateFilter) return true
@@ -124,7 +129,7 @@ export function EvenementsFilterWrapper({
         }
       })()
 
-      return searchMatch && categoryMatch && locationMatch && dateMatch
+      return searchMatch && categoryMatch && locationMatch && typeMatch && dateMatch
     })
   }, [filters, allEvents])
 
@@ -134,7 +139,7 @@ export function EvenementsFilterWrapper({
       icon: "CalendarDays",
       name: "dateFilter",
       options: [
-        { label: "Toutes", value: undefined },
+        { label: "Date", value: undefined },
         { label: "Aujourd'hui", value: "today" },
         { label: "Cette semaine", value: "this_week" },
         { label: "Ce mois", value: "this_month" },
@@ -146,9 +151,21 @@ export function EvenementsFilterWrapper({
       icon: "MapPin",
       name: "location",
       options: [
-        { label: "Tous", value: undefined },
+        { label: "Lieu", value: undefined },
         { label: "En ligne", value: "en_ligne" },
         { label: "Présentiel", value: "presentiel" },
+      ],
+    },
+    {
+      label: "Type",
+      icon: "Tag",
+      name: "type_evenement",
+      options: [
+        { label: "Type", value: undefined },
+        { label: "Conférence", value: "conference" },
+        { label: "Atelier", value: "atelier" },
+        { label: "Séminaire", value: "seminaire" },
+        { label: "Webinaire", value: "webinaire" },
       ],
     },
   ]
@@ -174,6 +191,37 @@ export function EvenementsFilterWrapper({
 
         {/* Barre de filtres */}
         <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <CustomBottomSheet>
+            <CustomBottomSheetTrigger asChild>
+              <Button variant="outline" size="sm" className="rounded-xl">
+                <SlidersHorizontal size={16} />
+              </Button>
+            </CustomBottomSheetTrigger>
+            <CustomBottomSheetContent>
+              <CustomBottomSheetHeader>
+                <CustomBottomSheetTitle>Tous les filtres</CustomBottomSheetTitle>
+              </CustomBottomSheetHeader>
+              <div className="grid gap-4 py-4">
+                {filtersConfig.map(filter => (
+                  <div key={filter.name}>
+                    <h4 className="font-semibold mb-2">{filter.label}</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {filter.options.map(option => (
+                        <CustomBottomSheetClose asChild key={option.label}>
+                          <Button
+                            variant={filters[filter.name] === option.value ? "default" : "outline"}
+                            onClick={() => handleFilterChange(filter.name, option.value)}
+                          >
+                            {option.label}
+                          </Button>
+                        </CustomBottomSheetClose>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CustomBottomSheetContent>
+          </CustomBottomSheet>
           {filtersConfig.map(filter => {
             const Icon = iconMap[filter.icon as keyof typeof iconMap]
             const displayValue =
@@ -182,7 +230,7 @@ export function EvenementsFilterWrapper({
             return (
               <CustomBottomSheet key={filter.name}>
                 <CustomBottomSheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="rounded-xl">
+                  <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
                     {Icon && <Icon size={16} className="mr-1.5" />}
                     {displayValue}
                   </Button>
@@ -215,12 +263,8 @@ export function EvenementsFilterWrapper({
               </CustomBottomSheet>
             )
           })}
-          <Button variant="outline" size="sm" className="rounded-xl ml-auto">
-            <SlidersHorizontal size={16} />
-          </Button>
         </div>
 
-        {/* Barre de catégories (REPLACED) */}
         <HorizontalCategoryNav
           scope="event"
           selectedSlugs={filters.categorySlugs}
