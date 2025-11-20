@@ -35,23 +35,7 @@ export default async function BlogPage() {
           gradient="from-purple-500 to-indigo-500"
         />
 
-        {/* Newsletter CTA */}
-        <section className="bg-muted/30 py-12 lg:py-20">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              Restez informé
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
-              Recevez nos meilleurs articles directement dans votre boîte mail
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input placeholder="Votre email" type="email" className="h-12" />
-              <Button size="lg" className="font-semibold px-8 rounded-xl">
-                S'abonner
-              </Button>
-            </div>
-          </div>
-        </section>
+
       </main>
 
       <Footer />

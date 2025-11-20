@@ -32,24 +32,7 @@ export default function ProfesseursPage() {
         {/* Le wrapper gère maintenant toute la logique */}
         <ProfesseursFilterWrapper />
 
-        {/* CTA Section */}
-        <section className="bg-muted/30 py-12 lg:py-20">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              Devenez un professeur EduSky
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
-              Partagez votre expertise et inspirez la prochaine génération
-              d'apprenants.
-            </p>
-            <Button
-              size="lg"
-              className="font-semibold text-lg px-8 py-6 rounded-xl"
-            >
-              Postuler maintenant
-            </Button>
-          </div>
-        </section>
+
       </main>
 
       <Footer />

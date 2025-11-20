@@ -34,24 +34,7 @@ export default async function ClubsPage() {
           gradient="from-blue-500 to-cyan-500"
         />
 
-        {/* CTA Section */}
-        <section className="bg-muted/30 py-12 lg:py-20">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              Créez votre club
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
-              Vous avez une passion à partager ? Créez votre propre club et
-              rassemblez une communauté
-            </p>
-            <Button
-              size="lg"
-              className="font-semibold text-lg px-8 py-6 rounded-xl"
-            >
-              Créer un club
-            </Button>
-          </div>
-        </section>
+
       </main>
 
       <Footer />

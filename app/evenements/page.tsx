@@ -34,24 +34,7 @@ export default async function EvenementsPage() {
           gradient="from-orange-500 to-red-500"
         />
 
-        {/* CTA Section */}
-        <section className="bg-muted/30 py-12 lg:py-20">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              Organisez votre événement
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
-              Vous souhaitez organiser un événement éducatif ? Contactez-nous pour
-              en discuter
-            </p>
-            <Button
-              size="lg"
-              className="font-semibold text-lg px-8 py-6 rounded-xl"
-            >
-              Proposer un événement
-            </Button>
-          </div>
-        </section>
+
       </main>
 
       <Footer />
