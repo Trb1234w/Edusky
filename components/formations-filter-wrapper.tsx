@@ -25,6 +25,7 @@ import {
   CustomBottomSheetClose,
 } from "@/components/ui/custom-bottom-sheet"
 import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
+import { FormationSidebar } from "./ui/formation-sidebar" // Import the new sidebar
 
 const iconMap: { [key: string]: React.ElementType } = {
   BarChartHorizontal,
@@ -151,7 +152,7 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
     { label: "Niveau", name: "niveau", icon: "BarChartHorizontal", options: [ { label: "Niveau", value: undefined }, { label: "Débutant", value: "Débutant" }, { label: "Intermédiaire", value: "Intermédiaire" }, { label: "Avancé", value: "Avancé" } ] },
     { label: "Mode", name: "mode", icon: "Computer", options: [ { label: "Mode", value: undefined }, { label: "En ligne", value: "en_ligne" }, { label: "Présentiel", value: "presentiel" }, { label: "Hybride", value: "hybride" } ] },
     { label: "Certificat", name: "certificat", icon: "Award", options: [ { label: "Certificat", value: undefined }, { label: "Avec certificat", value: "true" }, { label: "Sans certificat", value: "false" } ] },
-    { label: "Durée", name: "duree_heures", icon: "Clock", options: [ { label: "Durée", value: undefined }, { label: "Moins de 2h", value: "0-2" }, { label: "2h à 5h", value: "2-5" }, { label: "5h à 10h", value: "5-10" }, { label: "Plus de 10h", value: "10+" } ] },
+    { label: "Durée", name: "duree_heures", icon: "Clock", options: [ { label: "Durée", value: undefined }, { label: "Moins de 2h", value: "0-2" }, { label: "2h à 5h", value: "2-5" }, { label: "5h à 10h", "value": "5-10" }, { label: "Plus de 10h", value: "10+" } ] },
   ]
   const secondaryFiltersConfig = [
     { label: "Prix", name: "maxPrice", options: [ { label: "Prix", value: undefined }, { label: "Gratuit", value: 0 } ] },
@@ -159,48 +160,82 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
   ]
 
   return (
-    <>
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-        {/* Mobile-only back button */}
-        <div className="md:hidden px-4 py-2 border-b flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft size={16} />
-          </Button>
-          <span className="text-lg font-semibold ml-2">Formations</span>
-        </div>
-        <div className="px-4 py-2 border-b">
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input
-              placeholder="Rechercher une formation..."
-              className="pl-10 h-10 rounded-xl border-border/50 focus:ring-2 focus:ring-primary"
-              value={filters.search}
-              onChange={e => handleFilterChange("search", e.target.value)}
-            />
-          </form>
-        </div>
+    <div className="container mx-auto px-4 lg:px-8">
+      {/* Mobile-only Filter UI */}
+      <div className="lg:hidden">
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+          {/* Mobile-only back button */}
+          <div className="md:hidden px-4 py-2 border-b flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft size={16} />
+            </Button>
+            <span className="text-lg font-semibold ml-2">Formations</span>
+          </div>
+          <div className="px-4 py-2 border-b">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <Input
+                placeholder="Rechercher une formation..."
+                className="pl-10 h-10 rounded-xl border-border/50 focus:ring-2 focus:ring-primary"
+                value={filters.search}
+                onChange={e => handleFilterChange("search", e.target.value)}
+              />
+            </form>
+          </div>
 
-        <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          <CustomBottomSheet>
-            <CustomBottomSheetTrigger asChild>
-              <Button variant="outline" size="sm" className="rounded-xl">
-                <SlidersHorizontal size={16} />
-              </Button>
-            </CustomBottomSheetTrigger>
-            <CustomBottomSheetContent>
-              <CustomBottomSheetHeader>
-                <CustomBottomSheetTitle>Tous les filtres</CustomBottomSheetTitle>
-              </CustomBottomSheetHeader>
-              <div className="grid gap-4 py-4">
-                {[...mainFiltersConfig, ...secondaryFiltersConfig].map(filter => (
-                  <div key={filter.name}>
-                    <h4 className="font-semibold mb-2">{filter.label}</h4>
-                    <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
+            <CustomBottomSheet>
+              <CustomBottomSheetTrigger asChild>
+                <Button variant="outline" size="sm" className="rounded-xl">
+                  <SlidersHorizontal size={16} />
+                </Button>
+              </CustomBottomSheetTrigger>
+              <CustomBottomSheetContent>
+                <CustomBottomSheetHeader>
+                  <CustomBottomSheetTitle>Tous les filtres</CustomBottomSheetTitle>
+                </CustomBottomSheetHeader>
+                <div className="grid gap-4 py-4">
+                  {[...mainFiltersConfig, ...secondaryFiltersConfig].map(filter => (
+                    <div key={filter.name}>
+                      <h4 className="font-semibold mb-2">{filter.label}</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {filter.options.map(option => (
+                          <CustomBottomSheetClose asChild key={option.label}>
+                            <Button
+                              variant={filters[filter.name] === option.value ? "default" : "outline"}
+                              onClick={() => handleFilterChange(filter.name, option.value)}
+                            >
+                              {option.label}
+                            </Button>
+                          </CustomBottomSheetClose>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CustomBottomSheetContent>
+            </CustomBottomSheet>
+            {mainFiltersConfig.map(filter => {
+              const Icon = iconMap[filter.icon]
+              const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
+              return (
+                <CustomBottomSheet key={filter.name}>
+                  <CustomBottomSheetTrigger asChild>
+                    <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
+                      {Icon && <Icon size={16} className="mr-1.5" />}
+                      {displayValue}
+                    </Button>
+                  </CustomBottomSheetTrigger>
+                  <CustomBottomSheetContent>
+                    <CustomBottomSheetHeader>
+                      <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
+                    </CustomBottomSheetHeader>
+                    <div className="grid grid-cols-2 gap-2 px-4">
                       {filter.options.map(option => (
                         <CustomBottomSheetClose asChild key={option.label}>
                           <Button
@@ -212,54 +247,34 @@ export function FormationsFilterWrapper({}: FormationsFilterWrapperProps) {
                         </CustomBottomSheetClose>
                       ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CustomBottomSheetContent>
-          </CustomBottomSheet>
-          {mainFiltersConfig.map(filter => {
-            const Icon = iconMap[filter.icon]
-            const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
-            return (
-              <CustomBottomSheet key={filter.name}>
-                <CustomBottomSheetTrigger asChild>
-                  <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
-                    {Icon && <Icon size={16} className="mr-1.5" />}
-                    {displayValue}
-                  </Button>
-                </CustomBottomSheetTrigger>
-                <CustomBottomSheetContent>
-                  <CustomBottomSheetHeader>
-                    <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
-                  </CustomBottomSheetHeader>
-                  <div className="grid grid-cols-2 gap-2 px-4">
-                    {filter.options.map(option => (
-                      <CustomBottomSheetClose asChild key={option.label}>
-                        <Button
-                          variant={filters[filter.name] === option.value ? "default" : "outline"}
-                          onClick={() => handleFilterChange(filter.name, option.value)}
-                        >
-                          {option.label}
-                        </Button>
-                      </CustomBottomSheetClose>
-                    ))}
-                  </div>
-                </CustomBottomSheetContent>
-              </CustomBottomSheet>
-            )
-          })}
+                  </CustomBottomSheetContent>
+                </CustomBottomSheet>
+              )
+            })}
+          </div>
+
+          <HorizontalCategoryNav
+            scope="formation"
+            selectedSlugs={filters.categorySlugs}
+            onCategorySelect={(slugs) => handleFilterChange("categorySlugs", slugs)}
+          />
         </div>
-
-        <HorizontalCategoryNav
-          scope="formation"
-          selectedSlugs={filters.categorySlugs}
-          onCategorySelect={(slugs) => handleFilterChange("categorySlugs", slugs)}
-        />
       </div>
 
-      <div className="container mx-auto px-4 lg:px-8 py-8">
-        <FormationsList formations={filteredFormations} isLoading={isLoading} />
+      {/* Desktop Layout */}
+      <div className="flex gap-8">
+        <div className="hidden lg:block w-full max-w-xs mt-4">
+          <FormationSidebar 
+            filters={filters}
+            handleFilterChange={handleFilterChange}
+            mainFiltersConfig={mainFiltersConfig}
+            secondaryFiltersConfig={secondaryFiltersConfig}
+          />
+        </div>
+        <div className="flex-1 py-4">
+          <FormationsList formations={filteredFormations} isLoading={isLoading} />
+        </div>
       </div>
-    </>
+    </div>
   )
 }
