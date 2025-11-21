@@ -13,16 +13,16 @@ export default async function BlogPage() {
 
       <main className="flex-1 pt-1 lg:pt-20">
         {/* Hero Section */}
-        <section className="hidden lg:block bg-gradient-to-br from-purple-500 via-indigo-500 to-blue-600 py-16 lg:py-24">
+        <section className="hidden lg:block bg-gradient-to-r from-primary to-secondary py-8 lg:py-12">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-                <BookOpen size={32} className="text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-background/60 backdrop-blur-sm mb-6">
+                <BookOpen size={32} className="text-primary" />
               </div>
-              <h1 className="text-3xl lg:text-5xl font-bold text-white mb-4 text-balance">
+              <h1 className="text-3xl lg:text-5xl font-bold text-secondary-foreground mb-4 text-balance">
                 Blog EduSky
               </h1>
-              <p className="text-lg text-white/90 leading-relaxed text-pretty">
+              <p className="text-lg text-secondary-foreground leading-relaxed text-pretty">
                 Conseils, actualités et ressources pour réussir votre parcours
                 éducatif
               </p>
