@@ -55,15 +55,15 @@ export function FormationSidebar({
 
 
   return (
-    <aside className="border bg-card text-card-foreground rounded-xl p-6 shadow-sm space-y-6">
+    <aside className="border bg-primary text-primary-foreground rounded-xl p-6 shadow-sm space-y-6">
       <h3 className="text-xl font-semibold">Filtres</h3>
 
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground" size={18} />
         <Input
           placeholder="Rechercher par mot-clé..."
-          className="pl-10 h-10 rounded-xl"
+          className="pl-10 h-10 rounded-xl placeholder-primary-foreground"
           value={filters.search}
           onChange={e => handleFilterChange('search', e.target.value)}
         />
@@ -78,8 +78,11 @@ export function FormationSidebar({
             {categories.map((category) => (
               <Button
                 key={category.slug}
-                variant={filters.categorySlugs?.includes(category.slug) ? 'default' : 'outline'}
-                className="w-full justify-start"
+                className={
+                  filters.categorySlugs?.includes(category.slug)
+                    ? "w-full justify-start bg-primary-foreground text-primary hover:bg-primary-foreground/90" // Selected style
+                    : "w-full justify-start bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90" // Unselected style
+                }
                 onClick={() => {
                   const currentSlugs = filters.categorySlugs || [];
                   const newSlugs = currentSlugs.includes(category.slug)
@@ -104,9 +107,12 @@ export function FormationSidebar({
                 {filterGroup.options.map(option => (
                   <Button
                     key={option.label}
-                    variant={filters[filterGroup.name] === option.value ? 'default' : 'outline'}
+                    className={
+                      filters[filterGroup.name] === option.value
+                        ? "text-xs h-9 bg-primary-foreground text-primary hover:bg-primary-foreground/90" // Selected style
+                        : "text-xs h-9 bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90" // Unselected style
+                    }
                     onClick={() => handleFilterChange(filterGroup.name, option.value)}
-                    className="text-xs h-9"
                   >
                     {option.label}
                   </Button>

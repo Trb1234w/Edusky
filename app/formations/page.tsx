@@ -12,16 +12,16 @@ export default async function FormationsPage() {
 
       <main className="flex-1 pt-1 lg:pt-20">
         {/* Hero Section */}
-        <section className="hidden lg:block bg-muted py-16 lg:py-24">
+        <section className="hidden lg:block bg-gradient-to-r from-primary to-secondary py-8 lg:py-12">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-background/60 backdrop-blur-sm mb-6">
                 <BookOpen size={32} className="text-primary" />
               </div>
-              <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-4">
+              <h1 className="text-3xl lg:text-5xl font-bold text-secondary-foreground mb-4">
                 Explorez nos formations
               </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-lg text-secondary-foreground leading-relaxed">
                 Des cours adaptés à tous les niveaux pour développer vos compétences et atteindre vos objectifs.
               </p>
             </div>
