@@ -33,7 +33,7 @@ export function PostCard({ post }: PostCardProps) {
   const postImage = post.media?.find(m => m.type === 'image');
 
   return (
-    <Card className="p-4 sm:p-6 border-border shadow-sm">
+    <Card className="p-2 sm:p-6 border-border shadow-sm">
       <div className="flex items-start gap-4">
         <Avatar>
           <AvatarImage src={post.auteur.avatar_url || undefined} alt={post.auteur.full_name || 'User'} />
@@ -41,7 +41,7 @@ export function PostCard({ post }: PostCardProps) {
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <p className="font-semibold">{post.auteur.full_name}</p>
+            <p className="font-semibold text-base sm:text-lg">{post.auteur.full_name}</p>
             <span className="text-xs text-muted-foreground">·</span>
             <span className="text-xs text-muted-foreground hover:underline">
               {timeAgo}
@@ -49,7 +49,7 @@ export function PostCard({ post }: PostCardProps) {
           </div>
           
           <div className="prose prose-sm dark:prose-invert max-w-none mt-2">
-            <p>{post.contenu}</p>
+            <p className="text-sm sm:text-base">{post.contenu}</p>
           </div>
 
           {postImage && (

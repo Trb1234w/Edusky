@@ -1,10 +1,11 @@
+import { Search } from "lucide-react";
 import { MobileNav } from "@/components/mobile-nav"
 import { PostCard } from "@/components/post-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MobileFeedHeader } from "@/components/mobile-feed-header"
+import { SocialHeader } from "@/components/social-header"
 import { getAllFeedPosts } from "@/lib/data/posts.server" // Import de la fonction serveur
 import { createClient } from "@/lib/supabase/server" // Import du client Supabase serveur
 import { redirect } from "next/navigation"
@@ -64,21 +65,20 @@ export default async function FeedPage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-            <MobileFeedHeader /> {/* Render custom mobile header */}
-
-      <main className="pt-2 lg:pt-20">        {/* Main Content */}
-        <section className="container mx-auto px-0 lg:px-8 py-0 lg:py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <SocialHeader />
+      <main>
+        <section className="container mx-auto py-2 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left Sidebar - Hidden on mobile */}
             <div className="hidden lg:block">
-              <Card className="sticky top-24 border-border">
-                <CardContent className="p-6">
-                  <h3 className="font-bold text-foreground mb-4">Suggestions</h3>
-                  <div className="space-y-4">
+              <Card className="sticky top-20 border-border">
+                <CardContent className="p-4">
+                  <h3 className="font-bold text-foreground mb-3">Suggestions</h3>
+                  <div className="space-y-3">
                     {suggestedProfiles && suggestedProfiles.length > 0 ? (
                       suggestedProfiles.map((suggestion: any) => (
                         <div key={suggestion.id} className="flex items-center gap-3">
-                          <Avatar className="w-12 h-12">
+                          <Avatar className="w-10 h-10">
                             <AvatarImage src={suggestion.avatar_url || "/placeholder.svg"} alt={suggestion.full_name || suggestion.username} />
                             <AvatarFallback>{suggestion.full_name ? suggestion.full_name[0] : suggestion.username[0]}</AvatarFallback>
                           </Avatar>
@@ -100,41 +100,70 @@ export default async function FeedPage() {
             </div>
 
             {/* Main Feed */}
-            <div className="lg:col-span-2 space-y-1 lg:space-y-6">
-              {/* Nouveau Header du Feed */}
-              <FeedHeader 
-                avatarUrl={profile?.avatar_url || null} 
-                userName={profile?.full_name || ''}
-              />
+            <div className="lg:col-span-2">
 
-              {/* Tabs for Feed */}
-              <Tabs defaultValue="all" className="w-full">
-                <TabsList className="w-full">
-                  <TabsTrigger value="all" className="flex-1">
-                    Tous
-                  </TabsTrigger>
-                  <TabsTrigger value="following" className="flex-1">
-                    Abonnements
-                  </TabsTrigger>
-                  <TabsTrigger value="trending" className="flex-1">
-                    Tendances
-                  </TabsTrigger>
-                </TabsList>
+              {/* UNIFIED MOBILE VIEW */}
+              <div className="md:hidden">
+                <div className="bg-background border-b p-2 space-y-2">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-blue-500" />
+                            <h1 className="text-xl font-semibold text-foreground">Edusky</h1>
+                        </div>
+                        <Button variant="ghost" size="icon">
+                            <Search className="h-5 w-5" />
+                            <span className="sr-only">Rechercher</span>
+                        </Button>
+                    </div>
+                    <FeedHeader 
+                      avatarUrl={profile?.avatar_url || null} 
+                      userName={profile?.full_name || ''}
+                    />
+                </div>
+                <Tabs defaultValue="all" className="w-full">
+                  <div className="bg-background border-b">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="all">Tous</TabsTrigger>
+                      <TabsTrigger value="following">Abonnements</TabsTrigger>
+                      <TabsTrigger value="trending">Tendances</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <TabsContent value="all" className="mt-2 space-y-2 divide-y divide-border">
+                    {posts.map(renderPost)}
+                  </TabsContent>
+                  <TabsContent value="following" className="mt-2 space-y-2 divide-y divide-border">
+                    {posts.slice(0, 3).map(renderPost)}
+                  </TabsContent>
+                  <TabsContent value="trending" className="mt-2 space-y-2 divide-y divide-border">
+                    {posts.filter((p) => p.likes >= 150).map(renderPost)}
+                  </TabsContent>
+                </Tabs>
+              </div>
 
-                <TabsContent value="all" className="space-y-1 lg:space-y-6 mt-6 bg-transparent">
-                  {posts.map(renderPost)}
-                </TabsContent>
+              {/* DESKTOP VIEW (Untouched logic and spacing) */}
+              <div className="hidden md:block space-y-4">
+                <FeedHeader 
+                  avatarUrl={profile?.avatar_url || null} 
+                  userName={profile?.full_name || ''}
+                />
+                <Tabs defaultValue="all" className="w-full">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="all" className="flex-1">Tous</TabsTrigger>
+                    <TabsTrigger value="following" className="flex-1">Abonnements</TabsTrigger>
+                    <TabsTrigger value="trending" className="flex-1">Tendances</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all" className="space-y-4 mt-4 divide-y divide-border">
+                    {posts.map(renderPost)}
+                  </TabsContent>
+                  <TabsContent value="following" className="space-y-4 mt-4 divide-y divide-border">
+                    {posts.slice(0, 3).map(renderPost)}
+                  </TabsContent>
+                  <TabsContent value="trending" className="space-y-4 mt-4 divide-y divide-border">
+                    {posts.filter((p) => p.likes >= 150).map(renderPost)}
+                  </TabsContent>
+                </Tabs>
+              </div>
 
-                <TabsContent value="following" className="space-y-1 lg:space-y-6 mt-6 bg-transparent">
-                  {posts.slice(0, 3).map(renderPost)}
-                </TabsContent>
-
-                <TabsContent value="trending" className="space-y-1 lg:space-y-6 mt-6 bg-transparent">
-                  {posts
-                    .filter((p) => p.likes >= 150)
-                    .map(renderPost)}
-                </TabsContent>
-              </Tabs>
             </div>
           </div>
         </section>

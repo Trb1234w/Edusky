@@ -52,7 +52,7 @@ export function SharedPostCard(props: SharedPostCardProps) {
 
         {/* Affiche le commentaire du partageur s'il y en a un */}
         {props.content && 
-            <p className="text-foreground leading-relaxed whitespace-pre-wrap mb-4 ml-8">{props.content}</p>
+            <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-wrap mb-4 ml-8">{props.content}</p>
         }
 
         {/* Conteneur pour le post original */}
