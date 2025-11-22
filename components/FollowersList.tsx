@@ -12,8 +12,10 @@ import { useState } from "react";
 interface Profile {
   id: string;
   full_name: string | null;
+  username: string | null; // Added
   avatar_url: string | null;
   bio: string | null;
+  isFollowing?: boolean; // Optionnel, à ajouter plus tard si besoin du bouton Suivre
 }
 
 interface FollowersListProps {
@@ -49,24 +51,27 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
   return (
     <div className="space-y-4">
       {profiles.map(profile => (
-        <Card key={profile.id} className="flex items-center p-4 border-border">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name || "Utilisateur"} />
-            <AvatarFallback>{profile.full_name ? profile.full_name[0] : 'U'}</AvatarFallback>
-          </Avatar>
-          <div className="ml-4 flex-1">
-            <p className="font-semibold">{profile.full_name}</p>
-            {profile.bio && <p className="text-sm text-muted-foreground truncate">{profile.bio}</p>}
+        <div key={profile.id} className="flex items-center justify-between px-4 py-3 sm:py-4 border-b border-border last:border-b-0"> {/* px-4 for mobile, py-3/sm:py-4 for vertical spacing, border-b to separate items, last:border-b-0 to remove last border */}
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+              <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name || "Utilisateur"} />
+              <AvatarFallback>{profile.full_name ? profile.full_name[0] : 'U'}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <p className="font-semibold text-sm sm:text-base">{profile.full_name}</p>
+              {profile.username && <p className="text-xs text-muted-foreground">@{profile.username}</p>}
+            </div>
           </div>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => handleMessageUser(profile.id)}
             disabled={creatingConversationForUser === profile.id}
+            className="flex-shrink-0"
           >
             <MessageCircle className="h-5 w-5" />
           </Button>
-        </Card>
+        </div>
       ))}
     </div>
   );

@@ -162,7 +162,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               Favoris
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="posts" className="mt-6">
+          <TabsContent value="posts" className="mt-2 md:mt-6">
             <div className="space-y-4 w-full"> {/* Full width on all screens, no centering */}
               {posts && posts.length > 0 ? (
                 posts.map(renderPost)
@@ -173,7 +173,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               )}
             </div>
           </TabsContent>
-          <TabsContent value="abonnements" className="mt-6">
+          <TabsContent value="abonnements" className="mt-2 md:mt-6">
             {followingError ? (
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des abonnements.
@@ -186,7 +186,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="abonnes" className="mt-6">
+          <TabsContent value="abonnes" className="mt-2 md:mt-6">
             {followersError ? (
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des abonnés.
@@ -199,13 +199,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="events" className="mt-6">
+          <TabsContent value="events" className="mt-2 md:mt-6">
             {registeredEventsError ? (
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des événements.
               </Card>
             ) : registeredEvents && registeredEvents.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
                 {registeredEvents.map(event => (
                   <EventCard
                     key={event.id}
@@ -230,13 +230,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="formations" className="mt-6">
+          <TabsContent value="formations" className="mt-2 md:mt-6">
             {registeredFormationsError ? (
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des formations.
               </Card>
             ) : registeredFormations && registeredFormations.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
                 {registeredFormations.map(formation => (
                   <CourseCard
                     key={formation.id}
@@ -260,13 +260,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="clubs" className="mt-6">
+          <TabsContent value="clubs" className="mt-2 md:mt-6">
             {registeredClubsError ? (
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des clubs.
               </Card>
             ) : registeredClubs && registeredClubs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
                 {registeredClubs.map(club => (
                   <ClubCard
                     key={club.id}
@@ -288,13 +288,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="favorites" className="mt-6">
+          <TabsContent value="favorites" className="mt-2 md:mt-6">
             {favoritesError ? (
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des favoris.
               </Card>
             ) : favorites && favorites.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
                 {favorites.map(fav => {
                   if (!fav.details) return null; // Skip if details couldn't be fetched
 

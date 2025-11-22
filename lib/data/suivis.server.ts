@@ -34,6 +34,7 @@ export async function getFollowers(userId: string) {
       follower:profiles!follower_id(
         id,
         full_name,
+        username,
         avatar_url,
         bio
       )
@@ -63,6 +64,7 @@ export async function getFollowing(userId: string) {
       followed:profiles!followed_id(
         id,
         full_name,
+        username,
         avatar_url,
         bio
       )
