@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { CategoryButton } from "./CategoryButton";
+import { CategoryDialog } from "./CategoryDialog";
+import { FolderTree } from "lucide-react";
 
 // Types
 export type Category = {
@@ -105,7 +107,7 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
         >
           Toutes
         </Button>
-        
+
         {categoryTree.map(node => (
           <CategoryButton
             key={node.id}
@@ -116,6 +118,23 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
             activeLabel={activeLabels[node.id]}
           />
         ))}
+
+        {/* Dialog for all categories - always show */}
+        <CategoryDialog
+          categories={categoryTree}
+          selectedSlugs={selectedSlugs}
+          onCategorySelect={onCategorySelect}
+          trigger={
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full whitespace-nowrap border-dashed"
+            >
+              <FolderTree className="mr-1.5 h-4 w-4" />
+              Toutes ({categoryTree.length})
+            </Button>
+          }
+        />
       </div>
     </div>
   );

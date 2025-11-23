@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
+import { Search, FolderTree } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { HorizontalCategoryNav } from '../categories/HorizontalCategoryNav'
 import { getCategories } from '@/lib/data/categories'
+import { buildCategoryTree } from '@/lib/utils/categories'
+import { CategoryDialog, CategoryNode } from '@/components/categories/CategoryDialog'
+import { SidebarCategoryItem } from './sidebar-category-item'
 
 interface Option {
   label: string
@@ -35,7 +36,7 @@ export function FormationSidebar({
   secondaryFiltersConfig,
 }: FormationSidebarProps) {
 
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -44,15 +45,17 @@ export function FormationSidebar({
         console.error('Failed to fetch categories:', error);
         return;
       }
-      setCategories(data || []);
+      setCategoryTree(buildCategoryTree(data || []));
     };
     fetchCategories();
   }, []);
 
-  const handleCategorySelection = (slugs: string[]) => {
+  const handleCategorySelection = (slugs: string[] | undefined) => {
     handleFilterChange('categorySlugs', slugs);
   };
 
+  // Get first 5 root categories
+  const visibleCategories = categoryTree.slice(0, 5);
 
   return (
     <aside className="border bg-primary text-primary-foreground rounded-xl p-6 shadow-sm space-y-6">
@@ -75,25 +78,31 @@ export function FormationSidebar({
           <AccordionTrigger className="text-lg font-semibold">Catégories</AccordionTrigger>
           <AccordionContent className="space-y-2 pt-2">
             <div className="space-y-2">
-            {categories.map((category) => (
-              <Button
-                key={category.slug}
-                className={
-                  filters.categorySlugs?.includes(category.slug)
-                    ? "w-full justify-start bg-primary-foreground text-primary hover:bg-primary-foreground/90" // Selected style
-                    : "w-full justify-start bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90" // Unselected style
+              {/* Visible categories (first 5) - using recursive component */}
+              {visibleCategories.map((category) => (
+                <SidebarCategoryItem
+                  key={category.id}
+                  node={category}
+                  selectedSlugs={filters.categorySlugs}
+                  onSelect={handleCategorySelection}
+                />
+              ))}
+
+              {/* "Toutes" button to open dialog - always show */}
+              <CategoryDialog
+                categories={categoryTree}
+                selectedSlugs={filters.categorySlugs}
+                onCategorySelect={handleCategorySelection}
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start bg-primary-foreground text-primary border-2 border-dashed border-primary hover:bg-primary-foreground/90"
+                  >
+                    <FolderTree className="mr-2 h-4 w-4" />
+                    Toutes les catégories ({categoryTree.length})
+                  </Button>
                 }
-                onClick={() => {
-                  const currentSlugs = filters.categorySlugs || [];
-                  const newSlugs = currentSlugs.includes(category.slug)
-                    ? currentSlugs.filter((s: string) => s !== category.slug)
-                    : [...currentSlugs, category.slug];
-                  handleCategorySelection(newSlugs.length > 0 ? newSlugs : undefined);
-                }}
-              >
-                {category.nom}
-              </Button>
-            ))}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -109,8 +118,8 @@ export function FormationSidebar({
                     key={option.label}
                     className={
                       filters[filterGroup.name] === option.value
-                        ? "text-xs h-9 bg-primary-foreground text-primary hover:bg-primary-foreground/90" // Selected style
-                        : "text-xs h-9 bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90" // Unselected style
+                        ? "text-xs h-9 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                        : "text-xs h-9 bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90"
                     }
                     onClick={() => handleFilterChange(filterGroup.name, option.value)}
                   >

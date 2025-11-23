@@ -1,14 +1,14 @@
-'use client' // Add this line
+'use client'
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Clock, MapPin, Users, Heart } from "lucide-react" // Add Heart
+import { Calendar, Clock, MapPin, Users, Heart, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useState, useOptimistic, useTransition } from "react" // Import hooks
-import { toggleFavoriteAction } from "@/app/actions/favorites" // Import action
-import { cn } from "@/lib/utils" // Assuming cn exists for conditional classnames
+import { useState, useOptimistic, useTransition } from "react"
+import { toggleFavoriteAction } from "@/app/actions/favorites"
+import { cn } from "@/lib/utils"
 
 interface EventCardProps {
   id: string
@@ -23,7 +23,7 @@ interface EventCardProps {
   organizer: string
   image: string
   status: string
-  is_favorited: boolean // Add this prop
+  is_favorited: boolean
 }
 
 export function EventCard({
@@ -39,11 +39,11 @@ export function EventCard({
   organizer,
   image,
   status,
-  is_favorited: initialIsFavorited, // Destructure with new name
+  is_favorited: initialIsFavorited,
 }: EventCardProps) {
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
     initialIsFavorited,
-    (state) => !state // Toggle state optimistically
+    (state) => !state
   );
   const [isPending, startTransition] = useTransition();
 
@@ -57,104 +57,153 @@ export function EventCard({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Hackathon":
-        return "bg-purple-500/10 text-purple-700 dark:text-purple-400"
+        return "from-purple-500 to-purple-600"
       case "Conférence":
-        return "bg-blue-500/10 text-blue-700 dark:text-blue-400"
+        return "from-blue-500 to-blue-600"
       case "Compétition":
-        return "bg-red-500/10 text-red-700 dark:text-red-400"
+        return "from-red-500 to-red-600"
       case "Atelier":
-        return "bg-green-500/10 text-green-700 dark:text-green-400"
+        return "from-green-500 to-green-600"
       case "Forum":
-        return "bg-orange-500/10 text-orange-700 dark:text-orange-400"
+        return "from-orange-500 to-orange-600"
       case "Exposition":
-        return "bg-pink-500/10 text-pink-700 dark:text-pink-400"
+        return "from-pink-500 to-pink-600"
       default:
-        return "bg-muted text-muted-foreground"
+        return "from-gray-500 to-gray-600"
     }
   }
 
   const spotsLeft = maxParticipants - participants
   const percentageFilled = maxParticipants > 0 ? (participants / maxParticipants) * 100 : 0
 
+  // Parse date for creative display
+  const dateObj = new Date(date)
+  const day = dateObj.getDate()
+  const month = dateObj.toLocaleDateString('fr-FR', { month: 'short' }).toUpperCase()
+
   return (
     <Link href={`/evenements/${id}`} className="group block h-full">
-      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-primary/50 overflow-hidden h-full flex flex-col">
-        <div className="relative h-48 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-300"
-            style={{ backgroundImage: `url('${image}')` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <div className="absolute top-2 left-2 lg:top-4 lg:left-4">
-            <Badge className={getCategoryColor(category)}>{category}</Badge>
-          </div>
-          {status === "upcoming" && spotsLeft <= 20 && (
-            <div className="absolute top-2 right-2 lg:top-4 lg:right-4">
-              <Badge variant="destructive" className="bg-red-500">
-                {spotsLeft} places restantes
-              </Badge>
-            </div>
-          )}
-          {/* Favorite Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
-            onClick={(e) => {
-              e.preventDefault(); // Prevent navigating to Link
-              e.stopPropagation(); // Stop event propagation
-              handleToggleFavorite();
-            }}
-            aria-label={optimisticIsFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
-          >
-            <Heart className={cn(
-                "h-5 w-5",
-                optimisticIsFavorited ? "fill-red-500 text-red-500" : "fill-none text-white"
-            )} />
-          </Button>
-        </div>
+      <Card className="relative overflow-hidden h-full flex flex-col bg-card hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 border-border/50 hover:border-primary/50 hover:-translate-y-1">
 
-        <CardContent className="p-2 lg:p-6 flex-1 flex flex-col">
-          <h3 className="text-lg lg:text-xl font-bold text-foreground mb-1 lg:mb-2 group-hover:text-primary transition-colors line-clamp-1">
-            {title}
-          </h3>
-          <p className="text-xs lg:text-sm text-muted-foreground mb-2 lg:mb-4 line-clamp-2 leading-relaxed">{description}</p>
-
-          <div className="space-y-1 lg:space-y-2 mb-2 lg:mb-4">
-            <div className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm text-muted-foreground">
-              <span>{date}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock size={16} className="text-secondary" />
-              <span>{time}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin size={16} className="text-accent" />
-              <span className="line-clamp-1">{location}</span>
-            </div>
-          </div>
-
-          <div className="mb-4 py-4 border-y border-border">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Users size={16} className="text-primary" />
-                <span className="text-sm font-semibold text-foreground">
-                  {participants} / {maxParticipants} participants
-                </span>
+        {/* Top Section - Date Display with Image */}
+        <div className="relative flex-shrink-0">
+          {/* Date Calendar */}
+          <div className={cn(
+            "relative w-full h-24 bg-gradient-to-br",
+            getCategoryColor(category),
+            "flex items-center justify-between px-4 text-white"
+          )}>
+            <div className="flex items-center gap-3">
+              <Calendar size={20} className="opacity-70" />
+              <div className="text-center">
+                <div className="text-4xl font-black leading-none">{day}</div>
+                <div className="text-sm font-bold tracking-wider">{month}</div>
               </div>
             </div>
-            <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+
+            <Badge className="bg-white/20 backdrop-blur-md text-white border-white/30 text-xs font-semibold">
+              {category}
+            </Badge>
+
+            {/* Favorite Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 border border-white/20"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleToggleFavorite();
+              }}
+              aria-label={optimisticIsFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+            >
+              <Heart className={cn(
+                "h-4 w-4 transition-all",
+                optimisticIsFavorited ? "fill-white text-white scale-110" : "fill-none text-white"
+              )} />
+            </Button>
+          </div>
+
+          {/* Image Below Date */}
+          <div className="relative h-32 overflow-hidden">
+            <div
+              className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+              style={{ backgroundImage: `url('${image}')` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+            {/* Status Badge on Image */}
+            {status === "upcoming" && spotsLeft <= 20 && spotsLeft > 0 && (
+              <div className="absolute bottom-2 right-2">
+                <Badge variant="destructive" className="text-xs font-semibold">
+                  {spotsLeft} places
+                </Badge>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Event Details */}
+        <div className="flex-1 flex flex-col p-3">
+          {/* Title */}
+          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+            {title}
+          </h3>
+
+          {/* Description */}
+          <p className="text-sm text-muted-foreground mb-2 line-clamp-2 leading-relaxed">
+            {description}
+          </p>
+
+          {/* Event Info Grid */}
+          <div className="grid grid-cols-1 gap-2 mb-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock size={14} className="text-primary flex-shrink-0" />
+              <span className="font-medium">{time}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin size={14} className="text-primary flex-shrink-0" />
+              <span className="font-medium line-clamp-1">{location}</span>
+            </div>
+          </div>
+
+          {/* Participants Progress */}
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <Users size={14} className="text-primary" />
+                <span className="text-sm font-semibold text-foreground">
+                  {participants}/{maxParticipants}
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground">{Math.round(percentageFilled)}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-primary to-secondary transition-all"
+                className={cn("h-full bg-gradient-to-r transition-all", getCategoryColor(category))}
                 style={{ width: `${percentageFilled}%` }}
               />
             </div>
           </div>
 
-          <div className="text-xs text-muted-foreground mb-4">Organisé par {organizer}</div>
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
+            <div className="flex items-center gap-1.5">
+              <Sparkles size={14} className="text-primary" />
+              <span className="text-xs text-muted-foreground font-medium">{organizer}</span>
+            </div>
+            <Button size="sm" className="text-xs font-semibold px-4">
+              S'inscrire
+            </Button>
+          </div>
+        </div>
 
-          <Button className="w-full font-semibold mt-auto">S'inscrire</Button>
-        </CardContent>
+        {/* Hover Effect Glow */}
+        <div className={cn(
+          "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-r",
+          getCategoryColor(category),
+          "mix-blend-overlay"
+        )} style={{ opacity: 0.05 }} />
       </Card>
     </Link>
   )
@@ -162,28 +211,24 @@ export function EventCard({
 
 EventCard.Skeleton = function EventCardSkeleton() {
   return (
-    <Card className="h-full flex flex-col">
-      <Skeleton className="h-48 w-full" />
-      <CardContent className="p-2 lg:p-6 flex-1 flex flex-col">
-        <Skeleton className="h-5 w-3/4 mb-2" />
-        <Skeleton className="h-4 w-full mb-4" />
-
-        <div className="space-y-2 mb-4">
+    <Card className="h-full flex flex-col overflow-hidden">
+      <Skeleton className="w-full h-24" />
+      <Skeleton className="w-full h-32" />
+      <div className="flex-1 p-3 flex flex-col">
+        <Skeleton className="h-6 w-3/4 mb-1" />
+        <Skeleton className="h-4 w-full mb-1" />
+        <Skeleton className="h-4 w-5/6 mb-2" />
+        <div className="space-y-2 mb-3">
           <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-4 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
         </div>
-
-        <div className="mb-4 py-4 border-y border-border">
-          <div className="flex items-center justify-between mb-2">
-            <Skeleton className="h-4 w-1/3" />
-          </div>
-          <Skeleton className="h-2 w-full" />
+        <Skeleton className="h-4 w-full mb-1" />
+        <Skeleton className="h-1.5 w-full mb-3" />
+        <div className="flex items-center justify-between mt-auto pt-3">
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-8 w-20" />
         </div>
-
-        <Skeleton className="h-4 w-1/2 mb-4" />
-        <Skeleton className="h-10 w-full mt-auto" />
-      </CardContent>
+      </div>
     </Card>
   )
 }

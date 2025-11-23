@@ -1,11 +1,19 @@
 import { createClient } from "@/lib/supabase/client";
 
-export async function getCategories() {
+export async function getCategories(options?: { scope?: string }) {
   const supabase = createClient();
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("categories")
-    .select("id, nom, slug")
+    .select("id, nom, slug, parent_id")
     .order("nom", { ascending: true });
+
+  // Filter by scope if provided
+  if (options?.scope) {
+    query = query.eq("scope", options.scope);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error fetching categories:", error);
