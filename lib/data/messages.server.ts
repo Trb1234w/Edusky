@@ -49,28 +49,32 @@ export async function getUserConversations(userId: string) {
 
   // 3. Combiner les données pour former les conversations formatées
   const formattedConversations = userParticipants.map(userPart => {
-    const convo = userPart.conversations;
-    const participantsInConvo = allParticipants.filter(p => p.conversation_id === convo?.id);
+    const convo = Array.isArray(userPart.conversations) ? userPart.conversations[0] : userPart.conversations;
 
-    const otherParticipants = participantsInConvo.filter(
-      (p: any) => p.profiles.id !== userId
-    ).map(p => p.profiles);
+    if (!convo) return null;
+
+    const participantsInConvo = allParticipants.filter(p => p.conversation_id === convo.id);
+
+    const otherParticipants = participantsInConvo
+      .map((p: any) => Array.isArray(p.profiles) ? p.profiles[0] : p.profiles)
+      .filter((profile: any) => profile && profile.id !== userId);
 
     // Pour l'instant, on gère les conversations à 2. Le nom est celui de l'autre participant.
     const title = otherParticipants[0]?.full_name || 'Conversation';
     const avatarUrl = otherParticipants[0]?.avatar_url || null;
 
     return {
-      id: convo?.id,
-      updated_at: convo?.updated_at,
+      id: convo.id,
+      updated_at: convo.updated_at,
       title: title,
       avatarUrl: avatarUrl,
       participants: otherParticipants,
     };
-  }).sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()); // Sort by updated_at
+  }).filter(Boolean) // Remove nulls
+    .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()); // Sort by updated_at
 
   // Filter out duplicate conversations (if any) based on id
-  const uniqueConversations = Array.from(new Map(formattedConversations.map(convo => [convo.id, convo])).values());
+  const uniqueConversations = Array.from(new Map(formattedConversations.map((convo: any) => [convo.id, convo])).values());
 
   return { data: uniqueConversations, error: null };
 }

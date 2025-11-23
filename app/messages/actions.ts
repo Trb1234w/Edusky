@@ -4,19 +4,19 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from "@/lib/supabase/server";
 
 export async function getMessages(conversationId: string) {
-  const supabase = await createClient();
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('messages')
-    .select(`
+    const { data, error } = await supabase
+        .from('messages')
+        .select(`
         id,
         contenu,
         created_at,
         auteur_id,
         auteur:profiles!auteur_id(full_name, avatar_url)
     `)
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true });
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
 
     if (error) {
         console.error("Error fetching messages:", error);
@@ -104,5 +104,85 @@ export async function sendMessageAction(conversationId: string, authorId: string
         console.error("Error updating conversation timestamp:", convoError);
     }
 
+    // --- NOTIFICATION START ---
+    // Récupérer les participants de la conversation pour notifier les autres
+    const { data: participants, error: participantsError } = await supabase
+        .from('conversation_participants')
+        .select('user_id')
+        .eq('conversation_id', conversationId);
+
+    if (participants) {
+        // Récupérer le nom de l'expéditeur
+        const { data: sender } = await supabase.from('profiles').select('full_name').eq('id', authorId).single();
+        const senderName = sender?.full_name || "Quelqu'un";
+
+        const notifications = participants
+            .filter(p => p.user_id !== authorId) // Ne pas notifier l'expéditeur
+            .map(p => ({
+                userId: p.user_id,
+                type: 'message' as const,
+                content: `${senderName} vous a envoyé un message.`,
+                refId: conversationId,
+                refTable: 'conversations',
+                metadata: { conversation_id: conversationId, sender_id: authorId }
+            }));
+
+        // Envoyer les notifications en parallèle
+        // Note: createNotification est unitaire, donc on boucle.
+        // Idéalement on ferait un batch insert si createNotification le supportait,
+        // mais pour quelques participants ça va.
+        // Il faut importer createNotification.
+        const { createNotification } = await import("@/lib/notifications");
+
+        await Promise.all(notifications.map(n => createNotification(n)));
+    }
+    // --- NOTIFICATION END ---
+
     return { success: true };
+}
+
+export async function getConversation(conversationId: string, currentUserId: string) {
+    const supabase = await createClient();
+
+    // 1. Fetch conversation details
+    const { data: conversation, error: convoError } = await supabase
+        .from('conversations')
+        .select('id, updated_at')
+        .eq('id', conversationId)
+        .single();
+
+    if (convoError || !conversation) {
+        return { error: 'Conversation not found' };
+    }
+
+    // 2. Fetch participants
+    const { data: participants, error: participantsError } = await supabase
+        .from('conversation_participants')
+        .select(`
+            user_id,
+            profiles(id, full_name, avatar_url)
+        `)
+        .eq('conversation_id', conversationId);
+
+    if (participantsError) {
+        return { error: 'Error fetching participants' };
+    }
+
+    // 3. Format
+    const otherParticipants = participants
+        .map((p: any) => Array.isArray(p.profiles) ? p.profiles[0] : p.profiles)
+        .filter((profile: any) => profile && profile.id !== currentUserId);
+
+    const title = otherParticipants[0]?.full_name || 'Conversation';
+    const avatarUrl = otherParticipants[0]?.avatar_url || null;
+
+    return {
+        data: {
+            id: conversation.id,
+            updated_at: conversation.updated_at,
+            title,
+            avatarUrl,
+            participants: otherParticipants
+        }
+    };
 }

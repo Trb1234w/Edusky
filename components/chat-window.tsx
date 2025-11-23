@@ -38,6 +38,7 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
   // Fetch initial messages
   useEffect(() => {
     if (conversation?.id) {
+      setMessages([]); // Clear previous messages immediately
       const fetchMessages = async () => {
         setLoading(true);
         const { data } = await getMessages(conversation.id);
@@ -105,76 +106,76 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
 
   if (!conversation) {
     return (
-        <div className="h-full flex items-center justify-center bg-muted/40">
-            <p className="text-muted-foreground">Sélectionnez une conversation pour commencer à discuter.</p>
-        </div>
+      <div className="h-full flex items-center justify-center bg-muted/40">
+        <p className="text-muted-foreground">Sélectionnez une conversation pour commencer à discuter.</p>
+      </div>
     );
   }
 
   return (
     <div className="h-full flex flex-col bg-background">
-        {/* Header du Chat */}
-        <div className="p-4 border-b border-border flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
-                <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <Avatar>
-                <AvatarImage src={conversation.avatarUrl || undefined} alt={conversation.title} />
-                <AvatarFallback>{conversation.title ? conversation.title[0] : 'C'}</AvatarFallback>
-            </Avatar>
-            <h3 className="font-semibold text-lg">{conversation.title}</h3>
-        </div>
+      {/* Header du Chat */}
+      <div className="p-4 border-b border-border flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <Avatar>
+          <AvatarImage src={conversation.avatarUrl || undefined} alt={conversation.title} />
+          <AvatarFallback>{conversation.title ? conversation.title[0] : 'C'}</AvatarFallback>
+        </Avatar>
+        <h3 className="font-semibold text-lg">{conversation.title}</h3>
+      </div>
 
-        {/* Zone des Messages */}
-        <div className="flex-1 p-6 overflow-y-auto">
-            {loading ? (
-                <div className="flex justify-center items-center h-full">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      {/* Zone des Messages */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {messages.map(msg => (
+              <div key={msg.id} className={cn(
+                "flex items-end gap-2",
+                msg.auteur_id === currentUserId ? "justify-end" : "justify-start"
+              )}>
+                {msg.auteur_id !== currentUserId && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={msg.auteur?.avatar_url} />
+                    <AvatarFallback>{msg.auteur?.full_name?.[0] || 'U'}</AvatarFallback>
+                  </Avatar>
+                )}
+                <div className={cn(
+                  "max-w-xs md:max-w-md lg:max-w-lg p-3 rounded-lg",
+                  msg.auteur_id === currentUserId
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
+                )}>
+                  <p className="text-sm">{msg.contenu}</p>
+                  <p className="text-xs opacity-70 mt-1 text-right">{format(new Date(msg.created_at), 'HH:mm', { locale: fr })}</p>
                 </div>
-            ) : (
-                <div className="space-y-6">
-                    {messages.map(msg => (
-                        <div key={msg.id} className={cn(
-                            "flex items-end gap-2",
-                            msg.auteur_id === currentUserId ? "justify-end" : "justify-start"
-                        )}>
-                            {msg.auteur_id !== currentUserId && (
-                                <Avatar className="h-8 w-8">
-                                    <AvatarImage src={msg.auteur?.avatar_url} />
-                                    <AvatarFallback>{msg.auteur?.full_name?.[0] || 'U'}</AvatarFallback>
-                                </Avatar>
-                            )}
-                            <div className={cn(
-                                "max-w-xs md:max-w-md lg:max-w-lg p-3 rounded-lg",
-                                msg.auteur_id === currentUserId 
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-muted"
-                            )}>
-                                <p className="text-sm">{msg.contenu}</p>
-                                <p className="text-xs opacity-70 mt-1 text-right">{format(new Date(msg.created_at), 'HH:mm', { locale: fr })}</p>
-                            </div>
-                        </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                </div>
-            )}
-        </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
 
-        {/* Input pour envoyer un message */}
-        <form onSubmit={handleSendMessage} className="p-4 border-t border-border bg-background">
-            <div className="relative">
-                <Input 
-                    placeholder="Écrivez votre message..." 
-                    className="pr-12"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    disabled={isSending}
-                />
-                <Button type="submit" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isSending || !newMessage.trim()}>
-                    {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                </Button>
-            </div>
-        </form>
+      {/* Input pour envoyer un message */}
+      <form onSubmit={handleSendMessage} className="p-4 border-t border-border bg-background">
+        <div className="relative">
+          <Input
+            placeholder="Écrivez votre message..."
+            className="pr-12"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            disabled={isSending}
+          />
+          <Button type="submit" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isSending || !newMessage.trim()}>
+            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

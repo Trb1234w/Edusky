@@ -14,22 +14,20 @@ export default async function MessagesPage() {
   }
 
   const { data: conversations, error: conversationsError } = await getUserConversations(user.id);
-  const { data: followedUsers, error: followedUsersError } = await getFollowedUsers(user.id);
 
-  if (conversationsError || followedUsersError) {
-    console.error("Erreur lors du chargement des données de messagerie:", conversationsError || followedUsersError);
+  if (conversationsError) {
+    console.error("Erreur lors du chargement des données de messagerie:", conversationsError);
     return <div className="text-center p-8">Erreur lors du chargement des données de messagerie.</div>;
   }
 
   return (
     <div className="flex flex-col h-screen">
-        <main className="flex-1 overflow-hidden">
-            <MessagesContainer 
-              initialConversations={conversations || []}
-              initialFollowedUsers={followedUsers || []}
-              currentUserId={user.id}
-            />
-        </main>
+      <main className="flex-1 overflow-hidden">
+        <MessagesContainer
+          initialConversations={conversations || []}
+          currentUserId={user.id}
+        />
+      </main>
     </div>
   );
 }

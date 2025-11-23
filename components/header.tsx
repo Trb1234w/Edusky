@@ -2,14 +2,33 @@
 
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
+import { NotificationsDropdown } from "@/components/notifications-dropdown"
+import { User } from "@supabase/supabase-js"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
   const pathname = usePathname()
+  const supabase = createClient()
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   const navLinks = [
     { href: "/professeurs", label: "Professeurs" },
@@ -58,16 +77,29 @@ export function Header() {
 
           {/* Actions Desktop */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link href="/connexion">
-              <Button variant="ghost" className="font-medium">
-                Connexion
-              </Button>
-            </Link>
-            <Link href="/inscription">
-              <Button className="font-medium bg-primary hover:opacity-90">
-                S'inscrire
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <NotificationsDropdown />
+                <Link href="/dashboard">
+                  <Button variant="ghost" className="font-medium">
+                    Mon Espace
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/connexion">
+                  <Button variant="ghost" className="font-medium">
+                    Connexion
+                  </Button>
+                </Link>
+                <Link href="/inscription">
+                  <Button className="font-medium bg-primary hover:opacity-90">
+                    S'inscrire
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Menu Mobile */}
@@ -95,14 +127,26 @@ export function Header() {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <Link href="/connexion" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full font-medium">
-                    Connexion
-                  </Button>
-                </Link>
-                <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full font-medium bg-gradient-to-r from-primary to-secondary">S'inscrire</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full font-medium">
+                        Mon Espace
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/connexion" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full font-medium">
+                        Connexion
+                      </Button>
+                    </Link>
+                    <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full font-medium bg-gradient-to-r from-primary to-secondary">S'inscrire</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

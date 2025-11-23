@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "@/lib/notifications";
 
 /**
  * Action pour suivre ou ne plus suivre un utilisateur.
@@ -29,8 +30,6 @@ export async function followUserAction(followerId: string, followedId: string) {
     return { error: "Erreur lors de la vérification du suivi." };
   }
 
-  let usernameToRevalidate = '';
-
   if (existingFollow) {
     // Le suivi existe, on le supprime (unfollow)
     const { error: deleteError } = await supabase
@@ -52,6 +51,21 @@ export async function followUserAction(followerId: string, followedId: string) {
       console.error("Erreur lors de l'ajout du suivi:", insertError);
       return { error: "Erreur lors de l'ajout du suivi." };
     }
+
+    // --- NOTIFICATION START ---
+    // Récupérer le nom du follower
+    const { data: follower } = await supabase.from('profiles').select('full_name').eq('id', followerId).single();
+    const followerName = follower?.full_name || "Quelqu'un";
+
+    await createNotification({
+      userId: followedId,
+      type: 'follow',
+      content: `${followerName} a commencé à vous suivre.`,
+      refId: followerId,
+      refTable: 'profiles',
+      metadata: { follower_id: followerId }
+    });
+    // --- NOTIFICATION END ---
   }
 
   // Pour revalider la page, nous avons besoin du nom d'utilisateur du profil visité.
@@ -65,7 +79,7 @@ export async function followUserAction(followerId: string, followedId: string) {
   if (profile?.username) {
     revalidatePath(`/profile/${profile.username}`);
   }
-  
+
   // On revalide aussi le feed, car les suggestions peuvent changer.
   revalidatePath('/feed');
 

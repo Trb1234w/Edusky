@@ -7,6 +7,7 @@ import { ChatWindow } from './chat-window';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 interface Profile {
   id: string;
@@ -24,16 +25,14 @@ interface Conversation {
 
 interface MessagesContainerProps {
   initialConversations: Conversation[];
-  initialFollowedUsers: Profile[];
   currentUserId: string;
 }
 
-export function MessagesContainer({ initialConversations, initialFollowedUsers, currentUserId }: MessagesContainerProps) {
+export function MessagesContainer({ initialConversations, currentUserId }: MessagesContainerProps) {
   const searchParams = useSearchParams();
   const paramConvoId = searchParams.get('conversation');
 
   const [conversations, setConversations] = useState(initialConversations);
-  const [followedUsers, setFollowedUsers] = useState(initialFollowedUsers);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(() => {
     if (paramConvoId && initialConversations.some(c => c.id === paramConvoId)) {
       return paramConvoId;
@@ -51,10 +50,46 @@ export function MessagesContainer({ initialConversations, initialFollowedUsers, 
     }
   }, [paramConvoId, initialConversations]);
 
-  // Update conversations state if initialConversations prop changes (e.g., after router.refresh() in page.tsx)
+  // Update conversations state if initialConversations prop changes
   useEffect(() => {
     setConversations(initialConversations);
   }, [initialConversations]);
+
+  // Realtime subscription for new conversations
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`user_conversations:${currentUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversation_participants',
+          filter: `user_id=eq.${currentUserId}`,
+        },
+        async (payload) => {
+          console.log('New conversation participant row:', payload);
+          const newConvoId = payload.new.conversation_id;
+
+          // Check if we already have this conversation
+          if (conversations.some(c => c.id === newConvoId)) return;
+
+          // Fetch the full conversation details
+          const { getConversation } = await import("@/app/messages/actions");
+          const { data: newConvo, error } = await getConversation(newConvoId, currentUserId);
+
+          if (newConvo) {
+            setConversations(prev => [newConvo as Conversation, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUserId, conversations]);
 
   const handleNewConversationCreated = (newConvo: Conversation) => {
     setConversations(prev => [newConvo, ...prev]);
@@ -68,36 +103,12 @@ export function MessagesContainer({ initialConversations, initialFollowedUsers, 
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
-  // Create a unified list of conversations and followed users
-  const unifiedList = useMemo(() => {
-    const existingConversationUserIds = new Set(conversations.flatMap(convo => convo.participants.map(p => p.id)));
-
-    const followedUsersNotInConversation = followedUsers.filter(
-      user => !existingConversationUserIds.has(user.id)
-    );
-
-    // Map followed users to a format compatible with conversations for display
-    const mappedFollowedUsers = followedUsersNotInConversation.map(user => ({
-      id: user.id, // Use user ID as a temporary ID for display
-      updated_at: new Date().toISOString(), // Placeholder for sorting
-      title: user.full_name || "Utilisateur",
-      avatarUrl: user.avatar_url,
-      isFollowedUser: true, // Flag to differentiate in ConversationList
-      participants: [user] // Store the user profile
-    }));
-
-    // Combine and sort by updated_at (conversations first, then followed users)
-    return [...conversations, ...mappedFollowedUsers].sort((a, b) => 
-      new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    );
-  }, [conversations, followedUsers]);
-
-  const filteredUnifiedList = useMemo(() => {
-    if (!searchQuery) return unifiedList;
-    return unifiedList.filter(item => 
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery) return conversations;
+    return conversations.filter(item =>
       item.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [unifiedList, searchQuery]);
+  }, [conversations, searchQuery]);
 
   return (
     <div className="h-full flex">
@@ -118,8 +129,8 @@ export function MessagesContainer({ initialConversations, initialFollowedUsers, 
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">
-          <ConversationList 
-            items={filteredUnifiedList}
+          <ConversationList
+            items={filteredConversations}
             selectedConversationId={selectedConversationId}
             onSelectConversation={handleSelectConversation}
             currentUserId={currentUserId}

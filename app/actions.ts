@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server"; // Utiliser le client serv
 import { createClient as createAdminClient } from "@supabase/supabase-js"; // Pour le client admin
 import { revalidatePath } from "next/cache";
 
+import { createNotification } from "@/lib/notifications";
+
 // La fonction accepte maintenant l'ID de l'auteur en argument
 export async function createPostAction(content: string, authorId: string, imageUrl?: string) {
   if (!authorId) {
@@ -99,6 +101,26 @@ export async function toggleLike(postId: string, userId: string) {
       return { error: "Erreur lors de l'ajout du like." };
     }
     console.log("[toggleLike] Succès: Like ajouté.");
+
+    // --- NOTIFICATION START ---
+    // Récupérer l'auteur du post pour lui envoyer une notif (si ce n'est pas soi-même)
+    const { data: post } = await supabase.from('postes').select('auteur_id').eq('id', postId).single();
+
+    if (post && post.auteur_id && post.auteur_id !== userId) {
+      // Récupérer les infos de celui qui like pour le message
+      const { data: liker } = await supabase.from('profiles').select('full_name').eq('id', userId).single();
+      const likerName = liker?.full_name || "Quelqu'un";
+
+      await createNotification({
+        userId: post.auteur_id,
+        type: 'like',
+        content: `${likerName} a aimé votre publication.`,
+        refId: postId,
+        refTable: 'postes',
+        metadata: { liker_id: userId }
+      });
+    }
+    // --- NOTIFICATION END ---
   }
 
   // Étape 3: Revalidation du cache
@@ -129,6 +151,25 @@ export async function addComment(postId: string, authorId: string, content: stri
     return { error: "Une erreur est survenue lors de l'ajout du commentaire." };
   }
 
+  // --- NOTIFICATION START ---
+  // Récupérer l'auteur du post
+  const { data: post } = await supabase.from('postes').select('auteur_id').eq('id', postId).single();
+
+  if (post && post.auteur_id && post.auteur_id !== authorId) {
+    const { data: commenter } = await supabase.from('profiles').select('full_name').eq('id', authorId).single();
+    const commenterName = commenter?.full_name || "Quelqu'un";
+
+    await createNotification({
+      userId: post.auteur_id,
+      type: 'comment',
+      content: `${commenterName} a commenté votre publication.`,
+      refId: postId,
+      refTable: 'postes',
+      metadata: { commenter_id: authorId }
+    });
+  }
+  // --- NOTIFICATION END ---
+
   revalidatePath("/feed");
   revalidatePath("/dashboard");
 
@@ -157,6 +198,25 @@ export async function sharePostAction(originalPostId: string, authorId: string) 
     console.error("Erreur lors du partage du post:", error);
     return { error: "Une erreur est survenue lors du partage du post." };
   }
+
+  // --- NOTIFICATION START ---
+  // Récupérer l'auteur du post original
+  const { data: originalPost } = await supabaseAdmin.from('postes').select('auteur_id').eq('id', originalPostId).single();
+
+  if (originalPost && originalPost.auteur_id && originalPost.auteur_id !== authorId) {
+    const { data: sharer } = await supabaseAdmin.from('profiles').select('full_name').eq('id', authorId).single();
+    const sharerName = sharer?.full_name || "Quelqu'un";
+
+    await createNotification({
+      userId: originalPost.auteur_id,
+      type: 'share',
+      content: `${sharerName} a partagé votre publication.`,
+      refId: originalPostId,
+      refTable: 'postes',
+      metadata: { sharer_id: authorId }
+    });
+  }
+  // --- NOTIFICATION END ---
 
   revalidatePath("/feed");
   revalidatePath("/dashboard");

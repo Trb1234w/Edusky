@@ -26,6 +26,8 @@ export async function getUserProfileByUsername(username: string, currentUserId?:
   noStore();
   const supabase = await createServerClient();
 
+  const supabaseAdmin = getSupabaseAdminClient();
+
   // Étape 1: Récupérer le profil de base par nom d'utilisateur
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
@@ -39,16 +41,17 @@ export async function getUserProfileByUsername(username: string, currentUserId?:
   }
 
   // Étape 2: Récupérer les comptes d'abonnés et d'abonnements en parallèle
+  // Utilisation du client Admin pour contourner les règles RLS sur la table 'suivis'
   const [followersResult, followingResult, isFollowingResult] = await Promise.all([
-    supabase
+    supabaseAdmin
       .from('suivis')
       .select('id', { count: 'exact', head: true })
       .eq('followed_id', profile.id),
-    supabase
+    supabaseAdmin
       .from('suivis')
       .select('id', { count: 'exact', head: true })
       .eq('follower_id', profile.id),
-    currentUserId ? supabase
+    currentUserId ? supabaseAdmin
       .from('suivis')
       .select('id', { count: 'exact', head: true })
       .eq('follower_id', currentUserId)
@@ -60,7 +63,7 @@ export async function getUserProfileByUsername(username: string, currentUserId?:
   const { count: isFollowingCount, error: isFollowingError } = isFollowingResult as { count: number | null, error: any };
 
 
-  if (followersError || followingError || isFollowingResult) { // Fixed: isFollowingResult to isFollowingError
+  if (followersError || followingError || isFollowingError) {
     console.error("Error fetching follow counts:", { followersError, followingError, isFollowingError });
     // On peut décider de continuer même si les comptes échouent
   }

@@ -83,5 +83,8 @@ export async function getRegisteredEventsByUserId(userId: string) {
 
   const registeredEvents = data.map(inscription => inscription.evenement);
 
-  return { data: registeredEvents, error: null };
+  // Deduplicate events based on ID
+  const uniqueEvents = Array.from(new Map(registeredEvents.map((event: any) => [event.id, event])).values());
+
+  return { data: uniqueEvents, error: null };
 }
