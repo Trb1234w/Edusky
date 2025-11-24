@@ -44,7 +44,15 @@ export async function toggleFavoriteAction(itemType: string, itemId: string) {
         console.error("Error unfavoriting item:", deleteError);
         return { success: false, error: deleteError.message };
       }
-      revalidatePath('/'); // Revalidate homepage to reflect changes
+
+      // Revalidate all relevant paths
+      revalidatePath('/');
+      revalidatePath('/formations');
+      revalidatePath('/evenements');
+      revalidatePath('/clubs');
+      revalidatePath('/blog');
+      revalidatePath('/professeurs');
+
       return { success: true, message: "Item unfavorited." };
     } else {
       // Item is not favorited, so favorite it
@@ -60,7 +68,15 @@ export async function toggleFavoriteAction(itemType: string, itemId: string) {
         console.error("Error favoriting item:", insertError);
         return { success: false, error: insertError.message };
       }
-      revalidatePath('/'); // Revalidate homepage to reflect changes
+
+      // Revalidate all relevant paths
+      revalidatePath('/');
+      revalidatePath('/formations');
+      revalidatePath('/evenements');
+      revalidatePath('/clubs');
+      revalidatePath('/blog');
+      revalidatePath('/professeurs');
+
       return { success: true, message: "Item favorited." };
     }
   } catch (e: any) {

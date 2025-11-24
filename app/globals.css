@@ -4,24 +4,32 @@
 /* Custom Scrollbar Styles */
 /* Pour les navigateurs basés sur WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 8px; /* Largeur de la scrollbar verticale */
-  height: 8px; /* Hauteur de la scrollbar horizontale */
+  width: 8px;
+  /* Largeur de la scrollbar verticale */
+  height: 8px;
+  /* Hauteur de la scrollbar horizontale */
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--muted); /* Couleur de fond de la piste de la scrollbar */
-  border-radius: 10px; /* Bords arrondis pour la piste */
+  background: var(--muted);
+  /* Couleur de fond de la piste de la scrollbar */
+  border-radius: 10px;
+  /* Bords arrondis pour la piste */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary); /* Couleur du "pouce" de la scrollbar */
-  border-radius: 10px; /* Bords arrondis pour le pouce */
-  border: 2px solid var(--muted); /* Bordure pour le pouce, pour le faire ressortir de la piste */
+  background: var(--primary);
+  /* Couleur du "pouce" de la scrollbar */
+  border-radius: 10px;
+  /* Bords arrondis pour le pouce */
+  border: 2px solid var(--muted);
+  /* Bordure pour le pouce, pour le faire ressortir de la piste */
 }
 
 /* Au survol du pouce de la scrollbar */
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(from var(--primary) l c h / 0.8); /* Légèrement plus clair ou plus foncé au survol */
+  background: oklch(from var(--primary) l c h / 0.8);
+  /* Légèrement plus clair ou plus foncé au survol */
 }
 
 :root {
@@ -140,6 +148,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -150,6 +159,7 @@
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -161,6 +171,7 @@
     opacity: 1;
     transform: translateX(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(-100%);
@@ -172,9 +183,76 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Nouvelles animations pour le header moderne */
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(var(--primary), 0.6);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Sparkle/Scintillement Animation */
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes twinkle {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
   }
 }
 
@@ -188,4 +266,68 @@
 
 .animate-fade-in-up {
   animation: fade-in-up 0.6s ease-out;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+/* Animation delays pour effets staggered */
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+/* Custom Cursor Styling */
+* {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>') 12 12, auto;
+}
+
+a,
+button {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23667eea"><circle cx="12" cy="12" r="6"/></svg>') 12 12, pointer;
+}
+
+/* Utility to hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -1,0 +1,328 @@
+'use client'
+
+import { ArrowRight, CheckCircle2, Sparkles, Users, BookOpen, Award, Briefcase, Trophy, GraduationCap, Network, Search, Newspaper } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { GlossyButton } from './modern/GlossyButton'
+import { useState, useEffect } from 'react'
+import { cn } from '@/lib/utils'
+
+// Slides avec le contenu spécifique demandé
+const heroSlides = [
+    {
+        id: 'connexion',
+        title: 'Connexion & Mentorat',
+        description: 'Connectez-vous avec des professeurs, coachs et mentors qualifiés pour un suivi personnalisé.',
+        icon: Users,
+        image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80', // Meeting/Mentoring
+        color: 'from-violet-500 to-purple-600'
+    },
+    {
+        id: 'formations',
+        title: 'Formations Certifiées',
+        description: 'Formations dans tous les domaines avec suivi IA de pointe et certification à la clé.',
+        icon: Award,
+        image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80', // Studying/Certificate
+        color: 'from-blue-500 to-cyan-600'
+    },
+    {
+        id: 'clubs',
+        title: 'Clubs de Révision',
+        description: 'Rejoignez des clubs de révision et accédez à des modules spécialisés avec accompagnement.',
+        icon: BookOpen,
+        image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80', // Group study
+        color: 'from-emerald-500 to-green-600'
+    },
+    {
+        id: 'reseau',
+        title: 'Réseau Professionnel',
+        description: 'Espace social type LinkedIn pour connecter étudiants et entreprises (stages, emplois, bénévolat).',
+        icon: Briefcase,
+        image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80', // Professional network
+        color: 'from-orange-500 to-red-600'
+    },
+    {
+        id: 'evenements',
+        title: 'Événements Éducatifs',
+        description: 'Participez à des hackathons, compétitions, conférences et événements exclusifs.',
+        icon: Trophy,
+        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80', // Event/Conference
+        color: 'from-pink-500 to-rose-600'
+    },
+]
+
+// Chips pour l'accès rapide (remplace les CTA)
+const quickAccessChips = [
+    { label: 'Formations', icon: BookOpen, href: '/formations', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+    { label: 'Professeurs', icon: GraduationCap, href: '/professeurs', color: 'bg-violet-500/10 text-violet-500 border-violet-500/20' },
+    { label: 'Clubs', icon: Users, href: '/clubs', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
+    { label: 'Événements', icon: Trophy, href: '/evenements', color: 'bg-pink-500/10 text-pink-500 border-pink-500/20' },
+    { label: 'Blog', icon: Newspaper, href: '/blog', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
+]
+
+// Phrases pour l'effet typing
+const typingPhrases = [
+    "commence ici",
+    "se construit ici",
+    "s'illumine ici",
+    "se transforme ici"
+]
+
+export function NewHero() {
+    const [currentSlide, setCurrentSlide] = useState(0)
+    const [isVisible, setIsVisible] = useState(false)
+
+    // Typing effect state
+    const [text, setText] = useState('')
+    const [phraseIndex, setPhraseIndex] = useState(0)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [typingSpeed, setTypingSpeed] = useState(150)
+
+    // Auto-play slider
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+        }, 5000)
+        return () => clearInterval(timer)
+    }, [])
+
+    useEffect(() => {
+        setIsVisible(true)
+    }, [])
+
+    // Typing effect logic
+    useEffect(() => {
+        const handleTyping = () => {
+            const currentPhrase = typingPhrases[phraseIndex]
+
+            if (isDeleting) {
+                setText(currentPhrase.substring(0, text.length - 1))
+                setTypingSpeed(50)
+            } else {
+                setText(currentPhrase.substring(0, text.length + 1))
+                setTypingSpeed(150)
+            }
+
+            if (!isDeleting && text === currentPhrase) {
+                setTimeout(() => setIsDeleting(true), 2000)
+            } else if (isDeleting && text === '') {
+                setIsDeleting(false)
+                setPhraseIndex((prev) => (prev + 1) % typingPhrases.length)
+            }
+        }
+
+        const timer = setTimeout(handleTyping, typingSpeed)
+        return () => clearTimeout(timer)
+    }, [text, isDeleting, phraseIndex, typingSpeed])
+
+    return (
+        <section className="relative pt-20 pb-6 md:pt-28 md:pb-12 lg:py-20 overflow-hidden">
+            {/* Advanced Background Elements */}
+            <div className="absolute inset-0 -z-10">
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+
+                {/* Animated Orbs */}
+                <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary/10 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-secondary/10 blur-[120px] rounded-full animate-pulse animation-delay-2000" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 h-1/3 bg-accent/5 blur-[100px] rounded-full animate-pulse animation-delay-1000" />
+
+                {/* Advanced Particles */}
+                {[...Array(20)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute rounded-full bg-white animate-twinkle"
+                        style={{
+                            width: Math.random() * 3 + 1 + 'px',
+                            height: Math.random() * 3 + 1 + 'px',
+                            top: `${Math.random() * 100}%`,
+                            left: `${Math.random() * 100}%`,
+                            opacity: Math.random() * 0.5 + 0.1,
+                            animationDelay: `${Math.random() * 5}s`,
+                            animationDuration: `${3 + Math.random() * 4}s`
+                        }}
+                    />
+                ))}
+            </div>
+
+            <div className="container mx-auto px-4 md:px-8 lg:px-12">
+                <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
+
+                    {/* Left Column: Text Content */}
+                    <div className={`space-y-5 md:space-y-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+                        {/* Redesigned Badge */}
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border border-primary/20 text-primary text-sm font-semibold animate-fade-in-up shadow-sm backdrop-blur-sm">
+                            <Sparkles className="w-4 h-4 fill-primary" />
+                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                La plateforme éducative tout-en-un
+                            </span>
+                        </div>
+
+                        {/* Main Title with Typing Effect */}
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[100px] md:min-h-[140px] lg:min-h-[160px]">
+                            Votre avenir <br />
+                            <span className="relative inline-block mt-1 md:mt-2">
+                                <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">
+                                    {text}
+                                </span>
+                                <span className="absolute -right-1 top-0 bottom-0 w-1 bg-primary animate-blink" />
+                                <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-primary/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="none" />
+                                </svg>
+                            </span>
+                        </h1>
+
+                        {/* Description */}
+                        {/* Description */}
+                        <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                            Edusky révolutionne l'apprentissage en connectant étudiants, mentors et entreprises.
+                            Profitez d'un suivi personnalisé par IA, de formations certifiantes et d'un réseau professionnel actif.
+                        </p>
+
+                        {/* Quick Access Chips (Scrollable) */}
+                        <div className="pt-2">
+                            <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Accès Rapide</p>
+                            <div className="flex overflow-x-auto pb-4 gap-3 -mx-4 px-4 md:mx-0 md:px-0 snap-x touch-pan-x scrollbar-hide">
+                                {quickAccessChips.map((chip, index) => (
+                                    <Link
+                                        key={index}
+                                        href={chip.href}
+                                        className={cn(
+                                            "flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 whitespace-nowrap snap-start hover:scale-105 active:scale-95",
+                                            "bg-background/50 backdrop-blur-sm hover:bg-background/80 shadow-sm",
+                                            chip.color
+                                        )}
+                                    >
+                                        <chip.icon className="w-5 h-5" />
+                                        <span className="text-base font-medium">{chip.label}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Feature List (Scrollable on Mobile) */}
+                        <div className="flex overflow-x-auto pb-4 md:pb-0 md:flex-col gap-3 md:gap-3 -mx-4 px-4 md:mx-0 md:px-0 snap-x mt-4 touch-pan-x scrollbar-hide">
+                            {heroSlides.map((slide, index) => (
+                                <div
+                                    key={slide.id}
+                                    className={cn(
+                                        "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer min-w-[240px] md:min-w-0 snap-center border md:border-transparent",
+                                        currentSlide === index
+                                            ? "bg-primary/10 border-primary/20 md:bg-primary/5 md:translate-x-2"
+                                            : "bg-card/50 border-border/50 md:bg-transparent md:hover:bg-primary/5 md:hover:translate-x-1 opacity-70"
+                                    )}
+                                    onClick={() => setCurrentSlide(index)}
+                                >
+                                    <div className={cn(
+                                        "w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0",
+                                        currentSlide === index ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                                    )}>
+                                        <slide.icon className="w-5 h-5" />
+                                    </div>
+                                    <span className={cn(
+                                        "text-lg font-medium transition-colors whitespace-nowrap",
+                                        currentSlide === index ? "text-foreground" : "text-muted-foreground"
+                                    )}>
+                                        {slide.title}
+                                    </span>
+                                    {currentSlide === index && (
+                                        <ArrowRight className="w-5 h-5 text-primary ml-auto animate-pulse hidden md:block" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Right Column: Coursera-style Slider */}
+                    <div className={`relative h-[280px] md:h-[450px] lg:h-[550px] w-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+                        {/* Main Image Container */}
+                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
+                            {heroSlides.map((slide, index) => (
+                                <div
+                                    key={slide.id}
+                                    className={cn(
+                                        "absolute inset-0 transition-all duration-700 ease-in-out",
+                                        index === currentSlide ? "opacity-100 scale-100 z-10" : "opacity-0 scale-105 z-0"
+                                    )}
+                                >
+                                    <Image
+                                        src={slide.image}
+                                        alt={slide.title}
+                                        fill
+                                        className="object-cover"
+                                        priority={index === 0}
+                                    />
+
+                                    {/* Gradient Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+                                    {/* Content Overlay */}
+                                    <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 transform transition-transform duration-700 delay-100">
+                                        <div className={cn(
+                                            "inline-flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-xl mb-3 shadow-lg bg-gradient-to-br",
+                                            slide.color
+                                        )}>
+                                            <slide.icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
+                                        </div>
+
+                                        <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-md">
+                                            {slide.title}
+                                        </h2>
+
+                                        <p className="text-base text-white/90 leading-relaxed max-w-md drop-shadow-sm line-clamp-2">
+                                            {slide.description}
+                                        </p>
+
+                                        {/* Progress Bar for current slide */}
+                                        {index === currentSlide && (
+                                            <div className="absolute bottom-0 left-0 h-1 bg-primary animate-progress-bar" />
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Floating Stats Cards - Decorative (Hidden on mobile to save space) */}
+                        <div className="absolute -top-4 -right-4 bg-card/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl animate-float hidden lg:block">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                </div>
+                                <div>
+                                    <div className="text-xs font-medium text-muted-foreground">Taux de réussite</div>
+                                    <div className="text-sm font-bold text-foreground">98%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="absolute -bottom-4 -left-4 bg-card/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl animate-float animation-delay-2000 hidden lg:block">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                    <Users className="w-4 h-4 text-blue-500" />
+                                </div>
+                                <div>
+                                    <div className="text-xs font-medium text-muted-foreground">Communauté</div>
+                                    <div className="text-sm font-bold text-foreground">5k+ Étudiants</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Navigation Dots */}
+                        <div className="absolute bottom-3 right-5 flex gap-1.5 z-20">
+                            {heroSlides.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentSlide(index)}
+                                    className={cn(
+                                        "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                                        index === currentSlide ? "w-6 bg-white" : "bg-white/50 hover:bg-white/80"
+                                    )}
+                                    aria-label={`Go to slide ${index + 1}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}

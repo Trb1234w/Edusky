@@ -6,12 +6,13 @@ interface ClubListItem {
   id: string;
   nom?: string;
   description?: string;
-  categories?: { nom?: string }; // Assuming categories is an object with a nom property
+  category_nom?: string;
   capacite?: number;
   theme_principal?: string;
-  leader?: { full_name?: string }; // Assuming leader is an object with full_name
+  leader_full_name?: string;
+  leader_avatar_url?: string;
   image_url?: string;
-  is_favorited?: boolean; // Add this prop
+  is_favorited?: boolean;
 }
 
 interface ClubsListProps {
@@ -43,10 +44,10 @@ export function ClubsList({ clubs, isLoading }: ClubsListProps) {
           id={club.id}
           name={club.nom || ""}
           description={club.description || ""}
-          category={club.categories?.nom || ""}
+          category={club.category_nom || ""}
           members={club.capacite || 0} // Using capacite as a proxy for members
           activities="Activités non spécifiées" // Placeholder
-          president={club.leader?.full_name || "Inconnu"}
+          president={club.leader_full_name || "Inconnu"}
           image={club.image_url || "/placeholder.png"}
           verified={false} // Placeholder
           is_favorited={club.is_favorited || false} // Pass the new prop

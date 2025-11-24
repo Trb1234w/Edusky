@@ -10,11 +10,12 @@ interface EventListItem {
   date_debut?: string;
   lieu?: string;
   mode?: string;
-  categories?: { nom?: string }; // Assuming categories is an object with a nom property
+  category_nom?: string;
   capacite?: number;
-  organisateur?: { full_name?: string }; // Assuming organisateur is an object with full_name
+  organisateur_full_name?: string;
+  organisateur_avatar_url?: string;
   image_url?: string;
-  is_favorited?: boolean; // Add this prop
+  is_favorited?: boolean;
 }
 
 interface EvenementsListProps {
@@ -49,10 +50,10 @@ export function EvenementsList({ events, isLoading }: EvenementsListProps) {
           date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
           time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
           location={event.lieu || event.mode || ""}
-          category={event.categories?.nom || ""}
+          category={event.category_nom || ""}
           participants={0} // Placeholder
           maxParticipants={event.capacite || 0}
-          organizer={event.organisateur?.full_name || "Inconnu"}
+          organizer={event.organisateur_full_name || "Inconnu"}
           image={event.image_url || "/placeholder.png"}
           status={new Date(event.date_debut || "") > new Date() ? "upcoming" : "past"}
           is_favorited={event.is_favorited || false} // Pass the new prop
