@@ -1,3 +1,9 @@
+-- Migration: Update get_formations function to include location and other filter fields
+-- This migration adds missing fields to the get_formations function so that client-side filtering works properly
+
+-- Drop the existing function first (required when changing return type)
+DROP FUNCTION IF EXISTS get_formations(text, text, text, numeric, numeric, numeric, text);
+
 create or replace function get_formations(
     search_term text default null,
     category_slug text default null,

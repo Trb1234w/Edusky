@@ -27,6 +27,9 @@ interface FormationSidebarProps {
   handleFilterChange: (key: string, value: any) => void
   mainFiltersConfig: FilterConfig[]
   secondaryFiltersConfig: FilterConfig[]
+  locationFiltersConfig?: FilterConfig[]
+  locations?: any
+  availableTags?: string[]
 }
 
 export function FormationSidebar({
@@ -34,6 +37,7 @@ export function FormationSidebar({
   handleFilterChange,
   mainFiltersConfig,
   secondaryFiltersConfig,
+  locationFiltersConfig = [],
 }: FormationSidebarProps) {
 
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
@@ -108,7 +112,7 @@ export function FormationSidebar({
         </AccordionItem>
 
         {/* Dynamic Filters */}
-        {[...mainFiltersConfig, ...secondaryFiltersConfig].map(filterGroup => (
+        {[...mainFiltersConfig, ...locationFiltersConfig, ...secondaryFiltersConfig].map(filterGroup => (
           <AccordionItem key={filterGroup.name} value={filterGroup.name}>
             <AccordionTrigger className="text-lg font-semibold">{filterGroup.label}</AccordionTrigger>
             <AccordionContent className="space-y-2 pt-2">
