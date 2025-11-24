@@ -1,0 +1,130 @@
+'use server';
+
+import { createClient } from "@/lib/supabase/server";
+
+/**
+ * Fetches all distinct tags used in clubs
+ */
+export async function getDistinctClubTags(): Promise<{ data: string[] | null; error: string | null }> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from('clubs')
+            .select('tags')
+            .not('tags', 'is', null);
+
+        if (error) {
+            console.error("Error fetching club tags:", error);
+            return { data: null, error: error.message };
+        }
+
+        const allTags = new Set<string>();
+        data?.forEach((club: any) => {
+            if (club.tags && Array.isArray(club.tags)) {
+                club.tags.forEach((tag: string) => allTags.add(tag));
+            }
+        });
+
+        return { data: Array.from(allTags).sort(), error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getDistinctClubTags:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}
+
+/**
+ * Fetches all distinct themes used in clubs
+ */
+export async function getDistinctClubThemes(): Promise<{ data: string[] | null; error: string | null }> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from('clubs')
+            .select('theme_principal')
+            .not('theme_principal', 'is', null);
+
+        if (error) {
+            console.error("Error fetching club themes:", error);
+            return { data: null, error: error.message };
+        }
+
+        const themes = new Set<string>();
+        data?.forEach((club: any) => {
+            if (club.theme_principal) {
+                themes.add(club.theme_principal);
+            }
+        });
+
+        return { data: Array.from(themes).sort(), error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getDistinctClubThemes:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}
+
+/**
+ * Fetches all distinct locations used in clubs
+ */
+export async function getDistinctClubLocations(): Promise<{ data: string[] | null; error: string | null }> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from('clubs')
+            .select('lieu')
+            .not('lieu', 'is', null);
+
+        if (error) {
+            console.error("Error fetching club locations:", error);
+            return { data: null, error: error.message };
+        }
+
+        const locations = new Set<string>();
+        data?.forEach((club: any) => {
+            if (club.lieu) {
+                locations.add(club.lieu);
+            }
+        });
+
+        return { data: Array.from(locations).sort(), error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getDistinctClubLocations:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}
+
+/**
+ * Fetches all clubs using the get_clubs RPC function with admin client
+ */
+export async function getAllClubs(): Promise<{ data: any[] | null; error: string | null }> {
+    try {
+        console.log('[getAllClubs] Starting to fetch clubs...');
+        const supabase = await createClient();
+        console.log('[getAllClubs] Supabase client created');
+
+        const { data, error } = await supabase.rpc('get_clubs', {
+            search_term: null,
+            category_slug: null,
+            statut_filter: null,
+            theme_filter: null,
+            sort_by: 'created_at_desc'
+        });
+
+        console.log('[getAllClubs] RPC call completed');
+        console.log('[getAllClubs] Data received:', data ? `${data.length} clubs` : 'null');
+        console.log('[getAllClubs] Error:', error);
+
+        if (error) {
+            console.error("Error fetching clubs via RPC:", error);
+            return { data: null, error: error.message };
+        }
+
+        console.log('[getAllClubs] Returning data successfully');
+        return { data: data || [], error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getAllClubs:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}

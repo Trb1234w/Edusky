@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getClubs } from "@/lib/data/clubs"
+import { getAllClubs, getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations } from "@/app/clubs/get-data"
 import { ClubsList } from "@/app/clubs/clubs-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,9 @@ import {
   Users,
   Heart,
   ArrowLeft,
+  Tag,
+  MapPin,
+  Palette,
 } from "lucide-react"
 import {
   CustomBottomSheet,
@@ -28,6 +31,9 @@ import { ClubSidebar } from "./ui/club-sidebar"
 const iconMap: { [key: string]: React.ElementType } = {
   Users,
   Heart,
+  Tag,
+  MapPin,
+  Palette,
 }
 
 interface ClubsFilterWrapperProps {
@@ -38,11 +44,20 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
   const router = useRouter()
   const [allClubs, setAllClubs] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  // Available filters data
+  const [availableTags, setAvailableTags] = useState<string[]>([])
+  const [availableThemes, setAvailableThemes] = useState<string[]>([])
+  const [availableLieux, setAvailableLieux] = useState<string[]>([])
+
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
     categorySlugs: undefined,
     statut: "ouvert",
     minCapacite: undefined,
+    tags: undefined,
+    theme_principal: undefined,
+    lieu: undefined,
   })
 
   useEffect(() => {
@@ -52,7 +67,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       const { data: { user } } = await supabase.auth.getUser()
       const currentUserId = user?.id
 
-      const { data: clubsData } = await getClubs({})
+      const { data: clubsData } = await getAllClubs()
       let fetchedClubs = clubsData || []
 
       if (currentUserId) {
@@ -65,7 +80,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
         if (favoritesError) console.error("Error fetching user favorites:", favoritesError)
         else {
           const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id))
-          fetchedClubs = fetchedClubs.map(club => ({
+          fetchedClubs = fetchedClubs.map((club: any) => ({
             ...club,
             is_favorited: favoriteItemIds.has(club.id),
           }))
@@ -77,6 +92,31 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
     }
     fetchClubsAndFavorites()
   }, [])
+
+  // Fetch tags, themes, and locations on mount
+  useEffect(() => {
+    const fetchFiltersData = async () => {
+      const [tagsResult, themesResult, lieuxResult] = await Promise.all([
+        getDistinctClubTags(),
+        getDistinctClubThemes(),
+        getDistinctClubLocations()
+      ]);
+
+      if (tagsResult.data) {
+        setAvailableTags(tagsResult.data);
+      }
+
+      if (themesResult.data) {
+        setAvailableThemes(themesResult.data);
+      }
+
+      if (lieuxResult.data) {
+        setAvailableLieux(lieuxResult.data);
+      }
+    };
+
+    fetchFiltersData();
+  }, []);
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -90,7 +130,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
 
       const categoryMatch =
         !filters.categorySlugs ||
-        filters.categorySlugs.includes(club.categories.slug)
+        filters.categorySlugs.includes(club.categorie_slug)
 
       const statusMatch =
         !filters.statut || club.statut === filters.statut
@@ -98,7 +138,22 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       const capacityMatch =
         !filters.minCapacite || club.capacite >= Number(filters.minCapacite)
 
-      return searchMatch && categoryMatch && statusMatch && capacityMatch
+      // Tags filter
+      const tagsMatch = !filters.tags || (
+        club.tags &&
+        Array.isArray(club.tags) &&
+        club.tags.includes(filters.tags)
+      )
+
+      // Theme filter
+      const themeMatch = !filters.theme_principal ||
+        club.theme_principal === filters.theme_principal
+
+      // Location filter (text field, not cascade)
+      const lieuMatch = !filters.lieu || club.lieu === filters.lieu
+
+      return searchMatch && categoryMatch && statusMatch && capacityMatch &&
+        tagsMatch && themeMatch && lieuMatch
     })
   }, [filters, allClubs])
 
@@ -122,6 +177,24 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
         { label: "10+", value: 10 },
         { label: "50+", value: 50 },
         { label: "100+", value: 100 },
+      ],
+    },
+    {
+      label: "Thème",
+      icon: "Palette",
+      name: "theme_principal",
+      options: [
+        { label: "Tous les thèmes", value: undefined },
+        ...availableThemes.map(theme => ({ label: theme, value: theme }))
+      ],
+    },
+    {
+      label: "Lieu",
+      icon: "MapPin",
+      name: "lieu",
+      options: [
+        { label: "Tous les lieux", value: undefined },
+        ...availableLieux.map(lieu => ({ label: lieu, value: lieu }))
       ],
     },
   ]
@@ -244,13 +317,49 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
                 </CustomBottomSheet>
               )
             })}
+
+            {/* Tags filter in mobile */}
+            {availableTags.length > 0 && (
+              <CustomBottomSheet>
+                <CustomBottomSheetTrigger asChild>
+                  <Button variant={filters.tags !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
+                    <Tag size={16} className="mr-1.5" />
+                    {filters.tags || "Tags"}
+                  </Button>
+                </CustomBottomSheetTrigger>
+                <CustomBottomSheetContent>
+                  <CustomBottomSheetHeader>
+                    <CustomBottomSheetTitle>Filtrer par Tags</CustomBottomSheetTitle>
+                  </CustomBottomSheetHeader>
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomBottomSheetClose asChild>
+                      <Button
+                        variant={filters.tags === undefined ? "default" : "outline"}
+                        onClick={() => handleFilterChange("tags", undefined)}
+                      >
+                        Tous les tags
+                      </Button>
+                    </CustomBottomSheetClose>
+                    {availableTags.map(tag => (
+                      <CustomBottomSheetClose asChild key={tag}>
+                        <Button
+                          variant={filters.tags === tag ? "default" : "outline"}
+                          onClick={() => handleFilterChange("tags", tag)}
+                        >
+                          {tag}
+                        </Button>
+                      </CustomBottomSheetClose>
+                    ))}
+                  </div>
+                </CustomBottomSheetContent>
+              </CustomBottomSheet>
+            )}
           </div>
 
           <HorizontalCategoryNav
             scope="club"
             selectedSlugs={filters.categorySlugs}
             onCategorySelect={(slugs) => handleFilterChange("categorySlugs", slugs)}
-            className="border-b border-border"
           />
         </div>
       </div>
@@ -262,6 +371,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
             filters={filters}
             handleFilterChange={handleFilterChange}
             filtersConfig={filtersConfig}
+            availableTags={availableTags}
           />
         </div>
 

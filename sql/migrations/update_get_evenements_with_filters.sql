@@ -1,4 +1,6 @@
--- Create get_evenements function with all filter parameters
+-- Migration: Create/Update get_evenements function with comprehensive filters
+-- This migration adds all necessary fields for client-side filtering
+
 DROP FUNCTION IF EXISTS get_evenements(text, text, text, uuid, uuid, uuid, text, text);
 
 CREATE OR REPLACE FUNCTION get_evenements(

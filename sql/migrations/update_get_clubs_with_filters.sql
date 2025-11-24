@@ -1,4 +1,6 @@
--- Create get_clubs function with all filter parameters
+-- Migration: Create/Update get_clubs function with comprehensive filters
+-- This migration adds all necessary fields for client-side filtering
+
 DROP FUNCTION IF EXISTS get_clubs(text, text, text, text, text);
 
 CREATE OR REPLACE FUNCTION get_clubs(

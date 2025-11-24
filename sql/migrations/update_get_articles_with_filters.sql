@@ -1,4 +1,6 @@
--- Create get_articles function with all filter parameters
+-- Migration: Create/Update get_articles function with comprehensive filters
+-- This migration adds all necessary fields for client-side filtering
+
 DROP FUNCTION IF EXISTS get_articles(text, text, integer, integer, text);
 
 CREATE OR REPLACE FUNCTION get_articles(

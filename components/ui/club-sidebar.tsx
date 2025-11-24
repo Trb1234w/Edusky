@@ -26,12 +26,14 @@ interface ClubSidebarProps {
   filters: Record<string, any>
   handleFilterChange: (key: string, value: any) => void
   filtersConfig: FilterConfig[]
+  availableTags: string[]
 }
 
 export function ClubSidebar({
   filters,
   handleFilterChange,
   filtersConfig,
+  availableTags,
 }: ClubSidebarProps) {
 
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
@@ -122,6 +124,40 @@ export function ClubSidebar({
             </AccordionContent>
           </AccordionItem>
         ))}
+
+        {/* Tags Filter */}
+        {availableTags.length > 0 && (
+          <AccordionItem value="tags">
+            <AccordionTrigger className="text-lg font-semibold">Tags</AccordionTrigger>
+            <AccordionContent className="space-y-2 pt-2">
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  className={
+                    filters.tags === undefined
+                      ? "text-xs h-9 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                      : "text-xs h-9 bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90"
+                  }
+                  onClick={() => handleFilterChange('tags', undefined)}
+                >
+                  Tous
+                </Button>
+                {availableTags.map(tag => (
+                  <Button
+                    key={tag}
+                    className={
+                      filters.tags === tag
+                        ? "text-xs h-9 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                        : "text-xs h-9 bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90"
+                    }
+                    onClick={() => handleFilterChange('tags', tag)}
+                  >
+                    {tag}
+                  </Button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
       </Accordion>
     </aside>
   )
