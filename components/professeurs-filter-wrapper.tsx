@@ -244,25 +244,26 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
     }, [filters, allProfesseurs])
 
     const mainFiltersConfig = [
-        { label: "Note", name: "note", icon: "Star", options: [{ label: "Toutes", value: undefined }, { label: "4+", value: 4 }, { label: "3+", value: 3 }] },
-        { label: "Expérience", name: "experience", icon: "Award", options: [{ label: "Toutes", value: undefined }, { label: "0-2 ans", value: "0-2" }, { label: "2-5 ans", value: "2-5" }, { label: "5-10 ans", value: "5-10" }, { label: "10+ ans", value: "10+" }] },
-        { label: "Certifications", name: "certifications", icon: "CheckCircle", options: [{ label: "Tous", value: undefined }, { label: "Oui", value: "true" }, { label: "Non", value: "false" }] },
+        { label: "Note", name: "note", icon: "Star", options: [{ label: "Note", value: undefined }, { label: "4+", value: 4 }, { label: "3+", value: 3 }] },
+        { label: "Expérience", name: "experience", icon: "Award", options: [{ label: "Experience", value: undefined }, { label: "0-2 ans", value: "0-2" }, { label: "2-5 ans", value: "2-5" }, { label: "5-10 ans", value: "5-10" }, { label: "10+ ans", value: "10+" }] },
+        { label: "Certifications", name: "certifications", icon: "CheckCircle", options: [{ label: "Certifications", value: undefined }, { label: "Oui", value: "true" }, { label: "Non", value: "false" }] },
     ]
 
     const locationFiltersConfig = [
-        { label: "Pays", name: "pays_id", icon: "MapPin", options: [{ label: "Tous les pays", value: undefined }, ...locations.countries.map(c => ({ label: c.nom, value: c.id }))] },
-        { label: "Ville", name: "ville_id", icon: "Building2", options: [{ label: "Toutes les villes", value: undefined }, ...getFilteredVilles().map(v => ({ label: v.nom, value: v.id }))] },
-        { label: "Quartier", name: "quartier_id", icon: "Home", options: [{ label: "Tous les quartiers", value: undefined }, ...getFilteredQuartiers().map(q => ({ label: q.nom, value: q.id }))] },
+        { label: "Pays", name: "pays_id", icon: "MapPin", options: [{ label: "Pays", value: undefined }, ...locations.countries.map(c => ({ label: c.nom, value: c.id }))] },
+        { label: "Ville", name: "ville_id", icon: "Building2", options: [{ label: "Ville", value: undefined }, ...getFilteredVilles().map(v => ({ label: v.nom, value: v.id }))] },
+        { label: "Quartier", name: "quartier_id", icon: "Home", options: [{ label: "Quartier", value: undefined }, ...getFilteredQuartiers().map(q => ({ label: q.nom, value: q.id }))] },
     ]
 
     const secondaryFiltersConfig = [
-        { label: "Tarif", name: "tarif", icon: "TrendingUp", options: [{ label: "Tous", value: undefined }, { label: "Gratuit", value: "0" }, { label: "< 50k GNF", value: "50000" }, { label: "50k-100k", value: "50000-100000" }, { label: "100k-200k", value: "100000-200000" }, { label: "200k+", value: "200000+" }] },
-        { label: "Étudiants", name: "etudiants", icon: "Users", options: [{ label: "Tous", value: undefined }, { label: "10+", value: "10" }, { label: "50+", value: "50" }, { label: "100+", value: "100" }, { label: "500+", value: "500" }] },
-        { label: "Genre", name: "genre", icon: "Globe", options: [{ label: "Tous", value: undefined }, { label: "Homme", value: "Homme" }, { label: "Femme", value: "Femme" }] },
+        { label: "Tarif", name: "tarif", icon: "TrendingUp", options: [{ label: "Tarif", value: undefined }, { label: "Gratuit", value: "0" }, { label: "< 50k GNF", value: "50000" }, { label: "50k-100k", value: "50000-100000" }, { label: "100k-200k", value: "100000-200000" }, { label: "200k+", value: "200000+" }] },
+        { label: "Étudiants", name: "etudiants", icon: "Users", options: [{ label: "Étudiants", value: undefined }, { label: "10+", value: "10" }, { label: "50+", value: "50" }, { label: "100+", value: "100" }, { label: "500+", value: "500" }] },
+        { label: "Genre", name: "genre", icon: "Globe", options: [{ label: "Genre", value: undefined }, { label: "Homme", value: "Homme" }, { label: "Femme", value: "Femme" }] },
     ]
 
     return (
         <div className="container mx-auto px-4 lg:px-8">
+            {/* Mobile-only Filter UI */}
             <div className="lg:hidden">
                 <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
                     <div className="md:hidden px-4 py-2 border-b flex items-center">
@@ -288,10 +289,12 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                         </form>
                     </div>
 
-                    <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                    {/* Barre de filtres horizontale scrollable */}
+                    <div className="flex items-center gap-2 px-4 py-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        {/* Bouton "Tous les filtres" */}
                         <CustomBottomSheet>
                             <CustomBottomSheetTrigger asChild>
-                                <Button variant="outline" size="sm" className="rounded-xl">
+                                <Button variant="outline" size="sm" className="rounded-xl whitespace-nowrap">
                                     <SlidersHorizontal size={16} />
                                 </Button>
                             </CustomBottomSheetTrigger>
@@ -299,7 +302,7 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                                 <CustomBottomSheetHeader>
                                     <CustomBottomSheetTitle>Tous les filtres</CustomBottomSheetTitle>
                                 </CustomBottomSheetHeader>
-                                <div className="grid gap-4 py-4">
+                                <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
                                     {[...mainFiltersConfig, ...locationFiltersConfig, ...secondaryFiltersConfig].map(filter => (
                                         <div key={filter.name}>
                                             <h4 className="font-semibold mb-2">{filter.label}</h4>
@@ -320,13 +323,15 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                                 </div>
                             </CustomBottomSheetContent>
                         </CustomBottomSheet>
+
+                        {/* Filtres principaux */}
                         {mainFiltersConfig.map(filter => {
                             const Icon = iconMap[filter.icon]
                             const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
                             return (
                                 <CustomBottomSheet key={filter.name}>
                                     <CustomBottomSheetTrigger asChild>
-                                        <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
+                                        <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl whitespace-nowrap">
                                             {Icon && <Icon size={16} className="mr-1.5" />}
                                             {displayValue}
                                         </Button>
@@ -351,36 +356,198 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                                 </CustomBottomSheet>
                             )
                         })}
-                    </div>
 
-                    {availableSpecialties.length > 0 && (
-                        <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                            <div className="flex gap-2 px-4 py-2 min-w-max">
-                                <Button
-                                    variant={filters.specialite === undefined ? "default" : "outline"}
-                                    size="sm"
-                                    className="rounded-full whitespace-nowrap transition-all"
-                                    onClick={() => handleFilterChange("specialite", undefined)}
-                                >
-                                    Toutes
-                                </Button>
-                                {availableSpecialties.map(spec => (
-                                    <Button
-                                        key={spec}
-                                        variant={filters.specialite === spec ? "default" : "outline"}
-                                        size="sm"
-                                        className="rounded-full whitespace-nowrap transition-all"
-                                        onClick={() => handleFilterChange("specialite", spec)}
-                                    >
-                                        {spec}
+                        {/* Type de professeur */}
+                        {availableTypes.length > 0 && (
+                            <CustomBottomSheet>
+                                <CustomBottomSheetTrigger asChild>
+                                    <Button variant={filters.type !== undefined ? "default" : "outline"} size="sm" className="rounded-xl whitespace-nowrap">
+                                        <Briefcase size={16} className="mr-1.5" />
+                                        {filters.type ? (
+                                            filters.type === 'en_ligne' ? 'En ligne' :
+                                                filters.type === 'a_domicile' ? 'À domicile' :
+                                                    filters.type === 'mentor' ? 'Mentor' :
+                                                        filters.type === 'coach' ? 'Coach' :
+                                                            filters.type === 'tuteur' ? 'Tuteur' : filters.type
+                                        ) : 'Type'}
                                     </Button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                                </CustomBottomSheetTrigger>
+                                <CustomBottomSheetContent>
+                                    <CustomBottomSheetHeader>
+                                        <CustomBottomSheetTitle>Type de professeur</CustomBottomSheetTitle>
+                                    </CustomBottomSheetHeader>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <CustomBottomSheetClose asChild>
+                                            <Button
+                                                variant={filters.type === undefined ? "default" : "outline"}
+                                                onClick={() => handleFilterChange('type', undefined)}
+                                            >
+                                                Tous
+                                            </Button>
+                                        </CustomBottomSheetClose>
+                                        {availableTypes.map(type => (
+                                            <CustomBottomSheetClose asChild key={type}>
+                                                <Button
+                                                    variant={filters.type === type ? "default" : "outline"}
+                                                    onClick={() => handleFilterChange('type', type)}
+                                                >
+                                                    {type === 'en_ligne' ? 'En ligne' :
+                                                        type === 'a_domicile' ? 'À domicile' :
+                                                            type === 'mentor' ? 'Mentor' :
+                                                                type === 'coach' ? 'Coach' :
+                                                                    type === 'tuteur' ? 'Tuteur' : type}
+                                                </Button>
+                                            </CustomBottomSheetClose>
+                                        ))}
+                                    </div>
+                                </CustomBottomSheetContent>
+                            </CustomBottomSheet>
+                        )}
+
+                        {/* Spécialités */}
+                        {availableSpecialties.length > 0 && (
+                            <CustomBottomSheet>
+                                <CustomBottomSheetTrigger asChild>
+                                    <Button variant={filters.specialite !== undefined ? "default" : "outline"} size="sm" className="rounded-xl whitespace-nowrap">
+                                        <Award size={16} className="mr-1.5" />
+                                        {filters.specialite || 'Spécialités'}
+                                    </Button>
+                                </CustomBottomSheetTrigger>
+                                <CustomBottomSheetContent>
+                                    <CustomBottomSheetHeader>
+                                        <CustomBottomSheetTitle>Spécialités</CustomBottomSheetTitle>
+                                    </CustomBottomSheetHeader>
+                                    <div className="grid grid-cols-2 gap-2 max-h-[50vh] overflow-y-auto">
+                                        <CustomBottomSheetClose asChild>
+                                            <Button
+                                                variant={filters.specialite === undefined ? "default" : "outline"}
+                                                onClick={() => handleFilterChange('specialite', undefined)}
+                                            >
+                                                Toutes
+                                            </Button>
+                                        </CustomBottomSheetClose>
+                                        {availableSpecialties.map(spec => (
+                                            <CustomBottomSheetClose asChild key={spec}>
+                                                <Button
+                                                    variant={filters.specialite === spec ? "default" : "outline"}
+                                                    onClick={() => handleFilterChange('specialite', spec)}
+                                                >
+                                                    {spec}
+                                                </Button>
+                                            </CustomBottomSheetClose>
+                                        ))}
+                                    </div>
+                                </CustomBottomSheetContent>
+                            </CustomBottomSheet>
+                        )}
+
+                        {/* Filtres de localisation */}
+                        {locationFiltersConfig.map(filter => {
+                            const Icon = iconMap[filter.icon]
+                            const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
+                            return (
+                                <CustomBottomSheet key={filter.name}>
+                                    <CustomBottomSheetTrigger asChild>
+                                        <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl whitespace-nowrap">
+                                            {Icon && <Icon size={16} className="mr-1.5" />}
+                                            {displayValue}
+                                        </Button>
+                                    </CustomBottomSheetTrigger>
+                                    <CustomBottomSheetContent>
+                                        <CustomBottomSheetHeader>
+                                            <CustomBottomSheetTitle>{filter.label}</CustomBottomSheetTitle>
+                                        </CustomBottomSheetHeader>
+                                        <div className="grid grid-cols-2 gap-2 max-h-[50vh] overflow-y-auto">
+                                            {filter.options.map(option => (
+                                                <CustomBottomSheetClose asChild key={option.label}>
+                                                    <Button
+                                                        variant={filters[filter.name] === option.value ? "default" : "outline"}
+                                                        onClick={() => handleFilterChange(filter.name, option.value)}
+                                                    >
+                                                        {option.label}
+                                                    </Button>
+                                                </CustomBottomSheetClose>
+                                            ))}
+                                        </div>
+                                    </CustomBottomSheetContent>
+                                </CustomBottomSheet>
+                            )
+                        })}
+
+                        {/* Filtres secondaires */}
+                        {secondaryFiltersConfig.map(filter => {
+                            const Icon = iconMap[filter.icon]
+                            const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
+                            return (
+                                <CustomBottomSheet key={filter.name}>
+                                    <CustomBottomSheetTrigger asChild>
+                                        <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl whitespace-nowrap">
+                                            {Icon && <Icon size={16} className="mr-1.5" />}
+                                            {displayValue}
+                                        </Button>
+                                    </CustomBottomSheetTrigger>
+                                    <CustomBottomSheetContent>
+                                        <CustomBottomSheetHeader>
+                                            <CustomBottomSheetTitle>{filter.label}</CustomBottomSheetTitle>
+                                        </CustomBottomSheetHeader>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {filter.options.map(option => (
+                                                <CustomBottomSheetClose asChild key={option.label}>
+                                                    <Button
+                                                        variant={filters[filter.name] === option.value ? "default" : "outline"}
+                                                        onClick={() => handleFilterChange(filter.name, option.value)}
+                                                    >
+                                                        {option.label}
+                                                    </Button>
+                                                </CustomBottomSheetClose>
+                                            ))}
+                                        </div>
+                                    </CustomBottomSheetContent>
+                                </CustomBottomSheet>
+                            )
+                        })}
+
+                        {/* Langues */}
+                        {availableLangues.length > 0 && (
+                            <CustomBottomSheet>
+                                <CustomBottomSheetTrigger asChild>
+                                    <Button variant={filters.langue !== undefined ? "default" : "outline"} size="sm" className="rounded-xl whitespace-nowrap">
+                                        <Globe size={16} className="mr-1.5" />
+                                        {filters.langue || 'Langues'}
+                                    </Button>
+                                </CustomBottomSheetTrigger>
+                                <CustomBottomSheetContent>
+                                    <CustomBottomSheetHeader>
+                                        <CustomBottomSheetTitle>Langues</CustomBottomSheetTitle>
+                                    </CustomBottomSheetHeader>
+                                    <div className="grid grid-cols-2 gap-2 max-h-[50vh] overflow-y-auto">
+                                        <CustomBottomSheetClose asChild>
+                                            <Button
+                                                variant={filters.langue === undefined ? "default" : "outline"}
+                                                onClick={() => handleFilterChange('langue', undefined)}
+                                            >
+                                                Toutes
+                                            </Button>
+                                        </CustomBottomSheetClose>
+                                        {availableLangues.map(langue => (
+                                            <CustomBottomSheetClose asChild key={langue}>
+                                                <Button
+                                                    variant={filters.langue === langue ? "default" : "outline"}
+                                                    onClick={() => handleFilterChange('langue', langue)}
+                                                >
+                                                    {langue}
+                                                </Button>
+                                            </CustomBottomSheetClose>
+                                        ))}
+                                    </div>
+                                </CustomBottomSheetContent>
+                            </CustomBottomSheet>
+                        )}
+                    </div>
                 </div>
             </div>
 
+            {/* Desktop Layout */}
             <div className="flex gap-8">
                 <div className="hidden lg:block w-full max-w-xs mt-4 lg:animate-fade-in-left lg:animation-delay-300">
                     <ProfesseurSidebar
@@ -395,6 +562,7 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                     />
                 </div>
                 <div className="flex-1 py-4 lg:animate-fade-in-up lg:animation-delay-500">
+                    {/* Desktop Header */}
                     <div className="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-border/50">
                         <div>
                             <h2 className="text-2xl font-bold">Catalogue</h2>
