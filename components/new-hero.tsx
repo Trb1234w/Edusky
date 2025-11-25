@@ -125,23 +125,6 @@ export function NewHero() {
                 <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary/10 blur-[120px] rounded-full animate-pulse" />
                 <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-secondary/10 blur-[120px] rounded-full animate-pulse animation-delay-2000" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 h-1/3 bg-accent/5 blur-[100px] rounded-full animate-pulse animation-delay-1000" />
-
-                {/* Advanced Particles */}
-                {[...Array(20)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="absolute rounded-full bg-white animate-twinkle"
-                        style={{
-                            width: Math.random() * 3 + 1 + 'px',
-                            height: Math.random() * 3 + 1 + 'px',
-                            top: `${Math.random() * 100}%`,
-                            left: `${Math.random() * 100}%`,
-                            opacity: Math.random() * 0.5 + 0.1,
-                            animationDelay: `${Math.random() * 5}s`,
-                            animationDuration: `${3 + Math.random() * 4}s`
-                        }}
-                    />
-                ))}
             </div>
 
             <div className="container mx-auto px-4 md:px-8 lg:px-12">

@@ -62,26 +62,34 @@ export function FormationSidebar({
   const visibleCategories = categoryTree.slice(0, 5);
 
   return (
-    <aside className="border bg-primary text-primary-foreground rounded-xl p-6 shadow-sm space-y-6">
-      <h3 className="text-xl font-semibold">Filtres</h3>
-
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground" size={18} />
-        <Input
-          placeholder="Rechercher par mot-clé..."
-          className="pl-10 h-10 rounded-xl placeholder-primary-foreground"
-          value={filters.search}
-          onChange={e => handleFilterChange('search', e.target.value)}
-        />
+    <aside className="sticky top-24 h-fit border border-border/50 bg-card/50 backdrop-blur-xl rounded-2xl p-6 shadow-lg space-y-8 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+      <div className="flex items-center gap-2 pb-4 border-b border-border/50">
+        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+          <FolderTree size={20} />
+        </div>
+        <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Filtres</h3>
       </div>
 
-      <Accordion type="multiple" defaultValue={['categories', 'niveau']} className="w-full">
+      {/* Search Bar */}
+      <div className="relative group">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+          <Input
+            placeholder="Rechercher..."
+            className="pl-10 h-11 rounded-xl border-border/50 bg-background/50 focus:bg-background transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+            value={filters.search}
+            onChange={e => handleFilterChange('search', e.target.value)}
+          />
+        </div>
+      </div>
+
+      <Accordion type="multiple" defaultValue={['categories', 'niveau']} className="w-full space-y-4">
         {/* Categories Section */}
-        <AccordionItem value="categories">
-          <AccordionTrigger className="text-lg font-semibold">Catégories</AccordionTrigger>
+        <AccordionItem value="categories" className="border-none">
+          <AccordionTrigger className="text-base font-semibold hover:no-underline py-2 hover:text-primary transition-colors">Catégories</AccordionTrigger>
           <AccordionContent className="space-y-2 pt-2">
-            <div className="space-y-2">
+            <div className="space-y-1">
               {/* Visible categories (first 5) - using recursive component */}
               {visibleCategories.map((category) => (
                 <SidebarCategoryItem
@@ -99,11 +107,11 @@ export function FormationSidebar({
                 onCategorySelect={handleCategorySelection}
                 trigger={
                   <Button
-                    variant="outline"
-                    className="w-full justify-start bg-primary-foreground text-primary border-2 border-dashed border-primary hover:bg-primary-foreground/90"
+                    variant="ghost"
+                    className="w-full justify-start text-muted-foreground hover:text-primary hover:bg-primary/5 mt-2 h-9 font-medium"
                   >
                     <FolderTree className="mr-2 h-4 w-4" />
-                    Toutes les catégories ({categoryTree.length})
+                    Voir tout ({categoryTree.length})
                   </Button>
                 }
               />
@@ -113,17 +121,19 @@ export function FormationSidebar({
 
         {/* Dynamic Filters */}
         {[...mainFiltersConfig, ...locationFiltersConfig, ...secondaryFiltersConfig].map(filterGroup => (
-          <AccordionItem key={filterGroup.name} value={filterGroup.name}>
-            <AccordionTrigger className="text-lg font-semibold">{filterGroup.label}</AccordionTrigger>
+          <AccordionItem key={filterGroup.name} value={filterGroup.name} className="border-none">
+            <AccordionTrigger className="text-base font-semibold hover:no-underline py-2 hover:text-primary transition-colors">{filterGroup.label}</AccordionTrigger>
             <AccordionContent className="space-y-2 pt-2">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-wrap gap-2">
                 {filterGroup.options.map(option => (
                   <Button
                     key={option.label}
+                    variant="outline"
+                    size="sm"
                     className={
                       filters[filterGroup.name] === option.value
-                        ? "text-xs h-9 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                        : "text-xs h-9 bg-primary-foreground text-primary border border-primary hover:bg-primary-foreground/90"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 border-primary"
+                        : "bg-transparent hover:bg-primary/5 hover:text-primary border-border/50"
                     }
                     onClick={() => handleFilterChange(filterGroup.name, option.value)}
                   >

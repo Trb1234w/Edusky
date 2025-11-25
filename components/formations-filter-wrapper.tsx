@@ -470,7 +470,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
 
       {/* Desktop Layout */}
       <div className="flex gap-8">
-        <div className="hidden lg:block w-full max-w-xs mt-4">
+        <div className="hidden lg:block w-full max-w-xs mt-4 lg:animate-fade-in-left lg:animation-delay-300">
           <FormationSidebar
             filters={filters}
             handleFilterChange={handleFilterChange}
@@ -481,7 +481,18 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
             availableTags={availableTags}
           />
         </div>
-        <div className="flex-1 py-4">
+        <div className="flex-1 py-4 lg:animate-fade-in-up lg:animation-delay-500">
+          {/* Desktop Header */}
+          <div className="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-border/50">
+            <div>
+              <h2 className="text-2xl font-bold">Catalogue</h2>
+              <p className="text-muted-foreground text-sm">Explorez nos meilleures formations</p>
+            </div>
+            <div className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+              {filteredFormations.length} résultats
+            </div>
+          </div>
+
           <FormationsList formations={filteredFormations} isLoading={isLoading} />
         </div>
       </div>

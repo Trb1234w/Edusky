@@ -9,68 +9,155 @@ export function MobileNav() {
   const pathname = usePathname()
 
   const navItems = [
-    { href: "/", icon: Home, label: "Accueil" },
-    { href: "/professeurs", icon: GraduationCap, label: "Professeurs" },
-    { href: "/formations", icon: BookOpen, label: "Formations" },
-    { href: "/evenements", icon: Calendar, label: "Événements" },
-    { href: "/clubs", icon: Users, label: "Clubs" },
-    { href: "/blog", icon: Newspaper, label: "Blog" },
+    { href: "/", icon: Home, label: "Accueil", color: "from-blue-500 to-cyan-500" },
+    { href: "/professeurs", icon: GraduationCap, label: "Profs", color: "from-green-500 to-emerald-500" },
+    { href: "/formations", icon: BookOpen, label: "Cours", color: "from-purple-500 to-pink-500" },
+    { href: "/evenements", icon: Calendar, label: "Events", color: "from-orange-500 to-red-500" },
+    { href: "/clubs", icon: Users, label: "Clubs", color: "from-blue-500 to-indigo-500" },
+    { href: "/blog", icon: Newspaper, label: "Blog", color: "from-violet-500 to-purple-500" },
   ]
 
   return (
     <>
-      <nav className="lg:hidden fixed bottom-4 left-4 right-4 z-50">
-        <div className="bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-3xl px-2 py-3">
-          <div className="flex items-center justify-around relative">
-            {navItems.slice(0, 3).map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 p-2 rounded-2xl transition-all duration-200 relative",
-                    isActive ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {isActive && <div className="absolute inset-0 bg-primary/10 rounded-2xl animate-pulse" />}
-                  <div className="relative z-10">
-                    <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                  </div>
-                </Link>
-              )
-            })}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+        {/* Main Container - Full Width Edge to Edge */}
+        <div className="relative bg-card/90 backdrop-blur-2xl shadow-2xl">
+          {/* Gradient Top Border - Highlighted */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent" />
 
-            <Link href="/feed" className="flex items-center justify-center -mt-8 relative">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-lg flex items-center justify-center hover:scale-110 transition-transform">
-                <Plus size={28} className="text-white" strokeWidth={2.5} />
-              </div>
-              {pathname === "/feed" && <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />}
-            </Link>
+          <div className="px-1 py-2 pt-3">
+            <div className="flex items-center justify-around relative">
+              {navItems.slice(0, 3).map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-all duration-300 relative group",
+                      isActive ? "scale-105" : "scale-100 hover:scale-105 active:scale-95"
+                    )}
+                  >
+                    {/* Active Background with Gradient */}
+                    {isActive && (
+                      <div className={cn(
+                        "absolute inset-0 bg-gradient-to-br rounded-xl opacity-10",
+                        item.color
+                      )} />
+                    )}
 
-            {navItems.slice(3).map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 p-2 rounded-2xl transition-all duration-200 relative",
-                    isActive ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {isActive && <div className="absolute inset-0 bg-primary/10 rounded-2xl animate-pulse" />}
-                  <div className="relative z-10">
-                    <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                  </div>
-                </Link>
-              )
-            })}
+                    {/* Hover Effect */}
+                    <div className={cn(
+                      "absolute inset-0 bg-gradient-to-br rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300",
+                      item.color
+                    )} />
+
+                    {/* Icon Container */}
+                    <div className={cn(
+                      "relative z-10 transition-all duration-300",
+                      isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                    )}>
+                      <item.icon
+                        size={20}
+                        strokeWidth={isActive ? 2.5 : 2}
+                        className={cn(
+                          "transition-all duration-300",
+                          isActive && "drop-shadow-sm"
+                        )}
+                      />
+                    </div>
+
+                    {/* Label */}
+                    <span className={cn(
+                      "text-[9px] font-medium transition-all duration-300 relative z-10",
+                      isActive ? "text-foreground opacity-100" : "text-muted-foreground opacity-70 group-hover:opacity-100"
+                    )}>
+                      {item.label}
+                    </span>
+                  </Link>
+                )
+              })}
+
+              {/* Center FAB Button */}
+              <Link
+                href="/feed"
+                className="flex items-center justify-center -mt-8 relative group"
+              >
+                {/* Outer Glow Ring */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent rounded-full opacity-30 blur-md scale-110 group-hover:scale-125 group-active:scale-105 transition-transform duration-300" />
+
+                {/* Main Button */}
+                <div className="relative w-13 h-13 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-2xl flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-all duration-300">
+                  {/* Inner Shine Effect */}
+                  <div className="absolute inset-[2px] rounded-full bg-gradient-to-br from-white/20 to-transparent" />
+
+                  {/* Icon */}
+                  <Plus size={24} className="text-white relative z-10 group-hover:rotate-90 transition-transform duration-300" strokeWidth={2.5} />
+                </div>
+
+                {/* Active Indicator */}
+                {pathname === "/feed" && (
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-secondary animate-pulse" />
+                )}
+              </Link>
+
+              {navItems.slice(3).map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-all duration-300 relative group",
+                      isActive ? "scale-105" : "scale-100 hover:scale-105 active:scale-95"
+                    )}
+                  >
+                    {/* Active Background with Gradient */}
+                    {isActive && (
+                      <div className={cn(
+                        "absolute inset-0 bg-gradient-to-br rounded-xl opacity-10",
+                        item.color
+                      )} />
+                    )}
+
+                    {/* Hover Effect */}
+                    <div className={cn(
+                      "absolute inset-0 bg-gradient-to-br rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300",
+                      item.color
+                    )} />
+
+                    {/* Icon Container */}
+                    <div className={cn(
+                      "relative z-10 transition-all duration-300",
+                      isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                    )}>
+                      <item.icon
+                        size={20}
+                        strokeWidth={isActive ? 2.5 : 2}
+                        className={cn(
+                          "transition-all duration-300",
+                          isActive && "drop-shadow-sm"
+                        )}
+                      />
+                    </div>
+
+                    {/* Label */}
+                    <span className={cn(
+                      "text-[9px] font-medium transition-all duration-300 relative z-10",
+                      isActive ? "text-foreground opacity-100" : "text-muted-foreground opacity-70 group-hover:opacity-100"
+                    )}>
+                      {item.label}
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="lg:hidden h-24" />
+      {/* Bottom Spacer */}
+      <div className="lg:hidden h-20" />
     </>
   )
 }

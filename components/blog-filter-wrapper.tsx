@@ -399,8 +399,18 @@ export function BlogFilterWrapper({ gradient }: BlogFilterWrapperProps) {
       </div>
 
       {/* Desktop Layout */}
-      <div className="flex gap-8 mt-2">
-        <div className="hidden lg:block w-full max-w-xs mt-2">
+      <div className="hidden lg:flex items-center justify-between mb-6 mt-8">
+        <div>
+          <h2 className="text-2xl font-bold">Tous les articles</h2>
+          <p className="text-muted-foreground">Explorez nos conseils, actualités et ressources</p>
+        </div>
+        <div className="px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
+          {filteredArticles.length} article{filteredArticles.length > 1 ? 's' : ''}
+        </div>
+      </div>
+
+      <div className="flex gap-8 lg:animate-fade-in-up mt-2">
+        <div className="hidden lg:block w-full max-w-xs mt-2 lg:animate-fade-in-left lg:animation-delay-300">
           <BlogSidebar
             filters={filters}
             handleFilterChange={handleFilterChange}

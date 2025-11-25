@@ -517,8 +517,18 @@ export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
             </div>
 
             {/* Desktop Layout */}
-            <div className="flex gap-8">
-                <div className="hidden lg:block w-full max-w-xs mt-4">
+            <div className="hidden lg:flex items-center justify-between mb-6 mt-8">
+                <div>
+                    <h2 className="text-2xl font-bold">Tous les événements</h2>
+                    <p className="text-muted-foreground">Découvrez et participez aux événements à venir</p>
+                </div>
+                <div className="px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
+                    {filteredEvenements.length} événement{filteredEvenements.length > 1 ? 's' : ''}
+                </div>
+            </div>
+
+            <div className="flex gap-8 lg:animate-fade-in-up">
+                <div className="hidden lg:block w-full max-w-xs mt-4 lg:animate-fade-in-left lg:animation-delay-300">
                     <EvenementSidebar
                         filters={filters}
                         handleFilterChange={handleFilterChange}

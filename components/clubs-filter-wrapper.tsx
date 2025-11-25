@@ -365,8 +365,18 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       </div>
 
       {/* Desktop layout */}
-      <div className="flex gap-8 mt-2">
-        <div className="hidden lg:block w-full max-w-xs mt-2">
+      <div className="hidden lg:flex items-center justify-between mb-6 mt-8">
+        <div>
+          <h2 className="text-2xl font-bold">Tous les clubs</h2>
+          <p className="text-muted-foreground">Découvrez et rejoignez des communautés passionnées</p>
+        </div>
+        <div className="px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
+          {filteredClubs.length} club{filteredClubs.length > 1 ? 's' : ''}
+        </div>
+      </div>
+
+      <div className="flex gap-8 lg:animate-fade-in-up mt-2">
+        <div className="hidden lg:block w-full max-w-xs mt-2 lg:animate-fade-in-left lg:animation-delay-300">
           <ClubSidebar
             filters={filters}
             handleFilterChange={handleFilterChange}

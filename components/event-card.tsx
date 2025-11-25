@@ -113,17 +113,22 @@ export function EventCard({
 
                 {/* Content Section */}
                 <div className="flex-1 p-5 flex flex-col">
-                    <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-1 group-hover:text-primary transition-colors">
+                    <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
                         {title}
                     </h3>
 
-                    <div className="space-y-2.5 mb-5">
-                        <div className="flex items-center gap-2.5 text-base text-muted-foreground">
-                            <Clock size={16} className="text-primary" />
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                        {description}
+                    </p>
+
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center gap-1.5">
+                            <Clock size={16} className="text-primary shrink-0" />
                             <span>{time}</span>
                         </div>
-                        <div className="flex items-center gap-2.5 text-base text-muted-foreground">
-                            <MapPin size={16} className="text-primary" />
+                        <span className="text-border">|</span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                            <MapPin size={16} className="text-primary shrink-0" />
                             <span className="truncate">{location}</span>
                         </div>
                     </div>

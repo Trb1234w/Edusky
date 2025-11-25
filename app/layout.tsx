@@ -5,10 +5,12 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import AOSInitializer from "./components/AOSInitializer"
 import { Toaster } from "@/components/ui/toaster"
+import { MobileNav } from "@/components/mobile-nav"
+import { LayoutWrapper } from "@/components/layout-wrapper"
 
-const poppins = Poppins({ 
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"] 
+  weight: ["400", "500", "600", "700"]
 })
 
 export const metadata: Metadata = {
@@ -25,7 +27,10 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${poppins.className} font-sans antialiased`}>
-        {children}
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
+        <MobileNav />
         <Toaster />
         <AOSInitializer />
         <Analytics />
