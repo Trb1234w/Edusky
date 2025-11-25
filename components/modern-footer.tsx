@@ -29,7 +29,7 @@ import { GlossyButton } from './modern/GlossyButton'
 export function ModernFooter() {
     const pathname = usePathname()
     const isHomepage = pathname === '/'
-    const shouldShowOnMobile = isHomepage
+    const shouldShowOnMobile = true
     const [email, setEmail] = useState('')
 
     const sections = [

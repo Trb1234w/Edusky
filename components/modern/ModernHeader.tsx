@@ -63,14 +63,14 @@ export function ModernHeader() {
     ]
 
     const isHomepage = pathname === '/'
-    const shouldShowOnMobile = isHomepage
+    const shouldShowOnMobile = true // Controlled by LayoutWrapper
 
     return (
         <header
             className={cn(
                 'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
                 !shouldShowOnMobile && 'max-lg:hidden',
-                scrolled
+                scrolled || !isHomepage
                     ? 'bg-background/95 backdrop-blur-xl border-b border-primary/20 shadow-lg shadow-primary/5'
                     : 'bg-transparent border-b border-transparent'
             )}

@@ -2,9 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { ModernHeader } from "@/components/modern/ModernHeader"
-import { Header } from "@/components/header"
 import { ModernFooter } from "@/components/modern-footer"
-import { Footer } from "@/components/footer"
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
@@ -14,9 +12,17 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
     return (
         <>
-            {isHomePage ? <ModernHeader /> : <Header />}
+            {/* Header : Visible sur mobile UNIQUEMENT pour Accueil et Feed */}
+            <div className={pathname === '/' || pathname.startsWith('/feed') ? "block" : "hidden lg:block"}>
+                <ModernHeader />
+            </div>
+
             {children}
-            {isHomePage ? <ModernFooter /> : <Footer />}
+
+            {/* Footer : Visible sur mobile UNIQUEMENT pour Accueil et Feed */}
+            <div className={pathname === '/' || pathname.startsWith('/feed') ? "block" : "hidden lg:block"}>
+                <ModernFooter />
+            </div>
         </>
     )
 }

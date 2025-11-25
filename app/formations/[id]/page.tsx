@@ -7,7 +7,7 @@ import Image from "next/image";
 
 import Link from "next/link";
 
-import { Header } from "@/components/header"; 
+import { Header } from "@/components/header";
 
 import { Footer } from "@/components/footer";
 
@@ -211,13 +211,13 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
           <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8 xl:gap-12">
 
-            
+
 
             {/* Colonne de gauche : Contenu principal */}
 
             <div className="lg:col-span-2 space-y-6">
 
-              
+
 
               {/* Carte Hero */}
 
@@ -225,7 +225,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 {formation.categorie && (
 
-                   <Link href={`/formations?categorie=${formation.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
+                  <Link href={`/formations?categorie=${formation.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
 
                     {formation.categorie.nom}
 
@@ -237,7 +237,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <p className="text-lg text-muted-foreground mt-3">{formation.extrait}</p>
 
-                
+
 
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-4">
 
@@ -295,7 +295,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <div className="flex items-center gap-3">
 
-                  <Clock className="h-8 w-8 text-primary"/>
+                  <Clock className="h-8 w-8 text-primary" />
 
                   <div><p className="text-sm text-muted-foreground">Durée</p><p className="font-bold">{formation.duree_texte || 'N/A'}</p></div>
 
@@ -303,7 +303,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <div className="flex items-center gap-3">
 
-                  <BarChart3 className="h-8 w-8 text-primary"/>
+                  <BarChart3 className="h-8 w-8 text-primary" />
 
                   <div><p className="text-sm text-muted-foreground">Niveau</p><p className="font-bold">{formation.niveau || 'Tous'}</p></div>
 
@@ -311,7 +311,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <div className="flex items-center gap-3">
 
-                  <ListVideo className="h-8 w-8 text-primary"/>
+                  <ListVideo className="h-8 w-8 text-primary" />
 
                   <div><p className="text-sm text-muted-foreground">Contenu</p><p className="font-bold">{nbLecons} leçons</p></div>
 
@@ -319,7 +319,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <div className="flex items-center gap-3">
 
-                  <GraduationCap className="h-8 w-8 text-primary"/>
+                  <GraduationCap className="h-8 w-8 text-primary" />
 
                   <div><p className="text-sm text-muted-foreground">Certificat</p><p className="font-bold">{formation.certificat ? 'Oui' : 'Non'}</p></div>
 
@@ -335,17 +335,17 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-muted/50 rounded-xl">
 
-                  <TabsTrigger value="about"><Info className="h-4 w-4 mr-2"/>À propos</TabsTrigger>
+                  <TabsTrigger value="about"><Info className="h-4 w-4 mr-2" />À propos</TabsTrigger>
 
-                  <TabsTrigger value="curriculum"><Book className="h-4 w-4 mr-2"/>Programme</TabsTrigger>
+                  <TabsTrigger value="curriculum"><Book className="h-4 w-4 mr-2" />Programme</TabsTrigger>
 
-                  <TabsTrigger value="sessions"><Calendar className="h-4 w-4 mr-2"/>Sessions</TabsTrigger>
+                  <TabsTrigger value="sessions"><Calendar className="h-4 w-4 mr-2" />Sessions</TabsTrigger>
 
-                  <TabsTrigger value="reviews"><MessageSquare className="h-4 w-4 mr-2"/>Avis</TabsTrigger>
+                  <TabsTrigger value="reviews"><MessageSquare className="h-4 w-4 mr-2" />Avis</TabsTrigger>
 
                 </TabsList>
 
-                
+
 
                 <TabsContent value="about" className="p-6 bg-background rounded-2xl shadow-lg">
 
@@ -409,7 +409,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                 <TabsContent value="sessions" className="p-6 bg-background rounded-2xl shadow-lg">
 
-                   {sessions.length > 0 ? (
+                  {sessions.length > 0 ? (
 
                     <div className="space-y-4">
 
@@ -419,9 +419,9 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                           <p className="font-bold text-lg">Session du {formatDate(session.debut)} au {formatDate(session.fin)}</p>
 
-                          {session.lieu && <div className="flex items-center gap-3 text-sm mt-2 text-muted-foreground"><MapPin className="h-4 w-4 text-primary"/><p>{session.lieu}</p></div>}
+                          {session.lieu && <div className="flex items-center gap-3 text-sm mt-2 text-muted-foreground"><MapPin className="h-4 w-4 text-primary" /><p>{session.lieu}</p></div>}
 
-                          {session.capacite && <div className="flex items-center gap-3 text-sm mt-1 text-muted-foreground"><Users className="h-4 w-4 text-primary"/><p>{session.places_reservees || 0} / {session.capacite} places</p></div>}
+                          {session.capacite && <div className="flex items-center gap-3 text-sm mt-1 text-muted-foreground"><Users className="h-4 w-4 text-primary" /><p>{session.places_reservees || 0} / {session.capacite} places</p></div>}
 
                         </div>
 
@@ -453,7 +453,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                             <AvatarImage src={review.author?.avatar_url || ''} alt={review.author?.full_name || ''} />
 
-                            <AvatarFallback><User className="h-5 w-5"/></AvatarFallback>
+                            <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
 
                           </Avatar>
 
@@ -507,7 +507,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                   <Button size="lg" variant="outline" className="w-full text-lg font-semibold rounded-xl py-3">
 
-                    <Heart className="mr-2 h-5 w-5"/> Ajouter aux favoris
+                    <Heart className="mr-2 h-5 w-5" /> Ajouter aux favoris
 
                   </Button>
 
@@ -517,13 +517,13 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                   <h3 className="font-bold text-lg mb-2">Ce cours inclut :</h3>
 
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><Clock className="h-4 w-4 text-primary"/><span>Durée de {formation.duree_texte || 'N/A'}</span></div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><Clock className="h-4 w-4 text-primary" /><span>Durée de {formation.duree_texte || 'N/A'}</span></div>
 
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><ListVideo className="h-4 w-4 text-primary"/><span>{nbLecons} leçons dans {nbModules} modules</span></div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><ListVideo className="h-4 w-4 text-primary" /><span>{nbLecons} leçons dans {nbModules} modules</span></div>
 
-                  {formation.certificat && <div className="flex items-center gap-3 text-sm text-muted-foreground"><Award className="h-4 w-4 text-primary"/><span>Certificat de fin de formation</span></div>}
+                  {formation.certificat && <div className="flex items-center gap-3 text-sm text-muted-foreground"><Award className="h-4 w-4 text-primary" /><span>Certificat de fin de formation</span></div>}
 
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><Users className="h-4 w-4 text-primary"/><span>Accès aux sessions de groupe</span></div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><Users className="h-4 w-4 text-primary" /><span>Accès aux sessions de groupe</span></div>
 
                 </CardFooter>
 
@@ -557,7 +557,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
           <div className="flex-1">
 
-             <InscriptionModal formationId={formation.id} formationTitle={formation.titre} buttonClass="w-full" />
+            <InscriptionModal formationId={formation.id} formationTitle={formation.titre} buttonClass="w-full" />
 
           </div>
 
@@ -565,7 +565,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
       </div>
 
-      
+
 
       <Footer className="hidden lg:block" />
 
