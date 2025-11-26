@@ -17,6 +17,7 @@ import { ClubCard } from "@/components/club-card";
 import { Card } from "@/components/ui/card"; // Added for empty states
 import { Skeleton } from "@/components/ui/skeleton"; // Added for loading states
 import { FollowersList } from "@/components/FollowersList"; // Added import
+import { Grid3x3, UserPlus, Users, Calendar, GraduationCap, Users2, Heart } from "lucide-react"; // Icons for tabs
 
 // On force le rendu dynamique pour que la page soit toujours à jour
 export const dynamic = 'force-dynamic';
@@ -112,54 +113,61 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   return (
     <div className="min-h-screen bg-muted/20">
-      <main className="container mx-auto px-0 md:px-4 py-8">
+      <main className="container mx-auto px-0 md:px-4 py-8 pt-2 lg:pt-24">
         {/* Section de l'en-tête du profil gérée par le composant client */}
         <ProfileHeader profile={profileWithPostsCount} currentUserId={currentUser?.id} />
 
         {/* Section des contenus du profil */}
         <Tabs defaultValue="posts" className="w-full">
           <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-2 pb-2 border-b-2 border-gray-200 dark:border-gray-700">
-            <TabsTrigger 
-              value="posts" 
+            <TabsTrigger
+              value="posts"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Publications
+              <Grid3x3 className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Publications</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="abonnements" 
+            <TabsTrigger
+              value="abonnements"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Abonnements
+              <UserPlus className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Abonnements</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="abonnes" 
+            <TabsTrigger
+              value="abonnes"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Abonnés
+              <Users className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Abonnés</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="events" 
+            <TabsTrigger
+              value="events"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Événements
+              <Calendar className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Événements</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="formations" 
+            <TabsTrigger
+              value="formations"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Formations
+              <GraduationCap className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Formations</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="clubs" 
+            <TabsTrigger
+              value="clubs"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Clubs
+              <Users2 className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Clubs</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="favorites" 
+            <TabsTrigger
+              value="favorites"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
             >
-              Favoris
+              <Heart className="h-5 w-5" />
+              <span className="hidden lg:inline ml-2">Favoris</span>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="posts" className="mt-2 md:mt-6">
