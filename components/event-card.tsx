@@ -65,7 +65,7 @@ export function EventCard({
 
     return (
         <Link href={`/evenements/${id}`} className="group block h-full">
-            <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+            <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl mb-0 lg:mb-3">
 
                 {/* Image Section */}
                 <div className="relative h-40 overflow-hidden">
@@ -112,7 +112,7 @@ export function EventCard({
                 </div>
 
                 {/* Content Section */}
-                <div className="flex-1 p-5 flex flex-col">
+                <div className="flex-1 p-3 flex flex-col">
                     <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
                         {title}
                     </h3>

@@ -64,7 +64,7 @@ export function BlogCard({
 
   return (
     <Link href={`/blog/${id}`} className="group block h-full">
-      <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+      <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl mb-2 lg:mb-3">
 
         {/* Image Section */}
         <div className="relative h-40 overflow-hidden">
@@ -97,7 +97,7 @@ export function BlogCard({
           </Button>
         </div>
 
-        <div className="flex-1 p-5 flex flex-col">
+        <div className="flex-1 p-3 flex flex-col">
           <div className="flex items-center gap-3 mb-4">
             <Avatar className="h-8 w-8 border border-border">
               <AvatarImage src={authorAvatar} />

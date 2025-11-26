@@ -83,10 +83,10 @@ export function ProfesseurCard({
 
   return (
     <Link href={`/professeurs/${id}`} className="group block h-full">
-      <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+      <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl mb-2 lg:mb-3">
 
         {/* Header avec Avatar et Badges */}
-        <div className="p-5 pb-3">
+        <div className="p-3 pb-2">
           <div className="flex items-start gap-4 mb-4">
             {/* Avatar avec badge de vérification */}
             <div className="relative flex-shrink-0">
@@ -153,7 +153,7 @@ export function ProfesseurCard({
         </div>
 
         {/* Stats Grid */}
-        <div className="px-5 pb-4">
+        <div className="px-3 pb-3">
           <div className="grid grid-cols-3 gap-3 py-3 border-y border-border/50">
             {/* Note */}
             <div className="text-center">
@@ -191,7 +191,7 @@ export function ProfesseurCard({
         </div>
 
         {/* Footer */}
-        <div className="mt-auto px-5 pb-5">
+        <div className="mt-auto px-3 pb-3">
           <div className="flex items-center justify-between mb-3">
             {tarif_indicatif !== undefined && (
               <div className="flex items-center gap-1">

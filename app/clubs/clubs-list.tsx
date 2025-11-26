@@ -24,7 +24,7 @@ export function ClubsList({ clubs, isLoading }: ClubsListProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-6 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <ClubCard.Skeleton key={i} />
         ))}
@@ -37,7 +37,7 @@ export function ClubsList({ clubs, isLoading }: ClubsListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-6 lg:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
       {clubs.map((club) => (
         <ClubCard
           key={club.id}

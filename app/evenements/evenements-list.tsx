@@ -27,7 +27,7 @@ export function EvenementsList({ events, isLoading }: EvenementsListProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-6 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
         {Array.from({ length: 3 }).map((_, i) => (
           <EventCard.Skeleton key={i} />
         ))}
@@ -40,7 +40,7 @@ export function EvenementsList({ events, isLoading }: EvenementsListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-6 lg:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
       {events.map((event) => (
         <EventCard
           key={event.id}

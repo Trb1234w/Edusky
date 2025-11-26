@@ -70,7 +70,7 @@ export function CourseCard({
 
   return (
     <Link href={`/formations/${id}`} className="group block h-full">
-      <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+      <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl mb-2 lg:mb-3">
 
         {/* Image Section */}
         <div className="relative h-40 overflow-hidden">
@@ -110,7 +110,7 @@ export function CourseCard({
           </Button>
         </div>
 
-        <div className="p-5 flex flex-col flex-1">
+        <div className="p-3 flex flex-col flex-1">
           <div className="flex justify-between items-start mb-3">
             <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5 text-primary">
               {category}
