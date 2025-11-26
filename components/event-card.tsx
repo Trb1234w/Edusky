@@ -112,16 +112,16 @@ export function EventCard({
                 </div>
 
                 {/* Content Section */}
-                <div className="flex-1 p-3 flex flex-col">
-                    <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                <div className="flex-1 p-2 flex flex-col">
+                    <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                         {title}
                     </h3>
 
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                         {description}
                     </p>
 
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
                         <div className="flex items-center gap-1.5">
                             <Clock size={16} className="text-primary shrink-0" />
                             <span>{time}</span>
@@ -134,7 +134,7 @@ export function EventCard({
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
+                    <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
                         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <Users size={16} className="text-primary" />
                             <span>{participants} participants</span>

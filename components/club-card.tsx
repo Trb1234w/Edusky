@@ -95,8 +95,8 @@ export function ClubCard({
           </Button>
         </div>
 
-        <div className="flex-1 p-3 flex flex-col">
-          <div className="flex justify-between items-start mb-3">
+        <div className="flex-1 p-2 flex flex-col">
+          <div className="flex justify-between items-start mb-1.5">
             <div>
               <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
                 {name}
@@ -110,11 +110,11 @@ export function ClubCard({
             )}
           </div>
 
-          <p className="text-base text-muted-foreground mb-5 line-clamp-2 leading-relaxed">
+          <p className="text-base text-muted-foreground mb-2 line-clamp-2 leading-relaxed">
             {description}
           </p>
 
-          <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
+          <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users size={16} className="text-primary" />
               <span className="font-medium">{members} membres</span>

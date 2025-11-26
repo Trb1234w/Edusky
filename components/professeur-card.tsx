@@ -86,8 +86,8 @@ export function ProfesseurCard({
       <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl mb-2 lg:mb-3">
 
         {/* Header avec Avatar et Badges */}
-        <div className="p-3 pb-2">
-          <div className="flex items-start gap-4 mb-4">
+        <div className="p-2 pb-1.5">
+          <div className="flex items-start gap-4 mb-2">
             {/* Avatar avec badge de vérification */}
             <div className="relative flex-shrink-0">
               <Avatar className="w-16 h-16 border-4 border-background shadow-lg ring-2 ring-primary/10">
@@ -110,7 +110,7 @@ export function ProfesseurCard({
             {/* Type Badge */}
             <div className="flex-1 min-w-0">
               {type && (
-                <Badge variant="outline" className={cn("mb-2", getTypeColor(type))}>
+                <Badge variant="outline" className={cn("mb-1", getTypeColor(type))}>
                   {getTypeLabel(type)}
                 </Badge>
               )}
@@ -119,7 +119,7 @@ export function ProfesseurCard({
               <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                 {full_name}
               </h3>
-              <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
+              <p className="text-sm text-muted-foreground line-clamp-1 mb-1">
                 {titre || "Professeur"}
               </p>
 
@@ -137,7 +137,7 @@ export function ProfesseurCard({
 
           {/* Spécialités */}
           {specialites && specialites.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4">
+            <div className="flex flex-wrap gap-1.5 mb-2">
               {specialites.slice(0, 3).map((specialite, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
                   {specialite}
@@ -153,7 +153,7 @@ export function ProfesseurCard({
         </div>
 
         {/* Stats Grid */}
-        <div className="px-3 pb-3">
+        <div className="px-2 pb-2">
           <div className="grid grid-cols-3 gap-3 py-3 border-y border-border/50">
             {/* Note */}
             <div className="text-center">
@@ -191,8 +191,8 @@ export function ProfesseurCard({
         </div>
 
         {/* Footer */}
-        <div className="mt-auto px-3 pb-3">
-          <div className="flex items-center justify-between mb-3">
+        <div className="mt-auto px-2 pb-2">
+          <div className="flex items-center justify-between mb-2">
             {tarif_indicatif !== undefined && (
               <div className="flex items-center gap-1">
                 <TrendingUp size={14} className="text-primary" />

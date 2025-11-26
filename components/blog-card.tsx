@@ -97,8 +97,8 @@ export function BlogCard({
           </Button>
         </div>
 
-        <div className="flex-1 p-3 flex flex-col">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 p-2 flex flex-col">
+          <div className="flex items-center gap-3 mb-2">
             <Avatar className="h-8 w-8 border border-border">
               <AvatarImage src={authorAvatar} />
               <AvatarFallback>{author[0]}</AvatarFallback>
@@ -112,15 +112,15 @@ export function BlogCard({
             </Badge>
           </div>
 
-          <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+          <h3 className="text-xl font-bold text-foreground mb-1.5 line-clamp-2 group-hover:text-primary transition-colors leading-tight">
             {title}
           </h3>
 
-          <p className="text-base text-muted-foreground mb-5 line-clamp-2 leading-relaxed">
+          <p className="text-base text-muted-foreground mb-2 line-clamp-2 leading-relaxed">
             {excerpt}
           </p>
 
-          <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between text-sm text-muted-foreground">
+          <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Eye size={16} />

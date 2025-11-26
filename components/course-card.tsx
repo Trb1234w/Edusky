@@ -110,8 +110,8 @@ export function CourseCard({
           </Button>
         </div>
 
-        <div className="p-3 flex flex-col flex-1">
-          <div className="flex justify-between items-start mb-3">
+        <div className="p-2 flex flex-col flex-1">
+          <div className="flex justify-between items-start mb-1.5">
             <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5 text-primary">
               {category}
             </Badge>
@@ -121,15 +121,15 @@ export function CourseCard({
             </div>
           </div>
 
-          <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors">
             {title}
           </h3>
 
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-1">
+          <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
             Par <span className="font-medium text-foreground">{instructor}</span>
           </p>
 
-          <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
+          <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <Users size={16} className="text-primary" />
