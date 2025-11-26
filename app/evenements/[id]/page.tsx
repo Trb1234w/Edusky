@@ -2,8 +2,7 @@ import { getEvenementById } from "@/lib/data/evenements.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,8 +50,6 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
-      <Header className="hidden lg:block" />
-
       {/* Mobile-only Header */}
       <div className="lg:hidden p-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between">
         <Link href="/evenements" className="p-2 -ml-2 rounded-full hover:bg-muted">
@@ -79,18 +76,18 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
         <div className="container mx-auto -mt-24 md:-mt-32 lg:-mt-48 relative z-10 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8 xl:gap-12">
-            
+
             <div className="lg:col-span-2 space-y-6">
-              
+
               <Card className="p-6 md:p-8 bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-2xl rounded-2xl border-none">
                 {evenement.categorie && (
-                   <Link href={`/evenements?categorie=${evenement.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
+                  <Link href={`/evenements?categorie=${evenement.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
                     {evenement.categorie.nom}
                   </Link>
                 )}
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mt-2">{evenement.titre}</h1>
                 <p className="text-lg text-muted-foreground mt-3">{evenement.extrait}</p>
-              
+
                 {evenement.organisateur && (
                   <Link href={`/profiles/${evenement.organisateur.id}`} className="flex items-center space-x-4 pt-6 group">
                     <Avatar className="h-12 w-12 border-2 border-transparent group-hover:border-primary transition-colors">
@@ -107,12 +104,12 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
               <Tabs defaultValue="details" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-muted/50 rounded-xl">
-                  <TabsTrigger value="details"><Info className="h-4 w-4 mr-2"/>Détails</TabsTrigger>
-                  {intervenants.length > 0 && <TabsTrigger value="speakers"><Users2 className="h-4 w-4 mr-2"/>Intervenants</TabsTrigger>}
-                  <TabsTrigger value="location"><Map className="h-4 w-4 mr-2"/>Lieu</TabsTrigger>
-                  {inscriptions.length > 0 && <TabsTrigger value="attendees"><Handshake className="h-4 w-4 mr-2"/>Participants</TabsTrigger>}
+                  <TabsTrigger value="details"><Info className="h-4 w-4 mr-2" />Détails</TabsTrigger>
+                  {intervenants.length > 0 && <TabsTrigger value="speakers"><Users2 className="h-4 w-4 mr-2" />Intervenants</TabsTrigger>}
+                  <TabsTrigger value="location"><Map className="h-4 w-4 mr-2" />Lieu</TabsTrigger>
+                  {inscriptions.length > 0 && <TabsTrigger value="attendees"><Handshake className="h-4 w-4 mr-2" />Participants</TabsTrigger>}
                 </TabsList>
-                
+
                 <TabsContent value="details" className="p-6 bg-background rounded-2xl shadow-lg">
                   <h3 className="text-xl font-bold mb-4">À propos de cet événement</h3>
                   <div className="prose dark:prose-invert max-w-none text-foreground/90">
@@ -122,8 +119,8 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
                 {intervenants.length > 0 && (
                   <TabsContent value="speakers" className="p-6 bg-background rounded-2xl shadow-lg">
-                     <h3 className="text-xl font-bold mb-4">Intervenants</h3>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h3 className="text-xl font-bold mb-4">Intervenants</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {intervenants.map((speaker: any) => (
                         <Card key={speaker.id} className="p-4 flex items-center gap-4">
                           <Avatar>
@@ -136,7 +133,7 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                           </div>
                         </Card>
                       ))}
-                     </div>
+                    </div>
                   </TabsContent>
                 )}
 
@@ -157,10 +154,10 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                     <div className="flex flex-wrap gap-4">
                       {inscriptions.map(participant => (
                         <div key={participant.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                           <Avatar className="h-8 w-8">
+                          <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-primary text-primary-foreground text-xs">{participant.prenom.charAt(0)}{participant.nom.charAt(0)}</AvatarFallback>
                           </Avatar>
-                           <p className="font-semibold text-sm">{participant.prenom} {participant.nom}</p>
+                          <p className="font-semibold text-sm">{participant.prenom} {participant.nom}</p>
                         </div>
                       ))}
                     </div>
@@ -177,13 +174,13 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                 <CardContent className="p-0 mt-6 space-y-3">
                   <InscriptionEvenementModal evenementId={evenement.id} evenementTitle={evenement.titre} />
                   <Button size="lg" variant="outline" className="w-full text-lg font-semibold rounded-xl py-3">
-                    <Heart className="mr-2 h-5 w-5"/> Ajouter au calendrier
+                    <Heart className="mr-2 h-5 w-5" /> Ajouter au calendrier
                   </Button>
                 </CardContent>
                 <CardFooter className="p-0 border-t mt-6 pt-6 flex flex-col items-start gap-4">
-                  <div className="flex items-start gap-4 text-sm"><Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0"/><p><span className="font-bold">{formatDate(evenement.date_debut, {weekday: 'long'})}</span><br/><span className="text-muted-foreground">{formatDate(evenement.date_debut)} à {formatTime(evenement.date_debut)}</span></p></div>
-                  <div className="flex items-start gap-4 text-sm"><MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0"/><p><span className="font-bold">{evenement.mode === 'en_ligne' ? 'Événement en ligne' : evenement.lieu || 'Lieu à définir'}</span><br/><span className="text-muted-foreground">{evenement.mode === 'en_ligne' ? 'Le lien sera partagé aux inscrits' : lieuComplet}</span></p></div>
-                  {evenement.capacite && <div className="flex items-start gap-4 text-sm"><Users className="h-5 w-5 text-primary mt-1 flex-shrink-0"/><p><span className="font-bold">{inscriptions.length} / {evenement.capacite} places</span><br/><span className="text-muted-foreground">Réservez votre place dès maintenant !</span></p></div>}
+                  <div className="flex items-start gap-4 text-sm"><Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">{formatDate(evenement.date_debut, { weekday: 'long' })}</span><br /><span className="text-muted-foreground">{formatDate(evenement.date_debut)} à {formatTime(evenement.date_debut)}</span></p></div>
+                  <div className="flex items-start gap-4 text-sm"><MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">{evenement.mode === 'en_ligne' ? 'Événement en ligne' : evenement.lieu || 'Lieu à définir'}</span><br /><span className="text-muted-foreground">{evenement.mode === 'en_ligne' ? 'Le lien sera partagé aux inscrits' : lieuComplet}</span></p></div>
+                  {evenement.capacite && <div className="flex items-start gap-4 text-sm"><Users className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">{inscriptions.length} / {evenement.capacite} places</span><br /><span className="text-muted-foreground">Réservez votre place dès maintenant !</span></p></div>}
                 </CardFooter>
               </Card>
             </div>
@@ -199,12 +196,10 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
             <p className="text-2xl font-bold text-primary">{evenement.prix > 0 ? new Intl.NumberFormat("fr-FR", { style: "currency", currency: "GNF", minimumFractionDigits: 0 }).format(evenement.prix) : "Gratuit"}</p>
           </div>
           <div className="flex-1">
-             <InscriptionEvenementModal evenementId={evenement.id} evenementTitle={evenement.titre} buttonClass="w-full" buttonText="S'inscrire" />
+            <InscriptionEvenementModal evenementId={evenement.id} evenementTitle={evenement.titre} buttonClass="w-full" buttonText="S'inscrire" />
           </div>
         </div>
       </div>
-      
-      <Footer className="hidden lg:block" />
     </div>
   );
 }

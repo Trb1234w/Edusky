@@ -7,9 +7,7 @@ import Image from "next/image";
 
 import Link from "next/link";
 
-import { Header } from "@/components/header";
 
-import { Footer } from "@/components/footer";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -144,8 +142,6 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
   return (
 
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
-
-      <Header className="hidden lg:block" />
 
 
 
@@ -566,8 +562,6 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
       </div>
 
 
-
-      <Footer className="hidden lg:block" />
 
     </div>
 

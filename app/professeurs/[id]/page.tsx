@@ -1,5 +1,4 @@
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+
 import { getProfesseurById } from "@/lib/data/professeurs.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -52,8 +51,6 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header className="hidden lg:block" /> {/* Show Header on desktop only */}
-
       {/* Mobile-only "header" with back button */}
       <div className="lg:hidden p-4 border-b bg-background flex items-center justify-between">
         <Link href="/professeurs" className="flex items-center text-primary">
@@ -259,25 +256,25 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                   <h3 className="text-xl md:text-2xl font-bold text-foreground">Coordonnées</h3>
                   {professeur.profile_email && (
                     <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Mail className="h-4 w-4"/>
+                      <Mail className="h-4 w-4" />
                       <a href={`mailto:${professeur.profile_email}`} className="text-sm font-medium break-all">{professeur.profile_email}</a>
                     </div>
                   )}
                   {professeur.profile_phone && (
                     <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Phone className="h-4 w-4"/>
+                      <Phone className="h-4 w-4" />
                       <a href={`tel:${professeur.profile_phone}`} className="text-sm font-medium break-all">{professeur.profile_phone}</a>
                     </div>
                   )}
                   {professeur.profile_site_web && (
                     <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Globe className="h-4 w-4"/>
+                      <Globe className="h-4 w-4" />
                       <a href={professeur.profile_site_web} target="_blank" rel="noopener noreferrer" className="text-sm font-medium break-all">Site Web</a>
                     </div>
                   )}
                   {professeur.profile_linkedin_url && (
                     <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Linkedin className="h-4 w-4"/>
+                      <Linkedin className="h-4 w-4" />
                       <a href={professeur.profile_linkedin_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium break-all">LinkedIn</a>
                     </div>
                   )}
@@ -287,8 +284,6 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
           </div>
         </div>
       </main>
-
-      <Footer className="hidden lg:block" /> {/* Show Footer on desktop only */}
     </div>
   );
 }
