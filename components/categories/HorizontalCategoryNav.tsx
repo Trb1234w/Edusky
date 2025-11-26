@@ -84,7 +84,7 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
   if (loading) {
     return (
       <div className="flex gap-2 px-4 py-2 min-w-max">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 2 }).map((_, i) => (
           <Skeleton key={i} className="h-8 w-24 rounded-full" />
         ))}
       </div>
