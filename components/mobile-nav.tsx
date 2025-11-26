@@ -8,6 +8,19 @@ import { cn } from "@/lib/utils"
 export function MobileNav() {
   const pathname = usePathname()
 
+  // Hide MobileNav on detail pages
+  const isDetailPage =
+    /^\/formations\/[^/]+$/.test(pathname) ||
+    /^\/professeurs\/[^/]+$/.test(pathname) ||
+    /^\/evenements\/[^/]+$/.test(pathname) ||
+    /^\/clubs\/[^/]+$/.test(pathname) ||
+    /^\/blog\/[^/]+$/.test(pathname)
+
+  // Don't render if on detail page
+  if (isDetailPage) {
+    return null
+  }
+
   const navItems = [
     { href: "/", icon: Home, label: "Accueil", color: "from-blue-500 to-cyan-500" },
     { href: "/professeurs", icon: GraduationCap, label: "Profs", color: "from-green-500 to-emerald-500" },
