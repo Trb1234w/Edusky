@@ -98,3 +98,142 @@ export async function testServerAction() {
   console.log("--- TEST SERVER ACTION EXECUTED ---");
   return "Test successful!";
 }
+
+export async function updateProfileAction(formData: FormData) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: "Utilisateur non authentifié" }
+  }
+
+  try {
+    const full_name = formData.get('full_name') as string
+    const username = formData.get('username') as string
+    const bio = formData.get('bio') as string
+    const phone = formData.get('phone') as string
+    const city = formData.get('city') as string
+    const region = formData.get('region') as string
+    const country = formData.get('country') as string
+    const avatarFile = formData.get('avatar') as File | null
+
+    let avatar_url = null
+
+    // Upload avatar if provided
+    if (avatarFile && avatarFile.size > 0) {
+      const fileExt = avatarFile.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('profiles')
+        .upload(filePath, avatarFile, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (uploadError) {
+        console.error('Error uploading avatar:', uploadError)
+        return { error: "Erreur lors de l'upload de l'avatar" }
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('profiles')
+        .getPublicUrl(filePath)
+
+      avatar_url = publicUrl
+    }
+
+    // Update profile
+    const updateData: any = {
+      full_name,
+      username,
+      bio,
+      phone,
+      city,
+      region,
+      country,
+      updated_at: new Date().toISOString()
+    }
+
+    if (avatar_url) {
+      updateData.avatar_url = avatar_url
+    }
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update(updateData)
+      .eq('id', user.id)
+
+    if (updateError) {
+      console.error('Error updating profile:', updateError)
+      return { error: "Erreur lors de la mise à jour du profil" }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Unexpected error:', error)
+    return { error: "Une erreur inattendue s'est produite" }
+  }
+}
+
+export async function deletePostAction(postId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', postId)
+    .eq('author_id', user.id)
+
+  if (error) {
+    console.error('Error deleting post:', error)
+    return { error: "Erreur lors de la suppression du post" }
+  }
+
+  return { success: true }
+}
+
+export async function updatePostVisibilityAction(postId: string, visibility: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase
+    .from('posts')
+    .update({ visibilite: visibility })
+    .eq('id', postId)
+    .eq('author_id', user.id)
+
+  if (error) {
+    console.error('Error updating post visibility:', error)
+    return { error: "Erreur lors de la mise à jour de la visibilité" }
+  }
+
+  return { success: true }
+}
+
+export async function updatePostStatusAction(postId: string, status: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase
+    .from('posts')
+    .update({ statut: status })
+    .eq('id', postId)
+    .eq('author_id', user.id)
+
+  if (error) {
+    console.error('Error updating post status:', error)
+    return { error: "Erreur lors de la mise à jour du statut" }
+  }
+
+  return { success: true }
+}

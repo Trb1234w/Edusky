@@ -22,10 +22,15 @@ import {
   Activity,
   Bell,
   Settings,
+  Grid3x3,
+  UserPlus,
+  GraduationCap,
+  Users2,
+  Heart,
 } from "lucide-react";
 
 import { getPostsByAuthor } from "@/lib/data/posts";
-import { PostCard } from "@/components/PostCard";
+import { PostCard } from "@/components/post-card";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
 import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction } from "@/app/dashboard/actions";
 import { EventCard } from "@/components/event-card";
@@ -33,6 +38,8 @@ import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
 import { FollowersList } from "@/components/FollowersList";
 import { FavoritesList } from "./favorites-list";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { SharedPostCard } from "@/components/shared-post-card";
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null);
@@ -148,48 +155,66 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-muted/30">
 
-      <main className="">
-        <section className="bg-gradient-to-br from-primary via-accent to-secondary py-12 lg:py-16">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="w-20 h-20 border-4 border-white/20">
-                  <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name || 'User'} />
-                  <AvatarFallback>{(profile.prenom?.charAt(0) || '') + (profile.nom?.charAt(0) || '')}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">Bienvenue, {profile.prenom || profile.full_name}!</h1>
-                  <p className="text-white/90">Continuez votre parcours d'apprentissage</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="secondary" size="lg" className="font-semibold">
-                  <Bell size={20} className="mr-2" />
-                  Notifications
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="font-semibold bg-white/10 text-white border-white/20 hover:bg-white/20"
-                >
-                  <Settings size={20} className="mr-2" />
-                  Paramètres
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
+      <main className="container mx-auto px-0 md:px-4 py-8 pt-2 lg:pt-24">
+        <DashboardHeader
+          profile={profile}
+          postsCount={posts.length}
+          followersCount={followers.length}
+          followingCount={following.length}
+        />
 
-        <section className="container mx-auto px-4 lg:px-8 py-12">
+        <section className="container mx-auto px-0 md:px-4">
           <Tabs defaultValue="posts" className="w-full">
-            <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-2 pb-2">
-              <TabsTrigger value="posts">Publications</TabsTrigger>
-              <TabsTrigger value="followers">Abonnés</TabsTrigger>
-              <TabsTrigger value="following">Abonnements</TabsTrigger>
-              <TabsTrigger value="events">Événements</TabsTrigger>
-              <TabsTrigger value="formations">Formations</TabsTrigger>
-              <TabsTrigger value="clubs">Clubs</TabsTrigger>
-              <TabsTrigger value="favorites">Favoris</TabsTrigger>
+            <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-1 lg:gap-2 pb-2 border-b-2 border-gray-200 dark:border-gray-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <TabsTrigger
+                value="posts"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <Grid3x3 className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Publications</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="followers"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <Users className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Abonnés</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="following"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <UserPlus className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Abonnements</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="events"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <Calendar className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Événements</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="formations"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <GraduationCap className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Formations</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="clubs"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <Users2 className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Clubs</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="favorites"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <Heart className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Favoris</span>
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="posts" className="mt-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -199,14 +224,39 @@ export default function DashboardPage() {
                   {/* Section des posts de l'utilisateur */}
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold">Mes publications</h2>
-                                      {postsLoading ? (
-                                        <div className="space-y-4">
-                                          {Array.from({ length: 2 }).map((_, i) => (
-                                            <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                                          ))}
-                                        </div>                    ) : posts.length > 0 ? (
-                      posts.map(post => <PostCard key={post.id} post={post} />)
-                    ) : (
+                    {postsLoading ? (
+                      <div className="space-y-4">
+                        {Array.from({ length: 2 }).map((_, i) => (
+                          <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                        ))}
+                      </div>) : posts.length > 0 ? (
+                        posts.map(post => {
+                          const postImage = post.media?.find((m: any) => m.type === 'image')?.url || null;
+
+                          const commonProps = {
+                            id: post.id,
+                            authorId: post.auteur?.id,
+                            author: post.auteur?.full_name || "Utilisateur",
+                            authorRole: post.auteur?.role || "Membre",
+                            authorAvatar: post.auteur?.avatar_url,
+                            authorUsername: post.auteur?.username || post.auteur?.id,
+                            content: post.contenu,
+                            image: postImage,
+                            timestamp: post.created_at,
+                            likes: post.likes || 0,
+                            comments: post.comments || 0,
+                            shares: post.shares || 0,
+                            liked: post.liked || false,
+                            currentUserId: profile.id,
+                            followingIds: following.map((f: any) => f.followed_id),
+                          };
+
+                          if (post.sharedPost) {
+                            return <SharedPostCard key={post.id} {...commonProps} sharedPost={post.sharedPost} />;
+                          }
+                          return <PostCard key={post.id} {...commonProps} />;
+                        })
+                      ) : (
                       <Card className="p-8 text-center text-muted-foreground">
                         Vous n'avez pas encore créé de publication.
                       </Card>
@@ -359,7 +409,7 @@ export default function DashboardPage() {
           </Tabs>
         </section>
       </main>
-    </div>
+    </div >
   );
 }
 
