@@ -170,6 +170,8 @@ export async function updateProfileAction(formData: FormData) {
       updateData.avatar_url = avatar_url
     }
 
+    console.log("Updating profile for user:", user.id, "with data:", updateData);
+
     const { error: updateError } = await supabase
       .from('profiles')
       .update(updateData)
@@ -177,9 +179,10 @@ export async function updateProfileAction(formData: FormData) {
 
     if (updateError) {
       console.error('Error updating profile:', updateError)
-      return { error: "Erreur lors de la mise à jour du profil" }
+      return { error: "Erreur lors de la mise à jour du profil: " + updateError.message }
     }
 
+    console.log("Profile updated successfully");
     return { success: true }
   } catch (error) {
     console.error('Unexpected error:', error)
@@ -194,10 +197,10 @@ export async function deletePostAction(postId: string) {
   if (!user) return { error: "Non autorisé" }
 
   const { error } = await supabase
-    .from('posts')
+    .from('postes')
     .delete()
     .eq('id', postId)
-    .eq('author_id', user.id)
+    .eq('auteur_id', user.id)
 
   if (error) {
     console.error('Error deleting post:', error)
@@ -214,10 +217,10 @@ export async function updatePostVisibilityAction(postId: string, visibility: str
   if (!user) return { error: "Non autorisé" }
 
   const { error } = await supabase
-    .from('posts')
+    .from('postes')
     .update({ visibilite: visibility })
     .eq('id', postId)
-    .eq('author_id', user.id)
+    .eq('auteur_id', user.id)
 
   if (error) {
     console.error('Error updating post visibility:', error)
@@ -234,10 +237,10 @@ export async function updatePostStatusAction(postId: string, status: string) {
   if (!user) return { error: "Non autorisé" }
 
   const { error } = await supabase
-    .from('posts')
+    .from('postes')
     .update({ statut: status })
     .eq('id', postId)
-    .eq('author_id', user.id)
+    .eq('auteur_id', user.id)
 
   if (error) {
     console.error('Error updating post status:', error)

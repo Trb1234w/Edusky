@@ -15,6 +15,8 @@ import { getCommentsByPostId } from "@/lib/data/comments";
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toggleLike, addComment, sharePostAction } from "@/app/actions";
+import { deletePostAction, updatePostStatusAction, updatePostVisibilityAction } from "@/app/dashboard/actions";
+import { Trash2, Eye, EyeOff, Archive, Globe, Lock } from "lucide-react";
 import { followUserAction } from "@/app/users/actions";
 import { findOrCreateConversationAction } from "@/app/messages/actions";
 import { useRouter } from "next/navigation";
@@ -77,7 +79,46 @@ export function PostCard(props: PostCardProps) {
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [newCommentContent, setNewCommentContent] = useState('');
   const [addingComment, setAddingComment] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const { toast } = useToast();
+
+  const handleDeletePost = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
+    setIsDeleting(true);
+    const { error } = await deletePostAction(id);
+    if (error) {
+      toast({ title: "Erreur", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "Succès", description: "Post supprimé avec succès" });
+      router.refresh();
+    }
+    setIsDeleting(false);
+  };
+
+  const handleUpdateStatus = async (status: string) => {
+    setIsUpdatingStatus(true);
+    const { error } = await updatePostStatusAction(id, status);
+    if (error) {
+      toast({ title: "Erreur", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "Succès", description: "Statut mis à jour" });
+      router.refresh();
+    }
+    setIsUpdatingStatus(false);
+  };
+
+  const handleUpdateVisibility = async (visibility: string) => {
+    setIsUpdatingStatus(true);
+    const { error } = await updatePostVisibilityAction(id, visibility);
+    if (error) {
+      toast({ title: "Erreur", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "Succès", description: "Visibilité mise à jour" });
+      router.refresh();
+    }
+    setIsUpdatingStatus(false);
+  };
 
   useEffect(() => {
     setCurrentLikes(likes);
@@ -176,7 +217,7 @@ export function PostCard(props: PostCardProps) {
     const { data: conversationId, error } = await findOrCreateConversationAction(authorId);
     console.log("handleMessageUser: findOrCreateConversationAction returned. Data:", conversationId, "Error:", error);
     if (error) {
-      toast({ title: "Erreur de messagerie", description: error.message, variant: "destructive" });
+      toast({ title: "Erreur de messagerie", description: error, variant: "destructive" });
     } else {
       console.log(`handleMessageUser: Redirecting to /messages?conversation=${conversationId}`);
       router.push(`/messages?conversation=${conversationId}`);
@@ -220,9 +261,41 @@ export function PostCard(props: PostCardProps) {
                 </Button>
               </>
             )}
-            <Button size="sm" variant="ghost" className="text-muted-foreground">
-              <MoreHorizontal size={20} />
-            </Button>
+
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="ghost" className="text-muted-foreground">
+                  <MoreHorizontal size={20} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {currentUserId === authorId ? (
+                  <>
+                    <DropdownMenuItem onClick={() => handleUpdateVisibility('public')}>
+                      <Globe className="mr-2 h-4 w-4" />
+                      <span>Public</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleUpdateVisibility('prive')}>
+                      <Lock className="mr-2 h-4 w-4" />
+                      <span>Privé</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleUpdateStatus('archive')}>
+                      <Archive className="mr-2 h-4 w-4" />
+                      <span>Archiver</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDeletePost} className="text-red-600 focus:text-red-600">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      <span>Supprimer</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <DropdownMenuItem>
+                    <span>Signaler</span>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
