@@ -78,7 +78,36 @@ export async function getDistinctTags(): Promise<{ data: string[] | null; error:
 }
 
 /**
+ * Fetches all distinct venues (lieu) used in formations
+ */
+export async function getDistinctVenues(): Promise<{ data: string[] | null; error: string | null }> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from('formations')
+            .select('lieu')
+            .eq('statut', 'publie')
+            .not('lieu', 'is', null);
+
+        if (error) {
+            console.error("Error fetching venues:", error);
+            return { data: null, error: error.message };
+        }
+
+        const venues = Array.from(new Set(data?.map((item: any) => item.lieu).filter(Boolean) as string[])).sort();
+        return { data: venues, error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getDistinctVenues:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}
+
+/**
  * Fetches all formations using the get_formations RPC function with admin client
+ */
+/**
+ * Fetches all formations using direct query to ensure we get all columns including lieu
  */
 export async function getAllFormations(): Promise<{ data: any[] | null; error: string | null }> {
     try {
@@ -86,27 +115,52 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
         const supabase = await createClient();
         console.log('[getAllFormations] Supabase client created');
 
-        const { data, error } = await supabase.rpc('get_formations', {
-            search_term: null,
-            category_slug: null,
-            niveau_filter: null,
-            min_price: null,
-            max_price: null,
-            min_rating: null,
-            sort_by: 'date_publication_desc'
-        });
+        const { data: formations, error } = await supabase
+            .from('formations')
+            .select(`
+                *,
+                categorie:categorie_id(*),
+                professeur:professeurs(*),
+                pays:pays_id(*),
+                ville:ville_id(*),
+                quartier:quartier_id(*)
+            `)
+            .eq('statut', 'publie')
+            .order('date_publication', { ascending: false });
 
-        console.log('[getAllFormations] RPC call completed');
-        console.log('[getAllFormations] Data received:', data ? `${data.length} formations` : 'null');
-        console.log('[getAllFormations] Error:', error);
+        console.log('[getAllFormations] Query completed');
+        console.log('[getAllFormations] Data received:', formations ? `${formations.length} formations` : 'null');
 
         if (error) {
-            console.error("Error fetching formations via RPC:", error);
+            console.error("Error fetching formations:", error);
             return { data: null, error: error.message };
         }
 
-        console.log('[getAllFormations] Returning data successfully');
-        return { data: data || [], error: null };
+        // Manually fetch profiles for professors to avoid missing FK constraint issues
+        if (formations && formations.length > 0) {
+            const professorIds = Array.from(new Set(formations
+                .map((f: any) => f.professeur?.id)
+                .filter((id: any) => id)));
+
+            if (professorIds.length > 0) {
+                const { data: profiles } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, avatar_url')
+                    .in('id', professorIds);
+
+                if (profiles) {
+                    const profilesMap = new Map(profiles.map((p: any) => [p.id, p]));
+
+                    formations.forEach((f: any) => {
+                        if (f.professeur && f.professeur.id) {
+                            f.professeur.profiles = profilesMap.get(f.professeur.id);
+                        }
+                    });
+                }
+            }
+        }
+
+        return { data: formations || [], error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllFormations:", e);
         return { data: null, error: e.message || "An unexpected error occurred." };

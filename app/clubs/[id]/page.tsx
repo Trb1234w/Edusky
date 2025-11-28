@@ -1,7 +1,8 @@
-import { getClubById } from "@/lib/data/clubs.server";
+import { getClubById, getRelatedClubsByCategory } from "@/lib/data/clubs.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { RelatedClubs } from "@/components/related-clubs";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,9 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
 
   const inscriptions = Array.isArray(club.inscriptions) ? club.inscriptions : [];
   const leader = club.leader;
+
+  // Fetch related clubs
+  const { data: relatedClubs } = await getRelatedClubsByCategory(club.id, club.categorie_id);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
@@ -185,12 +189,16 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
         </div>
       </main>
 
+      {/* Related Clubs Section */}
+      <RelatedClubs clubs={relatedClubs || []} />
+
       {/* Barre d'action "sticky" pour mobile */}
       {club.statut === 'ouvert' && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-sm border-t z-40">
           <InscriptionClubModal clubId={club.id} clubName={club.nom} buttonClass="w-full" buttonText="Rejoindre le Club" />
         </div>
       )}
+
     </div>
   );
 }

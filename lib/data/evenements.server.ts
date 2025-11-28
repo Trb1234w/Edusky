@@ -88,3 +88,37 @@ export async function getRegisteredEventsByUserId(userId: string) {
 
   return { data: uniqueEvents, error: null };
 }
+
+export async function getRelatedEvenementsByCategory(currentEvenementId: string, categoryId: number | null) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  if (!categoryId) {
+    return { data: [], error: null };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('evenements')
+    .select(
+      `
+        *,
+        categorie:categorie_id(nom),
+        organisateur:profiles!organisateur_id(full_name, avatar_url),
+        pays:pays_id(nom),
+        ville:ville_id(nom)
+      `
+    )
+    .eq('categorie_id', categoryId)
+    .neq('id', currentEvenementId)
+    .limit(7)
+    .order('date_debut', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching related evenements:', error);
+    return { data: [], error };
+  }
+
+  return { data: data || [], error: null };
+}

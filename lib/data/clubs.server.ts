@@ -85,3 +85,35 @@ export async function getRegisteredClubsByUserId(userId: string) {
 
   return { data: registeredClubs, error: null };
 }
+
+export async function getRelatedClubsByCategory(currentClubId: string, categoryId: number | null) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  if (!categoryId) {
+    return { data: [], error: null };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('clubs')
+    .select(
+      `
+        *,
+        categorie:categorie_id(nom),
+        leader:profiles!leader_id(full_name, avatar_url)
+      `
+    )
+    .eq('categorie_id', categoryId)
+    .neq('id', currentClubId)
+    .limit(7)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching related clubs:', error);
+    return { data: [], error };
+  }
+
+  return { data: data || [], error: null };
+}

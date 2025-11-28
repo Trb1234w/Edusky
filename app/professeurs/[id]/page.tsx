@@ -1,8 +1,9 @@
 
-import { getProfesseurById } from "@/lib/data/professeurs.server";
+import { getProfesseurById, getRelatedProfesseursBySpecialty } from "@/lib/data/professeurs.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { RelatedProfesseurs } from "@/components/related-professeurs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,9 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
   const competences = Array.isArray(professeur.profile_competences) ? professeur.profile_competences : [];
   const diplomes = Array.isArray(professeur.profile_diplomes) ? professeur.profile_diplomes : [];
   const formationsParcours = Array.isArray(professeur.profile_formations_parcours) ? professeur.profile_formations_parcours : [];
+
+  // Fetch related professeurs
+  const { data: relatedProfesseurs } = await getRelatedProfesseursBySpecialty(professeur.id, specialites);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -283,6 +287,10 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
             </div>
           </div>
         </div>
+
+        {/* Related Professeurs Section */}
+        <RelatedProfesseurs professeurs={relatedProfesseurs || []} />
+
       </main>
     </div>
   );

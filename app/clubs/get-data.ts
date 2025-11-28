@@ -95,6 +95,47 @@ export async function getDistinctClubLocations(): Promise<{ data: string[] | nul
     }
 }
 
+interface Location {
+    id: string;
+    nom: string;
+}
+
+interface Ville extends Location {
+    pays_id: string;
+}
+
+interface Quartier extends Location {
+    ville_id: string;
+}
+
+interface LocationsData {
+    countries: Location[];
+    villes: Ville[];
+    quartiers: Quartier[];
+}
+
+/**
+ * Fetches all distinct locations (countries, cities, neighborhoods) from clubs
+ * using the get_distinct_locations SQL function.
+ */
+export async function getDistinctClubLocationsData(): Promise<{ data: LocationsData | null; error: string | null }> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase.rpc('get_distinct_locations');
+
+        if (error) {
+            console.error("Error fetching club locations data:", error);
+            return { data: null, error: error.message };
+        }
+
+        return { data: data as LocationsData, error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getDistinctClubLocationsData:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}
+
 /**
  * Fetches all clubs using the get_clubs RPC function with admin client
  */

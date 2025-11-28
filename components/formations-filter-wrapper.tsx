@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getAllFormations, getDistinctLocations, getDistinctTags } from "@/app/formations/get-locations"
+import { getAllFormations, getDistinctLocations, getDistinctTags, getDistinctVenues } from "@/app/formations/get-locations"
 import { FormationsList } from "@/app/formations/formations-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -73,6 +73,8 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
 
   // Available tags
   const [availableTags, setAvailableTags] = useState<string[]>([])
+  // Available venues
+  const [availableVenues, setAvailableVenues] = useState<string[]>([])
 
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
@@ -87,6 +89,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
     pays_id: undefined,
     ville_id: undefined,
     quartier_id: undefined,
+    lieu: undefined,
     tags: undefined,
     hasCapacity: undefined,
   })
@@ -128,9 +131,10 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
   // Fetch locations and tags on mount
   useEffect(() => {
     const fetchFiltersData = async () => {
-      const [locationsResult, tagsResult] = await Promise.all([
+      const [locationsResult, tagsResult, venuesResult] = await Promise.all([
         getDistinctLocations(),
-        getDistinctTags()
+        getDistinctTags(),
+        getDistinctVenues()
       ]);
 
       if (locationsResult.data) {
@@ -139,6 +143,10 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
 
       if (tagsResult.data) {
         setAvailableTags(tagsResult.data);
+      }
+
+      if (venuesResult.data) {
+        setAvailableVenues(venuesResult.data);
       }
     };
 
@@ -184,7 +192,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
 
       const categoryMatch =
         !filters.categorySlugs ||
-        filters.categorySlugs.includes(formation.categorie_slug)
+        filters.categorySlugs.includes(formation.categorie?.slug)
 
       const niveauMatch = !filters.niveau || formation.niveau === filters.niveau
       const modeMatch = !filters.mode || formation.mode === filters.mode
@@ -216,6 +224,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
       const paysMatch = !filters.pays_id || formation.pays_id === filters.pays_id
       const villeMatch = !filters.ville_id || formation.ville_id === filters.ville_id
       const quartierMatch = !filters.quartier_id || formation.quartier_id === filters.quartier_id
+      const lieuMatch = !filters.lieu || formation.lieu === filters.lieu
 
       // Tags filter
       const tagsMatch = !filters.tags || (
@@ -241,10 +250,15 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
         paysMatch &&
         villeMatch &&
         quartierMatch &&
+        lieuMatch &&
         tagsMatch &&
         capacityMatch
       )
-    })
+    }).map(formation => ({
+      ...formation,
+      professeur_full_name: formation.professeur?.profiles?.full_name || "Inconnu",
+      category_nom: formation.categorie?.nom || ""
+    }))
   }, [filters, allFormations])
 
   const mainFiltersConfig = [
@@ -258,6 +272,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
     { label: "Pays", name: "pays_id", icon: "MapPin", options: [{ label: "Tous les pays", value: undefined }, ...locations.countries.map(c => ({ label: c.nom, value: c.id }))] },
     { label: "Ville", name: "ville_id", icon: "Building2", options: [{ label: "Toutes les villes", value: undefined }, ...getFilteredVilles().map(v => ({ label: v.nom, value: v.id }))] },
     { label: "Quartier", name: "quartier_id", icon: "Home", options: [{ label: "Tous les quartiers", value: undefined }, ...getFilteredQuartiers().map(q => ({ label: q.nom, value: q.id }))] },
+    { label: "Lieu", name: "lieu", icon: "MapPin", options: [{ label: "Tous les lieux", value: undefined }, ...availableVenues.map(v => ({ label: v, value: v }))] },
   ]
 
   const secondaryFiltersConfig = [

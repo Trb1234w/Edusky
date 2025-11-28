@@ -1,7 +1,8 @@
-import { getArticleById } from "@/lib/data/blog.server";
+import { getArticleById, getRelatedArticlesByCategory } from "@/lib/data/blog.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { RelatedArticles } from "@/components/related-articles";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -62,6 +63,9 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
     .select('full_name, avatar_url')
     .eq('id', user.id)
     .single() : null;
+
+  // Fetch related articles
+  const { data: relatedArticles } = await getRelatedArticlesByCategory(article.id, article.categorie_id);
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black">
@@ -132,6 +136,36 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
               <div dangerouslySetInnerHTML={{ __html: article.contenu || 'Contenu de l\'article à venir.' }} />
             </div>
 
+            {/* Article Metadata */}
+            {(article.tags && article.tags.length > 0) && (
+              <div className="max-w-3xl mx-auto mt-12">
+                <h3 className="text-lg font-semibold mb-4">Tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {article.tags.map((tag: string, i: number) => (
+                    <Badge key={i} variant="secondary" className="text-sm">{tag}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Article Dates */}
+            <div className="max-w-3xl mx-auto mt-8 text-sm text-muted-foreground">
+              <div className="flex flex-wrap gap-4">
+                {article.created_at && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>Créé le {formatDate(article.created_at)}</span>
+                  </div>
+                )}
+                {article.updated_at && article.updated_at !== article.created_at && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>Mis à jour le {formatDate(article.updated_at)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <Separator className="my-16" />
 
             {/* Comments Section */}
@@ -151,6 +185,10 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
 
           </article>
         </div>
+
+        {/* Related Articles Section */}
+        <RelatedArticles articles={relatedArticles || []} />
+
       </main>
 
       <div className="hidden lg:block">

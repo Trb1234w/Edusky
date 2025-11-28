@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getAllClubs, getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations } from "@/app/clubs/get-data"
+import { getAllClubs, getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations, getDistinctClubLocationsData } from "@/app/clubs/get-data"
 import { ClubsList } from "@/app/clubs/clubs-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,8 @@ import {
   Tag,
   MapPin,
   Palette,
+  Building2,
+  Home,
 } from "lucide-react"
 import {
   CustomBottomSheet,
@@ -34,6 +36,8 @@ const iconMap: { [key: string]: React.ElementType } = {
   Tag,
   MapPin,
   Palette,
+  Building2,
+  Home,
 }
 
 interface ClubsFilterWrapperProps {
@@ -44,6 +48,13 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
   const router = useRouter()
   const [allClubs, setAllClubs] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  // Location data
+  const [locations, setLocations] = useState<{
+    countries: { id: string; nom: string }[];
+    villes: { id: string; nom: string; pays_id: string }[];
+    quartiers: { id: string; nom: string; ville_id: string }[];
+  }>({ countries: [], villes: [], quartiers: [] })
 
   // Available filters data
   const [availableTags, setAvailableTags] = useState<string[]>([])
@@ -58,6 +69,9 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
     tags: undefined,
     theme_principal: undefined,
     lieu: undefined,
+    pays_id: undefined,
+    ville_id: undefined,
+    quartier_id: undefined,
   })
 
   useEffect(() => {
@@ -96,10 +110,11 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
   // Fetch tags, themes, and locations on mount
   useEffect(() => {
     const fetchFiltersData = async () => {
-      const [tagsResult, themesResult, lieuxResult] = await Promise.all([
+      const [tagsResult, themesResult, lieuxResult, locationsResult] = await Promise.all([
         getDistinctClubTags(),
         getDistinctClubThemes(),
-        getDistinctClubLocations()
+        getDistinctClubLocations(),
+        getDistinctClubLocationsData()
       ]);
 
       if (tagsResult.data) {
@@ -113,13 +128,40 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       if (lieuxResult.data) {
         setAvailableLieux(lieuxResult.data);
       }
+
+      if (locationsResult.data) {
+        setLocations(locationsResult.data);
+      }
     };
 
     fetchFiltersData();
   }, []);
 
   const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
+    setFilters(prev => {
+      const newFilters = { ...prev, [key]: value };
+
+      // Cascading logic for location filters
+      if (key === 'pays_id') {
+        newFilters.ville_id = undefined;
+        newFilters.quartier_id = undefined;
+      } else if (key === 'ville_id') {
+        newFilters.quartier_id = undefined;
+      }
+
+      return newFilters;
+    });
+  }
+
+  // Helper functions to get filtered locations based on selections
+  const getFilteredVilles = () => {
+    if (!filters.pays_id) return locations.villes;
+    return locations.villes.filter(v => v.pays_id === filters.pays_id);
+  }
+
+  const getFilteredQuartiers = () => {
+    if (!filters.ville_id) return locations.quartiers;
+    return locations.quartiers.filter(q => q.ville_id === filters.ville_id);
   }
 
   const filteredClubs = useMemo(() => {
@@ -149,11 +191,16 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       const themeMatch = !filters.theme_principal ||
         club.theme_principal === filters.theme_principal
 
+      // Location filters (cascade)
+      const paysMatch = !filters.pays_id || club.pays_id === filters.pays_id
+      const villeMatch = !filters.ville_id || club.ville_id === filters.ville_id
+      const quartierMatch = !filters.quartier_id || club.quartier_id === filters.quartier_id
+
       // Location filter (text field, not cascade)
       const lieuMatch = !filters.lieu || club.lieu === filters.lieu
 
       return searchMatch && categoryMatch && statusMatch && capacityMatch &&
-        tagsMatch && themeMatch && lieuMatch
+        tagsMatch && themeMatch && paysMatch && villeMatch && quartierMatch && lieuMatch
     })
   }, [filters, allClubs])
 
@@ -188,15 +235,13 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
         ...availableThemes.map(theme => ({ label: theme, value: theme }))
       ],
     },
-    {
-      label: "Lieu",
-      icon: "MapPin",
-      name: "lieu",
-      options: [
-        { label: "Tous les lieux", value: undefined },
-        ...availableLieux.map(lieu => ({ label: lieu, value: lieu }))
-      ],
-    },
+  ]
+
+  const locationFiltersConfig = [
+    { label: "Pays", name: "pays_id", icon: "MapPin", options: [{ label: "Tous les pays", value: undefined }, ...locations.countries.map(c => ({ label: c.nom, value: c.id }))] },
+    { label: "Ville", name: "ville_id", icon: "Building2", options: [{ label: "Toutes les villes", value: undefined }, ...getFilteredVilles().map(v => ({ label: v.nom, value: v.id }))] },
+    { label: "Quartier", name: "quartier_id", icon: "Home", options: [{ label: "Tous les quartiers", value: undefined }, ...getFilteredQuartiers().map(q => ({ label: q.nom, value: q.id }))] },
+    { label: "Lieu", name: "lieu", icon: "MapPin", options: [{ label: "Tous les lieux", value: undefined }, ...availableLieux.map(lieu => ({ label: lieu, value: lieu }))] },
   ]
 
   return (
@@ -265,6 +310,28 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
                       </div>
                     </div>
                   ))}
+
+                  {/* Location Filters Section */}
+                  <div className="border-t pt-4">
+                    <h3 className="font-bold mb-3">Localisation</h3>
+                    {locationFiltersConfig.map(filter => (
+                      <div key={filter.name} className="mb-3">
+                        <h4 className="font-semibold mb-2">{filter.label}</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          {filter.options.map(option => (
+                            <CustomBottomSheetClose asChild key={option.label}>
+                              <Button
+                                variant={filters[filter.name] === option.value ? "default" : "outline"}
+                                onClick={() => handleFilterChange(filter.name, option.value)}
+                              >
+                                {option.label}
+                              </Button>
+                            </CustomBottomSheetClose>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CustomBottomSheetContent>
             </CustomBottomSheet>
@@ -381,6 +448,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
             filters={filters}
             handleFilterChange={handleFilterChange}
             filtersConfig={filtersConfig}
+            locationFiltersConfig={locationFiltersConfig}
             availableTags={availableTags}
           />
         </div>

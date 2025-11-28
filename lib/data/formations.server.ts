@@ -175,3 +175,58 @@ export async function getRegisteredFormationsByUserId(userId: string) {
 
   return { data: registeredFormations, error: null };
 }
+
+export async function getRelatedFormationsByCategory(currentFormationId: string, categoryId: number | null) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  if (!categoryId) {
+    return { data: [], error: null };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('formations')
+    .select(
+      `
+        *,
+        categorie:categorie_id(nom),
+        professeur:professeurs(id, titre, note_moyenne, nb_etudiants_formes)
+      `
+    )
+    .eq('categorie_id', categoryId)
+    .neq('id', currentFormationId)
+    .limit(7)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching related formations:', error);
+    return { data: [], error };
+  }
+
+  // Fetch profiles for each professor
+  const formationsWithProfiles = await Promise.all(
+    (data || []).map(async (formation: any) => {
+      if (formation.professeur) {
+        const { data: profileData } = await supabaseAdmin
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', formation.professeur.id)
+          .single();
+
+        return {
+          ...formation,
+          professeur: {
+            ...formation.professeur,
+            profiles: profileData,
+          },
+        };
+      }
+      return formation;
+    })
+  );
+
+  return { data: formationsWithProfiles, error: null };
+}
+

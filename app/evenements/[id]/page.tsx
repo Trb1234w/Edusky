@@ -1,7 +1,8 @@
-import { getEvenementById } from "@/lib/data/evenements.server";
+import { getEvenementById, getRelatedEvenementsByCategory } from "@/lib/data/evenements.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { RelatedEvenements } from "@/components/related-evenements";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,9 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
   const inscriptions = Array.isArray(evenement.inscriptions) ? evenement.inscriptions : [];
   const intervenants = Array.isArray(evenement.intervenants) ? evenement.intervenants : []; // Assumant que cette donnée puisse exister
   const lieuComplet = [evenement.lieu, evenement.quartier?.nom, evenement.ville?.nom, evenement.pays?.nom].filter(Boolean).join(', ');
+
+  // Fetch related evenements
+  const { data: relatedEvenements } = await getRelatedEvenementsByCategory(evenement.id, evenement.categorie_id);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
@@ -103,17 +107,53 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
               </Card>
 
               <Tabs defaultValue="details" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-muted/50 rounded-xl">
-                  <TabsTrigger value="details"><Info className="h-4 w-4 mr-2" />Détails</TabsTrigger>
-                  {intervenants.length > 0 && <TabsTrigger value="speakers"><Users2 className="h-4 w-4 mr-2" />Intervenants</TabsTrigger>}
-                  <TabsTrigger value="location"><Map className="h-4 w-4 mr-2" />Lieu</TabsTrigger>
-                  {inscriptions.length > 0 && <TabsTrigger value="attendees"><Handshake className="h-4 w-4 mr-2" />Participants</TabsTrigger>}
+                <TabsList className="flex w-full overflow-x-auto justify-start md:grid md:grid-cols-4 gap-2 bg-transparent md:bg-muted/50 p-0 md:p-1 mb-6 no-scrollbar">
+                  <TabsTrigger value="details" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-2" />Détails</TabsTrigger>
+                  {intervenants.length > 0 && <TabsTrigger value="speakers" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Users2 className="h-4 w-4 mr-2" />Intervenants</TabsTrigger>}
+                  <TabsTrigger value="location" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Map className="h-4 w-4 mr-2" />Lieu</TabsTrigger>
+                  {inscriptions.length > 0 && <TabsTrigger value="attendees" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Handshake className="h-4 w-4 mr-2" />Participants</TabsTrigger>}
                 </TabsList>
 
                 <TabsContent value="details" className="p-6 bg-background rounded-2xl shadow-lg">
                   <h3 className="text-xl font-bold mb-4">À propos de cet événement</h3>
-                  <div className="prose dark:prose-invert max-w-none text-foreground/90">
+                  <div className="prose dark:prose-invert max-w-none text-foreground/90 mb-6">
                     {evenement.description || "Aucune description disponible."}
+                  </div>
+
+                  {/* Additional Event Information */}
+                  <div className="space-y-6 border-t pt-6">
+                    {/* Type d'événement */}
+                    {evenement.type_evenement && (
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center gap-2"><Ticket className="h-4 w-4 text-primary" /> Type d'événement</h4>
+                        <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary">{evenement.type_evenement}</Badge>
+                      </div>
+                    )}
+
+                    {/* Tags */}
+                    {evenement.tags && evenement.tags.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center gap-2"><Tag className="h-4 w-4 text-primary" /> Tags</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {evenement.tags.map((tag: string, i: number) => (
+                            <Badge key={i} variant="secondary">{tag}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Event Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4">
+                      {evenement.created_at && (
+                        <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Créé le : {formatDate(evenement.created_at)}</div>
+                      )}
+                      {evenement.mode && (
+                        <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Mode : {evenement.mode === 'en_ligne' ? 'En ligne' : evenement.mode === 'presentiel' ? 'Présentiel' : 'Hybride'}</div>
+                      )}
+                      {evenement.capacite && (
+                        <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {evenement.capacite} places</div>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
 
@@ -152,7 +192,7 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                   <TabsContent value="attendees" className="p-6 bg-background rounded-2xl shadow-lg">
                     <h3 className="text-xl font-bold mb-4">Participants inscrits ({inscriptions.length})</h3>
                     <div className="flex flex-wrap gap-4">
-                      {inscriptions.map(participant => (
+                      {inscriptions.map((participant: any) => (
                         <div key={participant.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-primary text-primary-foreground text-xs">{participant.prenom.charAt(0)}{participant.nom.charAt(0)}</AvatarFallback>
@@ -200,6 +240,10 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
           </div>
         </div>
       </div>
+
+      {/* Related Evenements Section */}
+      <RelatedEvenements evenements={relatedEvenements || []} />
+
     </div>
   );
 }

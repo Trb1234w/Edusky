@@ -26,6 +26,7 @@ interface ClubSidebarProps {
   filters: Record<string, any>
   handleFilterChange: (key: string, value: any) => void
   filtersConfig: FilterConfig[]
+  locationFiltersConfig: FilterConfig[]
   availableTags: string[]
 }
 
@@ -33,6 +34,7 @@ export function ClubSidebar({
   filters,
   handleFilterChange,
   filtersConfig,
+  locationFiltersConfig,
   availableTags,
 }: ClubSidebarProps) {
 
@@ -171,6 +173,32 @@ export function ClubSidebar({
             </AccordionContent>
           </AccordionItem>
         )}
+
+        {/* Location Filters */}
+        {locationFiltersConfig.map(filterGroup => (
+          <AccordionItem key={filterGroup.name} value={filterGroup.name} className="border-none">
+            <AccordionTrigger className="text-base font-semibold hover:no-underline py-2 hover:text-blue-500 transition-colors">{filterGroup.label}</AccordionTrigger>
+            <AccordionContent className="space-y-2 pt-2">
+              <div className="flex flex-wrap gap-2">
+                {filterGroup.options.map(option => (
+                  <Button
+                    key={option.label}
+                    variant="outline"
+                    size="sm"
+                    className={
+                      filters[filterGroup.name] === option.value
+                        ? "bg-blue-500 text-white hover:bg-blue-600 border-blue-500"
+                        : "bg-transparent hover:bg-blue-500/5 hover:text-blue-500 border-border/50"
+                    }
+                    onClick={() => handleFilterChange(filterGroup.name, option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
       </Accordion>
     </aside>
   )
