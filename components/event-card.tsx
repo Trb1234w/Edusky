@@ -60,8 +60,9 @@ export function EventCard({
     };
 
     const eventDate = new Date(date)
-    const day = format(eventDate, 'dd', { locale: fr })
-    const month = format(eventDate, 'MMM', { locale: fr }).toUpperCase()
+    const isValidDate = !isNaN(eventDate.getTime())
+    const day = isValidDate ? format(eventDate, 'dd', { locale: fr }) : '??'
+    const month = isValidDate ? format(eventDate, 'MMM', { locale: fr }).toUpperCase() : '??'
 
     return (
         <Link href={`/evenements/${id}`} className="group block h-full">

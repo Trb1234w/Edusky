@@ -187,25 +187,11 @@ export default function DashboardPage() {
                 <span className="hidden lg:inline ml-2">Abonnements</span>
               </TabsTrigger>
               <TabsTrigger
-                value="events"
+                value="inscriptions"
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
               >
-                <Calendar className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Événements</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="formations"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
-              >
-                <GraduationCap className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Formations</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="clubs"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
-              >
-                <Users2 className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Clubs</span>
+                <BookOpen className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Mes Inscriptions</span>
               </TabsTrigger>
               <TabsTrigger
                 value="favorites"
@@ -297,103 +283,122 @@ export default function DashboardPage() {
                 <FollowersList profiles={following} currentUserId={profile.id} />
               )}
             </TabsContent>
-            <TabsContent value="events" className="mt-6">
-              {registeredEventsLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                  ))}
-                </div>
-              ) : registeredEvents.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {registeredEvents.map(event => (
-                    <EventCard
-                      key={event.id}
-                      id={event.id}
-                      title={event.titre || ""}
-                      description={event.extrait || event.description || ""}
-                      date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                      time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                      location={event.lieu || event.mode || ""}
-                      category={event.categories?.nom || ""}
-                      participants={0} // Placeholder
-                      maxParticipants={event.capacite || 0}
-                      organizer={event.organisateur?.full_name || "Inconnu"}
-                      image={event.image_url || "/placeholder.png"}
-                      status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
-                      is_favorited={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8 text-center text-muted-foreground">
-                  Vous n'êtes inscrit à aucun événement pour le moment.
-                </Card>
-              )}
-            </TabsContent>
-            <TabsContent value="formations" className="mt-6">
-              {registeredFormationsLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                  ))}
-                </div>
-              ) : registeredFormations.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {registeredFormations.map(formation => (
-                    <CourseCard
-                      key={formation.id}
-                      id={formation.id}
-                      title={formation.titre || ""}
-                      description={formation.extrait || ""}
-                      instructor={formation.professeur_full_name || "Inconnu"}
-                      category={formation.categorie?.nom || ""}
-                      level={formation.niveau || ""}
-                      duration={formation.duree_texte || ""}
-                      students={formation.nb_avis || 0}
-                      rating={formation.note_moyenne || 0}
-                      price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
-                      image={formation.image_url || "/placeholder.png"}
-                      is_favorited={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8 text-center text-muted-foreground">
-                  Vous n'êtes inscrit à aucune formation pour le moment.
-                </Card>
-              )}
-            </TabsContent>
-            <TabsContent value="clubs" className="mt-6">
-              {registeredClubsLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                  ))}
-                </div>
-              ) : registeredClubs.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {registeredClubs.map(club => (
-                    <ClubCard
-                      key={club.id}
-                      id={club.id}
-                      name={club.nom || ""}
-                      description={club.description || ""}
-                      category={club.categorie?.nom || ""}
-                      members={club.capacite || 0} // Using capacite as a proxy for members
-                      activities="Activités non spécifiées" // Placeholder
-                      president={club.leader?.full_name || "Inconnu"}
-                      image={club.image_url || "/placeholder.png"}
-                      verified={false} // Placeholder
-                      is_favorited={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8 text-center text-muted-foreground">
-                  Vous n'êtes inscrit à aucun club pour le moment.
-                </Card>
-              )}
+            <TabsContent value="inscriptions" className="mt-6 space-y-12">
+              {/* Événements */}
+              <section>
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  Événements
+                </h3>
+                {registeredEventsLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                    ))}
+                  </div>
+                ) : registeredEvents.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {registeredEvents.map(event => (
+                      <EventCard
+                        key={event.id}
+                        id={event.id}
+                        title={event.titre || ""}
+                        description={event.extrait || event.description || ""}
+                        date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        location={event.lieu || event.mode || ""}
+                        category={event.categories?.nom || ""}
+                        participants={0} // Placeholder
+                        maxParticipants={event.capacite || 0}
+                        organizer={event.organisateur?.full_name || "Inconnu"}
+                        image={event.image_url || "/placeholder.png"}
+                        status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
+                        is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="p-8 text-center text-muted-foreground">
+                    Vous n'êtes inscrit à aucun événement pour le moment.
+                  </Card>
+                )}
+              </section>
+
+              {/* Formations */}
+              <section>
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5 text-primary" />
+                  Formations
+                </h3>
+                {registeredFormationsLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                    ))}
+                  </div>
+                ) : registeredFormations.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {registeredFormations.map(formation => (
+                      <CourseCard
+                        key={formation.id}
+                        id={formation.id}
+                        title={formation.titre || ""}
+                        description={formation.extrait || ""}
+                        instructor={formation.professeur_full_name || "Inconnu"}
+                        category={formation.categorie?.nom || ""}
+                        level={formation.niveau || ""}
+                        duration={formation.duree_texte || ""}
+                        students={formation.nb_avis || 0}
+                        rating={formation.note_moyenne || 0}
+                        price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
+                        image={formation.image_url || "/placeholder.png"}
+                        is_favorited={favorites.some(fav => fav.type === 'formation' && fav.id === formation.id)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="p-8 text-center text-muted-foreground">
+                    Vous n'êtes inscrit à aucune formation pour le moment.
+                  </Card>
+                )}
+              </section>
+
+              {/* Clubs */}
+              <section>
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Users2 className="h-5 w-5 text-primary" />
+                  Clubs
+                </h3>
+                {registeredClubsLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                    ))}
+                  </div>
+                ) : registeredClubs.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {registeredClubs.map(club => (
+                      <ClubCard
+                        key={club.id}
+                        id={club.id}
+                        name={club.nom || ""}
+                        description={club.description || ""}
+                        category={club.categorie?.nom || ""}
+                        members={club.capacite || 0} // Using capacite as a proxy for members
+                        activities="Activités non spécifiées" // Placeholder
+                        president={club.leader?.full_name || "Inconnu"}
+                        image={club.image_url || "/placeholder.png"}
+                        verified={false} // Placeholder
+                        is_favorited={favorites.some(fav => fav.type === 'club' && fav.id === club.id)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="p-8 text-center text-muted-foreground">
+                    Vous n'êtes inscrit à aucun club pour le moment.
+                  </Card>
+                )}
+              </section>
             </TabsContent>
             <TabsContent value="favorites" className="mt-6">
               {favoritesLoading ? (
