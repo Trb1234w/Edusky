@@ -1,6 +1,15 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getPostsByAuthorId } from '@/lib/data/posts.server'
+
+export async function fetchUserPosts(authorId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // On passe l'ID de l'utilisateur connecté pour savoir s'il a liké les posts
+  return await getPostsByAuthorId(authorId, user?.id)
+}
 
 export async function getRegisteredEvents() {
   const supabase = await createClient()

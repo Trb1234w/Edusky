@@ -29,10 +29,9 @@ import {
   Heart,
 } from "lucide-react";
 
-import { getPostsByAuthor } from "@/lib/data/posts";
 import { PostCard } from "@/components/post-card";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
-import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction } from "@/app/dashboard/actions";
+import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction, fetchUserPosts } from "@/app/dashboard/actions";
 import { EventCard } from "@/components/event-card";
 import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
@@ -88,7 +87,7 @@ export default function DashboardPage() {
       console.log(`--- DEBUG: Début du chargement des données pour l'utilisateur ${profileData.id} ---`);
 
       // Une fois le profil chargé, on charge les posts
-      const { data: postsData, error: postsError } = await getPostsByAuthor(profileData.id);
+      const { data: postsData, error: postsError } = await fetchUserPosts(profileData.id);
       if (!postsError && postsData) {
         setPosts(postsData);
       }
@@ -114,7 +113,7 @@ export default function DashboardPage() {
       const { data: registeredEventsData, error: registeredEventsError } = await getRegisteredEvents();
       if (!registeredEventsError && registeredEventsData) {
         // Dédupliquer les événements basés sur leur 'id'
-        const uniqueEvents = Array.from(new Map(registeredEventsData.map(event => [event.id, event])).values());
+        const uniqueEvents = Array.from(new Map((registeredEventsData as any[]).map((event: any) => [event.id, event])).values());
         setRegisteredEvents(uniqueEvents);
       }
       setRegisteredEventsLoading(false);
@@ -231,18 +230,16 @@ export default function DashboardPage() {
                         ))}
                       </div>) : posts.length > 0 ? (
                         posts.map(post => {
-                          const postImage = post.media?.find((m: any) => m.type === 'image')?.url || null;
-
                           const commonProps = {
                             id: post.id,
-                            authorId: post.auteur?.id,
-                            author: post.auteur?.full_name || "Utilisateur",
-                            authorRole: post.auteur?.role || "Membre",
-                            authorAvatar: post.auteur?.avatar_url,
-                            authorUsername: post.auteur?.username || post.auteur?.id,
-                            content: post.contenu,
-                            image: postImage,
-                            timestamp: post.created_at,
+                            authorId: post.authorId,
+                            author: post.author || "Utilisateur",
+                            authorRole: post.authorRole || "Membre",
+                            authorAvatar: post.authorAvatar,
+                            authorUsername: post.authorUsername,
+                            content: post.content,
+                            image: post.image,
+                            timestamp: post.timestamp,
                             likes: post.likes || 0,
                             comments: post.comments || 0,
                             shares: post.shares || 0,
@@ -324,6 +321,7 @@ export default function DashboardPage() {
                       organizer={event.organisateur?.full_name || "Inconnu"}
                       image={event.image_url || "/placeholder.png"}
                       status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
+                      is_favorited={false}
                     />
                   ))}
                 </div>
@@ -356,6 +354,7 @@ export default function DashboardPage() {
                       rating={formation.note_moyenne || 0}
                       price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
                       image={formation.image_url || "/placeholder.png"}
+                      is_favorited={false}
                     />
                   ))}
                 </div>
@@ -386,6 +385,7 @@ export default function DashboardPage() {
                       president={club.leader?.full_name || "Inconnu"}
                       image={club.image_url || "/placeholder.png"}
                       verified={false} // Placeholder
+                      is_favorited={false}
                     />
                   ))}
                 </div>
