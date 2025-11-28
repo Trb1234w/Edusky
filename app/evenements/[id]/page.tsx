@@ -147,6 +147,9 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                       {evenement.created_at && (
                         <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Créé le : {formatDate(evenement.created_at)}</div>
                       )}
+                      {evenement.updated_at && (
+                        <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(evenement.updated_at)}</div>
+                      )}
                       {evenement.mode && (
                         <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Mode : {evenement.mode === 'en_ligne' ? 'En ligne' : evenement.mode === 'presentiel' ? 'Présentiel' : 'Hybride'}</div>
                       )}
@@ -218,7 +221,21 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                   </Button>
                 </CardContent>
                 <CardFooter className="p-0 border-t mt-6 pt-6 flex flex-col items-start gap-4">
-                  <div className="flex items-start gap-4 text-sm"><Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">{formatDate(evenement.date_debut, { weekday: 'long' })}</span><br /><span className="text-muted-foreground">{formatDate(evenement.date_debut)} à {formatTime(evenement.date_debut)}</span></p></div>
+                  <div className="flex items-start gap-4 text-sm">
+                    <Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <p>
+                      <span className="font-bold">Date et heure</span><br />
+                      <span className="text-muted-foreground">
+                        Du {formatDate(evenement.date_debut)} à {formatTime(evenement.date_debut)}
+                        {evenement.date_fin && (
+                          <>
+                            <br />
+                            Au {formatDate(evenement.date_fin)} à {formatTime(evenement.date_fin)}
+                          </>
+                        )}
+                      </span>
+                    </p>
+                  </div>
                   <div className="flex items-start gap-4 text-sm"><MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">{evenement.mode === 'en_ligne' ? 'Événement en ligne' : evenement.lieu || 'Lieu à définir'}</span><br /><span className="text-muted-foreground">{evenement.mode === 'en_ligne' ? 'Le lien sera partagé aux inscrits' : lieuComplet}</span></p></div>
                   {evenement.capacite && <div className="flex items-start gap-4 text-sm"><Users className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">{inscriptions.length} / {evenement.capacite} places</span><br /><span className="text-muted-foreground">Réservez votre place dès maintenant !</span></p></div>}
                 </CardFooter>

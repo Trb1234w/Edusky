@@ -1,4 +1,3 @@
-
 import { getFormationById, getRelatedFormationsByCategory } from "@/lib/data/formations.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -17,7 +16,7 @@ import {
   Briefcase, Tag, CheckCircle2, Building2, Globe
 } from "lucide-react";
 
-// --- Helpers (conservés) ---
+// --- Helpers ---
 
 const formatPrice = (price: number | null | undefined) => {
   if (price === null || price === undefined) return "N/A";
@@ -46,7 +45,7 @@ const StarRating = ({ rating, totalStars = 5 }: { rating: number, totalStars?: n
   );
 };
 
-// --- Page Component (Redesigné) ---
+// --- Page Component ---
 
 export default async function FormationDetailsPage({ params }: { params: { id: string } }) {
   const resolvedParams = await params;
@@ -85,7 +84,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
       </div>
 
       <main className="flex-1 pb-32 lg:pb-0">
-        {/* Section Média (Image/Vidéo) - plus proéminente */}
+        {/* Section Média (Image/Vidéo) */}
         <div className="relative h-56 md:h-80 lg:h-96 w-full overflow-hidden">
           {formation.video_intro_url ? (
             <div className="h-full w-full bg-black flex items-center justify-center">
@@ -129,14 +128,23 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                     <StarRating rating={formation.note_moyenne} />
                     <span className="text-sm font-medium text-muted-foreground">{formation.note_moyenne.toFixed(1)} ({avis.length} avis)</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="h-4 w-4 text-primary" />
-                    <span>{formation.nb_etudiants_inscrits || 0} participants</span>
-                  </div>
-                  {formation.lieu && (
+                  {formation.capacite && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="h-4 w-4 text-primary" />
+                      <span>{formation.capacite} places</span>
+                    </div>
+                  )}
+                  {(formation.lieu || formation.pays) && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4 text-primary" />
-                      <span>{formation.lieu}</span>
+                      <span>
+                        {[
+                          formation.lieu,
+                          formation.quartier?.nom,
+                          formation.ville?.nom,
+                          formation.pays?.nom
+                        ].filter(Boolean).join(', ')}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -155,7 +163,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                 )}
               </Card>
 
-              {/* Barre de statistiques rapide (Visible Mobile & Desktop) */}
+              {/* Barre de statistiques rapide */}
               <Card className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-xl rounded-2xl border-none">
                 <div className="flex items-center gap-3">
                   <Clock className="h-8 w-8 text-primary" />
@@ -190,9 +198,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                     {formation.description || "Aucune description disponible."}
                   </div>
 
-                  {/* Informations complémentaires (Tags, Vidéo Link, etc.) */}
                   <div className="space-y-6 border-t pt-6">
-
                     {/* Jobs Relies */}
                     {formation.jobs_relies && formation.jobs_relies.length > 0 && (
                       <div>
@@ -248,7 +254,10 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4">
                       {formation.date_publication && (
-                        <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(formation.date_publication)}</div>
+                        <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(String(formation.date_publication))}</div>
+                      )}
+                      {formation.updated_at && (
+                        <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(String(formation.updated_at))}</div>
                       )}
                       {formation.ville && (
                         <div className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Ville : {formation.ville.nom}</div>

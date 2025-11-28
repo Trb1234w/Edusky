@@ -1,4 +1,3 @@
-
 import { getProfesseurById, getRelatedProfesseursBySpecialty } from "@/lib/data/professeurs.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -45,10 +44,10 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
 
   const specialites = Array.isArray(professeur.specialites) ? professeur.specialites : [];
   const certifications = Array.isArray(professeur.certifications) ? professeur.certifications : [];
-  const langues = Array.isArray(professeur.profile_langues) ? professeur.profile_langues : [];
-  const competences = Array.isArray(professeur.profile_competences) ? professeur.profile_competences : [];
-  const diplomes = Array.isArray(professeur.profile_diplomes) ? professeur.profile_diplomes : [];
-  const formationsParcours = Array.isArray(professeur.profile_formations_parcours) ? professeur.profile_formations_parcours : [];
+  const langues = Array.isArray(professeur.profile?.langues) ? professeur.profile.langues : [];
+  const competences = Array.isArray(professeur.profile?.competences) ? professeur.profile.competences : [];
+  const diplomes = Array.isArray(professeur.profile?.diplomes) ? professeur.profile.diplomes : [];
+  const formationsParcours = Array.isArray(professeur.profile?.formations_parcours) ? professeur.profile.formations_parcours : [];
 
   // Fetch related professeurs
   const { data: relatedProfesseurs } = await getRelatedProfesseursBySpecialty(professeur.id, specialites);
@@ -73,7 +72,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
             <path d="m15 18-6-6 6-6" />
           </svg>
         </Link>
-        <span className="font-semibold text-lg">{professeur.profile_full_name}</span>
+        <span className="font-semibold text-lg">{professeur.profile?.full_name}</span>
         {/* Placeholder for potential right-side actions if needed */}
         <div className="w-12"></div>
       </div>
@@ -83,30 +82,30 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
           <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-12 xl:gap-16">
             {/* Colonne de gauche : Contenu principal */}
             <div className="lg:col-span-2 space-y-6 md:space-y-8">
-              {/* Fil d'ariane - Visible sur Desktop, peut-être caché sur Mobile si le "Retour" suffit */}
+              {/* Fil d'ariane */}
               <nav className="hidden lg:flex text-sm text-muted-foreground items-center gap-2 lg:mt-6">
                 <Link href="/professeurs" className="hover:text-primary transition-colors">Professeurs</Link>
                 <span className="mx-2">/</span>
-                <span className="font-medium text-foreground">{professeur.profile_full_name}</span>
+                <span className="font-medium text-foreground">{professeur.profile?.full_name}</span>
               </nav>
 
               {/* Section Hero du Professeur */}
               <Card className="p-6 md:p-8 lg:p-10 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-none">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
                   <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-primary/20 shadow-lg transition-transform duration-300 hover:scale-105">
-                    <AvatarImage src={professeur.profile_avatar_url || ''} alt={professeur.profile_full_name || ''} />
-                    <AvatarFallback className="text-5xl font-extrabold bg-primary text-primary-foreground">{professeur.profile_full_name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={professeur.profile?.avatar_url || ''} alt={professeur.profile?.full_name || ''} />
+                    <AvatarFallback className="text-5xl font-extrabold bg-primary text-primary-foreground">{professeur.profile?.full_name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="text-center md:text-left flex-1 space-y-2">
                     <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
-                      {professeur.profile_full_name}
+                      {professeur.profile?.full_name}
                     </h1>
                     <p className="text-lg sm:text-xl text-muted-foreground">{professeur.titre}</p>
                     <div className="flex items-center justify-center md:justify-start gap-2 mt-3">
                       <StarRating rating={professeur.note_moyenne} />
                       <span className="text-sm text-muted-foreground">({professeur.nb_notes} avis)</span>
                     </div>
-                    {/* Badges de statistiques - Plus visuels */}
+                    {/* Badges de statistiques */}
                     <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
                       <Badge variant="default" className="flex items-center gap-2 py-2 px-4 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-full">
                         <Briefcase className="h-4 w-4" /><span>{professeur.annees_experience || 0} ans d'expérience</span>
@@ -124,10 +123,10 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                           <Award className="h-4 w-4" /><span>Certifié</span>
                         </Badge>
                       )}
-                      {(professeur.pays_nom || professeur.ville_nom) && (
+                      {(professeur.pays?.nom || professeur.ville?.nom) && (
                         <Badge variant="default" className="flex items-center gap-2 py-2 px-4 text-sm bg-red-500 hover:bg-red-600 text-white rounded-full">
                           <MapPin className="h-4 w-4" />
-                          <span>{[professeur.quartier_nom, professeur.ville_nom, professeur.pays_nom].filter(Boolean).join(', ')}</span>
+                          <span>{[professeur.quartier?.nom, professeur.ville?.nom, professeur.pays?.nom].filter(Boolean).join(', ')}</span>
                         </Badge>
                       )}
                     </div>
@@ -140,7 +139,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                 <h2 className="text-2xl md:text-3xl font-bold mb-4 text-foreground flex items-center gap-3">
                   <User className="h-6 w-6 text-primary" /> Présentation
                 </h2>
-                <p className="text-base leading-relaxed text-foreground/90">{professeur.presentation || professeur.profile_bio || "Ce professeur n'a pas encore rédigé de présentation détaillée."}</p>
+                <p className="text-base leading-relaxed text-foreground/90">{professeur.presentation || professeur.profile?.bio || "Ce professeur n'a pas encore rédigé de présentation détaillée."}</p>
               </Card>
 
               {/* Spécialités */}
@@ -150,7 +149,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                     <BookOpen className="h-6 w-6 text-primary" /> Spécialités
                   </h2>
                   <div className="flex flex-wrap gap-3">
-                    {specialites.map((spec, index) => (
+                    {specialites.map((spec: string, index: number) => (
                       <Badge key={index} variant="secondary" className="py-2 px-4 text-base rounded-full border border-primary/20">
                         {spec}
                       </Badge>
@@ -166,7 +165,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                     <Languages className="h-6 w-6 text-primary" /> Langues parlées
                   </h2>
                   <div className="flex flex-wrap gap-3">
-                    {langues.map((lang, index) => (
+                    {langues.map((lang: string, index: number) => (
                       <Badge key={index} variant="secondary" className="py-2 px-4 text-base rounded-full border border-primary/20">
                         {lang}
                       </Badge>
@@ -182,7 +181,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                     <Lightbulb className="h-6 w-6 text-primary" /> Compétences
                   </h2>
                   <div className="flex flex-wrap gap-3">
-                    {competences.map((comp, index) => (
+                    {competences.map((comp: string, index: number) => (
                       <Badge key={index} variant="secondary" className="py-2 px-4 text-base rounded-full border border-primary/20">
                         {comp}
                       </Badge>
@@ -199,99 +198,83 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                   </h2>
                   <div className="space-y-4">
                     {diplomes.map((diplome: any, index: number) => (
-                      <Card key={index} className="p-4 md:p-5 bg-background dark:bg-gray-900 border border-primary/10 rounded-xl shadow-sm">
-                        <p className="font-semibold text-lg md:text-xl text-foreground">{diplome.titre}</p>
-                        <p className="text-sm md:text-base text-muted-foreground">{diplome.institution} ({diplome.annee})</p>
-                      </Card>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              {/* Formations/Parcours */}
-              {formationsParcours.length > 0 && (
-                <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl space-y-4">
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
-                    <Briefcase className="h-6 w-6 text-primary" /> Parcours Professionnel
-                  </h2>
-                  <div className="space-y-4">
-                    {formationsParcours.map((parcours: any, index: number) => (
-                      <Card key={index} className="p-4 md:p-5 bg-background dark:bg-gray-900 border border-primary/10 rounded-xl shadow-sm">
-                        <p className="font-semibold text-lg md:text-xl text-foreground">{parcours.poste} chez {parcours.entreprise}</p>
-                        <p className="text-sm md:text-base text-muted-foreground">{parcours.periode} - {parcours.description}</p>
-                      </Card>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              {/* Certifications */}
-              {certifications.length > 0 && (
-                <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl space-y-4">
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
-                    <Award className="h-6 w-6 text-primary" /> Certifications
-                  </h2>
-                  <div className="space-y-4">
-                    {certifications.map((cert: any, index: number) => (
-                      <Card key={index} className="p-4 md:p-5 bg-background dark:bg-gray-900 border border-primary/10 rounded-xl shadow-sm">
-                        <p className="font-semibold text-lg md:text-xl text-foreground">{cert.nom}</p>
-                        <p className="text-sm md:text-base text-muted-foreground">{cert.organisme} ({cert.annee})</p>
-                      </Card>
+                      <div key={index} className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl">
+                        <Award className="h-6 w-6 text-primary mt-1" />
+                        <div>
+                          <p className="font-bold text-lg">{diplome.titre || diplome.name}</p>
+                          <p className="text-muted-foreground">{diplome.ecole || diplome.institution} - {diplome.annee || diplome.year}</p>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </Card>
               )}
             </div>
 
-            {/* Colonne de droite : Carte d'action et Contact */}
+            {/* Colonne de droite : Contact & Tarifs (Sticky) */}
             <div className="lg:col-span-1 mt-8 lg:mt-0">
-              <Card className="lg:sticky lg:top-28 p-6 md:p-8 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-none">
-                <CardContent className="p-0 space-y-6">
-                  <CardTitle className="text-2xl md:text-3xl font-bold text-foreground">Tarifs indicatifs</CardTitle>
-                  <p className="text-3xl md:text-4xl font-extrabold text-primary">{formatPrice(professeur.tarif_indicatif)}</p>
-                  {professeur.tarif_horaire_min && professeur.tarif_horaire_max && (
-                    <p className="text-sm md:text-base text-muted-foreground">({formatPrice(professeur.tarif_horaire_min)} - {formatPrice(professeur.tarif_horaire_max)} / heure)</p>
-                  )}
-                  <Button size="lg" className="w-full text-lg md:text-xl py-3 rounded-xl font-bold">
-                    Contacter ce professeur
-                  </Button>
-                </CardContent>
-                <CardFooter className="p-0 border-t mt-6 pt-6 space-y-4 flex flex-col items-start">
-                  <h3 className="text-xl md:text-2xl font-bold text-foreground">Coordonnées</h3>
-                  {professeur.profile_email && (
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Mail className="h-4 w-4" />
-                      <a href={`mailto:${professeur.profile_email}`} className="text-sm font-medium break-all">{professeur.profile_email}</a>
+              <div className="lg:sticky lg:top-24 space-y-6">
+                <Card className="p-6 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-none">
+                  <h3 className="text-xl font-bold mb-4">Tarifs indicatifs</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center pb-4 border-b">
+                      <span className="text-muted-foreground">Taux horaire</span>
+                      <span className="font-bold text-xl text-primary">
+                        {professeur.tarif_horaire_min ? `${formatPrice(professeur.tarif_horaire_min)} - ${formatPrice(professeur.tarif_horaire_max)}` : formatPrice(professeur.tarif_indicatif)}
+                        <span className="text-sm font-normal text-muted-foreground">/h</span>
+                      </span>
                     </div>
-                  )}
-                  {professeur.profile_phone && (
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Phone className="h-4 w-4" />
-                      <a href={`tel:${professeur.profile_phone}`} className="text-sm font-medium break-all">{professeur.profile_phone}</a>
-                    </div>
-                  )}
-                  {professeur.profile_site_web && (
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Globe className="h-4 w-4" />
-                      <a href={professeur.profile_site_web} target="_blank" rel="noopener noreferrer" className="text-sm font-medium break-all">Site Web</a>
-                    </div>
-                  )}
-                  {professeur.profile_linkedin_url && (
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors w-full">
-                      <Linkedin className="h-4 w-4" />
-                      <a href={professeur.profile_linkedin_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium break-all">LinkedIn</a>
-                    </div>
-                  )}
-                </CardFooter>
-              </Card>
+                    <Button className="w-full text-lg py-6 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                      Contacter ce professeur
+                    </Button>
+                    <Button variant="outline" className="w-full text-lg py-6 rounded-xl font-bold">
+                      Réserver un cours
+                    </Button>
+                  </div>
+                </Card>
+
+                {/* Coordonnées (si disponibles) */}
+                <Card className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
+                  <h3 className="text-lg font-bold mb-4">Coordonnées</h3>
+                  <div className="space-y-3">
+                    {professeur.profile?.email && (
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <Mail className="h-5 w-5 text-primary" />
+                        <span className="truncate">{professeur.profile.email}</span>
+                      </div>
+                    )}
+                    {professeur.profile?.telephone && (
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <Phone className="h-5 w-5 text-primary" />
+                        <span>{professeur.profile.telephone}</span>
+                      </div>
+                    )}
+                    {professeur.profile?.site_web && (
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <Globe className="h-5 w-5 text-primary" />
+                        <a href={professeur.profile.site_web} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">Site web</a>
+                      </div>
+                    )}
+                    {professeur.profile?.linkedin_url && (
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <Linkedin className="h-5 w-5 text-primary" />
+                        <a href={professeur.profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">LinkedIn</a>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Related Professeurs Section */}
-        <RelatedProfesseurs professeurs={relatedProfesseurs || []} />
-
       </main>
+
+      {/* Related Professeurs Section */}
+      <div className="bg-white dark:bg-black py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <RelatedProfesseurs professeurs={relatedProfesseurs || []} />
+        </div>
+      </div>
     </div>
   );
 }

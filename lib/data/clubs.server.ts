@@ -13,7 +13,10 @@ export async function getClubById(id: string) {
         *,
         categorie:categorie_id(*),
         leader:profiles!leader_id(*),
-        inscriptions:inscriptions_club(*)
+        inscriptions:inscriptions_club(*),
+        pays:pays_id(*),
+        ville:ville_id(*),
+        quartier:quartier_id(*)
       `
     )
     .eq("id", id)

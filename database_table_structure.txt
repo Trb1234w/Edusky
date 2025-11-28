@@ -47,14 +47,6 @@ CREATE TABLE public.categories (
   CONSTRAINT categories_pkey PRIMARY KEY (id),
   CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.categories(id)
 );
-CREATE TABLE public.categories_closure (
-  ancestor uuid NOT NULL,
-  descendant uuid NOT NULL,
-  depth integer NOT NULL,
-  CONSTRAINT categories_closure_pkey PRIMARY KEY (ancestor, descendant),
-  CONSTRAINT categories_closure_ancestor_fkey FOREIGN KEY (ancestor) REFERENCES public.categories(id),
-  CONSTRAINT categories_closure_descendant_fkey FOREIGN KEY (descendant) REFERENCES public.categories(id)
-);
 CREATE TABLE public.clubs (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   nom text NOT NULL,
@@ -71,9 +63,15 @@ CREATE TABLE public.clubs (
   theme_principal text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  pays_id uuid,
+  ville_id uuid,
+  quartier_id uuid,
   CONSTRAINT clubs_pkey PRIMARY KEY (id),
   CONSTRAINT clubs_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
-  CONSTRAINT clubs_leader_id_fkey FOREIGN KEY (leader_id) REFERENCES public.profiles(id)
+  CONSTRAINT clubs_leader_id_fkey FOREIGN KEY (leader_id) REFERENCES public.profiles(id),
+  CONSTRAINT clubs_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT clubs_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id),
+  CONSTRAINT clubs_quartier_id_fkey FOREIGN KEY (quartier_id) REFERENCES public.quartiers(id)
 );
 CREATE TABLE public.commentaires (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -84,6 +82,17 @@ CREATE TABLE public.commentaires (
   CONSTRAINT commentaires_pkey PRIMARY KEY (id),
   CONSTRAINT commentaires_auteur_id_fkey FOREIGN KEY (auteur_id) REFERENCES public.profiles(id),
   CONSTRAINT commentaires_parent_poste_fkey FOREIGN KEY (parent_poste) REFERENCES public.postes(id)
+);
+CREATE TABLE public.commentaires_blog (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  article_id uuid NOT NULL,
+  auteur_id uuid NOT NULL,
+  contenu text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT commentaires_blog_pkey PRIMARY KEY (id),
+  CONSTRAINT commentaires_blog_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles_blog(id),
+  CONSTRAINT commentaires_blog_auteur_id_fkey FOREIGN KEY (auteur_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.conversation_participants (
   conversation_id uuid NOT NULL,
@@ -169,6 +178,7 @@ CREATE TABLE public.formations (
   nb_avis integer DEFAULT 0,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  lieu text,
   CONSTRAINT formations_pkey PRIMARY KEY (id),
   CONSTRAINT formations_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
   CONSTRAINT formations_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
@@ -317,7 +327,14 @@ CREATE TABLE public.professeurs (
   certifications jsonb,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT professeurs_pkey PRIMARY KEY (id)
+  pays_id uuid,
+  ville_id uuid,
+  quartier_id uuid,
+  type text,
+  CONSTRAINT professeurs_pkey PRIMARY KEY (id),
+  CONSTRAINT professeurs_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
+  CONSTRAINT professeurs_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id),
+  CONSTRAINT professeurs_quartier_id_fkey FOREIGN KEY (quartier_id) REFERENCES public.quartiers(id)
 );
 CREATE TABLE public.profiles (
   id uuid NOT NULL,

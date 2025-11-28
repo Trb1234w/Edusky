@@ -12,7 +12,7 @@ import { InscriptionClubModal } from "@/components/inscription-club-modal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar, User, MapPin, Users, Tag, ChevronLeft, Heart, Share2, Info, Users2,
-  Activity, MessageSquare, ShieldCheck
+  Activity, MessageSquare, ShieldCheck, Clock
 } from "lucide-react";
 
 
@@ -90,6 +90,16 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mt-2">{club.nom}</h1>
                 <p className="text-lg text-muted-foreground mt-3 max-w-2xl mx-auto">{club.description}</p>
 
+                {club.tags && club.tags.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-2 mt-4">
+                    {club.tags.map((tag: string) => (
+                      <Badge key={tag} variant="outline" className="bg-background/50 backdrop-blur-sm">
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mt-4">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="h-4 w-4 text-primary" />
@@ -123,6 +133,21 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
                   <div className="prose dark:prose-invert max-w-none text-foreground/90">
                     {club.long_description || club.description || "Aucune description détaillée disponible."}
                   </div>
+
+                  <div className="mt-8 pt-6 border-t flex flex-wrap gap-6 text-sm text-muted-foreground">
+                    {club.created_at && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>Créé le {formatDate(club.created_at)}</span>
+                      </div>
+                    )}
+                    {club.updated_at && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>Mis à jour le {formatDate(club.updated_at)}</span>
+                      </div>
+                    )}
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="members" className="p-6 bg-background rounded-2xl shadow-lg">
@@ -149,7 +174,15 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
                 <TabsContent value="activities" className="p-6 bg-background rounded-2xl shadow-lg text-center">
                   <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Activités à venir</h3>
-                  <p className="text-muted-foreground">Aucune activité n'est encore planifiée. Revenez bientôt !</p>
+                  {club.calendrier ? (
+                    <div className="text-left mt-4 bg-muted/30 p-4 rounded-lg">
+                      <pre className="whitespace-pre-wrap text-sm font-mono overflow-auto max-h-60">
+                        {JSON.stringify(club.calendrier, null, 2)}
+                      </pre>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">Aucune activité n'est encore planifiée. Revenez bientôt !</p>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="discussions" className="p-6 bg-background rounded-2xl shadow-lg text-center">
@@ -179,7 +212,32 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
                 </CardContent>
                 <CardFooter className="p-0 border-t mt-6 pt-6 flex flex-col items-start gap-4">
                   <div className="flex items-start gap-4 text-sm"><Tag className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">Thème</span><br /><span className="text-muted-foreground">{club.theme_principal || 'Non défini'}</span></p></div>
-                  <div className="flex items-start gap-4 text-sm"><MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">Lieu</span><br /><span className="text-muted-foreground">{club.lieu || 'Non spécifié'}</span></p></div>
+
+                  <div className="flex items-start gap-4 text-sm">
+                    <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <span className="font-bold">Localisation</span><br />
+                      <span className="text-muted-foreground">
+                        {[
+                          club.lieu,
+                          club.quartier?.nom,
+                          club.ville?.nom,
+                          club.pays?.nom
+                        ].filter(Boolean).join(', ') || 'Non spécifié'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4 text-sm">
+                    <Users className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <span className="font-bold">Capacité</span><br />
+                      <span className="text-muted-foreground">
+                        {club.capacite ? `${club.capacite} membres max` : 'Illimitée'}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="flex items-start gap-4 text-sm"><Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">Création</span><br /><span className="text-muted-foreground">{formatDate(club.created_at)}</span></p></div>
                 </CardFooter>
               </Card>

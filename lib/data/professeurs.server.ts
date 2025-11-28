@@ -6,17 +6,26 @@ export async function getProfesseurById(id: string) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { data, error } = await supabaseAdmin.rpc('get_professeur_by_id', {
-    professeur_id: id,
-  });
+  const { data, error } = await supabaseAdmin
+    .from("professeurs")
+    .select(
+      `
+        *,
+        profile:id(*),
+        pays:pays_id(*),
+        ville:ville_id(*),
+        quartier:quartier_id(*)
+      `
+    )
+    .eq("id", id)
+    .single();
 
   if (error) {
-    console.error("Error fetching professeur by ID via RPC:", error);
+    console.error("Error fetching professeur by ID:", error);
     return { data: null, error };
   }
 
-  // RPC returns an array, but get_professeur_by_id should return a single row
-  return { data: data ? data[0] : null, error };
+  return { data, error };
 }
 
 export async function getRelatedProfesseursBySpecialty(currentProfesseurId: string, specialties: string[]) {
