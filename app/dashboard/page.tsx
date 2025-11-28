@@ -269,7 +269,13 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <FollowersList profiles={followers} currentUserId={profile.id} />
+                <FollowersList
+                  profiles={followers.map(f => ({
+                    ...f,
+                    isFollowing: following.some((followed: any) => followed.id === f.id)
+                  }))}
+                  currentUserId={profile.id}
+                />
               )}
             </TabsContent>
             <TabsContent value="following" className="mt-6">
@@ -280,7 +286,13 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <FollowersList profiles={following} currentUserId={profile.id} />
+                <FollowersList
+                  profiles={following.map(f => ({
+                    ...f,
+                    isFollowing: true // User is following everyone in their following list
+                  }))}
+                  currentUserId={profile.id}
+                />
               )}
             </TabsContent>
             <TabsContent value="inscriptions" className="mt-6 space-y-12">

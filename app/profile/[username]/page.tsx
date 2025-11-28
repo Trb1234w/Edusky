@@ -61,12 +61,32 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     console.error("Error fetching following for profile:", followingError);
   }
 
+  // Récupérer les abonnements de l'utilisateur connecté pour déterminer le statut "isFollowing"
+  let currentUserFollowingIds = new Set<string>();
+  if (currentUser) {
+    const { data: myFollowing, error: myFollowingError } = await getFollowing(currentUser.id);
+    if (!myFollowingError && myFollowing) {
+      myFollowing.forEach((p: any) => currentUserFollowingIds.add(p.id));
+    }
+  }
+
+  // Mapper les profils pour ajouter isFollowing
+  const followersWithStatus = followers?.map((p: any) => ({
+    ...p,
+    isFollowing: currentUserFollowingIds.has(p.id)
+  })) || [];
+
+  const followingWithStatus = following?.map((p: any) => ({
+    ...p,
+    isFollowing: currentUserFollowingIds.has(p.id)
+  })) || [];
+
   const renderPost = (post: any) => {
     const props = {
       ...post,
       currentUserId: currentUser?.id,
-      followingIds: [], // Cette information n'est pas cruciale ici, on peut la laisser vide
-      authorUsername: post.authorUsername, // Corrigé
+      followingIds: Array.from(currentUserFollowingIds), // Use the Set converted to Array
+      authorUsername: post.authorUsername,
     };
     if (post.sharedPost) {
       return <SharedPostCard key={post.id} {...props} />;
@@ -77,13 +97,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const profileWithPostsCount = {
     ...profile,
     postsCount: posts?.length || 0,
+    isFollowing: currentUser ? currentUserFollowingIds.has(profile.id) : false, // Ensure profile header gets correct status too
   };
 
   return (
     <div className="min-h-screen bg-muted/20">
       <main className="container mx-auto px-0 md:px-4 py-8 pt-2 lg:pt-24">
         {/* Section de l'en-tête du profil gérée par le composant client */}
-        <ProfileHeader profile={profileWithPostsCount} currentUserId={currentUser?.id} />
+        <ProfileHeader profile={profileWithPostsCount} currentUserId={currentUser?.id || ''} />
 
         {/* Section des contenus du profil */}
         <Tabs defaultValue="posts" className="w-full">
@@ -126,8 +147,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des abonnements.
               </Card>
-            ) : following && following.length > 0 ? (
-              <FollowersList profiles={following} currentUserId={currentUser?.id} />
+            ) : followingWithStatus && followingWithStatus.length > 0 ? (
+              <FollowersList profiles={followingWithStatus} currentUserId={currentUser?.id || ''} />
             ) : (
               <Card className="p-8 text-center text-muted-foreground">
                 Cet utilisateur ne suit personne.
@@ -139,8 +160,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <Card className="p-8 text-center text-destructive-foreground bg-destructive/10 border-destructive">
                 Erreur lors du chargement des abonnés.
               </Card>
-            ) : followers && followers.length > 0 ? (
-              <FollowersList profiles={followers} currentUserId={currentUser?.id} />
+            ) : followersWithStatus && followersWithStatus.length > 0 ? (
+              <FollowersList profiles={followersWithStatus} currentUserId={currentUser?.id || ''} />
             ) : (
               <Card className="p-8 text-center text-muted-foreground">
                 Cet utilisateur n'a aucun abonné.

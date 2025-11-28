@@ -3,9 +3,11 @@
 import { useState, useTransition } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Mail, UserCheck, UserPlus, Loader2 } from "lucide-react";
+import { UserCheck, UserPlus, Loader2, MessageCircle } from "lucide-react";
 import { followUserAction } from '@/app/users/actions';
+import { findOrCreateConversationAction } from '@/app/messages/actions';
 import { useToast } from './ui/use-toast';
+import { useRouter } from 'next/navigation';
 
 // Type definition for the profile for clarity
 type Profile = {
@@ -22,12 +24,14 @@ type Profile = {
 
 interface ProfileHeaderProps {
   profile: Profile;
-  currentUserId?: string;
+  currentUserId: string;
 }
 
 export function ProfileHeader({ profile, currentUserId }: ProfileHeaderProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [creatingConversation, setCreatingConversation] = useState(false);
 
   // Local state for optimistic updates
   const [isFollowing, setIsFollowing] = useState(profile.isFollowing);
@@ -52,6 +56,20 @@ export function ProfileHeader({ profile, currentUserId }: ProfileHeaderProps) {
         toast({ title: "Erreur", description: error, variant: "destructive" });
       }
     });
+  };
+
+  const handleMessageClick = async () => {
+    if (creatingConversation) return;
+    setCreatingConversation(true);
+
+    const { data: conversationId, error } = await findOrCreateConversationAction(profile.id);
+
+    if (error) {
+      toast({ title: "Erreur de messagerie", description: error, variant: "destructive" });
+    } else if (conversationId) {
+      router.push(`/messages?conversation=${conversationId}`);
+    }
+    setCreatingConversation(false);
   };
 
   const StatItem = ({ count, label }: { count: number; label: string }) => (
@@ -91,8 +109,14 @@ export function ProfileHeader({ profile, currentUserId }: ProfileHeaderProps) {
                   </>
                 )}
               </Button>
-              <Button variant="secondary">Message</Button>
-              <Button variant="ghost" size="icon" className="h-9 w-9"><MoreHorizontal className="h-5 w-5" /></Button>
+              <Button variant="secondary" onClick={handleMessageClick} disabled={creatingConversation}>
+                {creatingConversation ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                )}
+                Message
+              </Button>
             </div>
           </div>
 
@@ -139,8 +163,14 @@ export function ProfileHeader({ profile, currentUserId }: ProfileHeaderProps) {
             </>
           )}
         </Button>
-        <Button variant="secondary" className="flex-1" size="sm">Message</Button>
-        <Button variant="ghost" size="icon"><MoreHorizontal className="h-5 w-5" /></Button>
+        <Button variant="secondary" onClick={handleMessageClick} disabled={creatingConversation} className="flex-1" size="sm">
+          {creatingConversation ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <MessageCircle className="mr-2 h-4 w-4" />
+          )}
+          Message
+        </Button>
       </div>
     </div>
   );
