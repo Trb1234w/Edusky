@@ -47,9 +47,9 @@ export default async function FeedPage() {
     return <div className="text-center text-red-500">Erreur lors du chargement des données.</div>;
   }
 
-    if (!posts) {
-      return <div className="text-center text-muted-foreground">Aucun post trouvé.</div>;
-    }
+  if (!posts) {
+    return <div className="text-center text-muted-foreground">Aucun post trouvé.</div>;
+  }
   const renderPost = (post: any) => {
     const props = {
       ...post,
@@ -66,7 +66,7 @@ export default async function FeedPage() {
   return (
     <div className="min-h-screen bg-muted/30">
       <SocialHeader />
-      <main>
+      <main className="pt-16">
         <section className="container mx-auto py-2 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left Sidebar - Hidden on mobile */}
@@ -104,28 +104,19 @@ export default async function FeedPage() {
 
               {/* UNIFIED MOBILE VIEW */}
               <div className="md:hidden">
-                <div className="bg-background border-b p-2 space-y-2">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-blue-500" />
-                            <h1 className="text-xl font-semibold text-foreground">Edusky</h1>
-                        </div>
-                        <Button variant="ghost" size="icon">
-                            <Search className="h-5 w-5" />
-                            <span className="sr-only">Rechercher</span>
-                        </Button>
-                    </div>
-                    <FeedHeader 
-                      avatarUrl={profile?.avatar_url || null} 
-                      userName={profile?.full_name || ''}
-                    />
-                </div>
                 <Tabs defaultValue="all" className="w-full">
-                  <div className="bg-background border-b">
-                    <TabsList className="grid w-full grid-cols-3">
+                  <div className="bg-background border-b p-2 space-y-2">
+                    <div className="relative pb-2">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        placeholder="Rechercher..."
+                        className="w-full pl-10 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+                    <TabsList className="grid w-full grid-cols-2 bg-background">
                       <TabsTrigger value="all">Tous</TabsTrigger>
                       <TabsTrigger value="following">Abonnements</TabsTrigger>
-                      <TabsTrigger value="trending">Tendances</TabsTrigger>
                     </TabsList>
                   </div>
                   <TabsContent value="all" className="mt-2 space-y-2 divide-y divide-border">
@@ -134,32 +125,30 @@ export default async function FeedPage() {
                   <TabsContent value="following" className="mt-2 space-y-2 divide-y divide-border">
                     {posts.slice(0, 3).map(renderPost)}
                   </TabsContent>
-                  <TabsContent value="trending" className="mt-2 space-y-2 divide-y divide-border">
-                    {posts.filter((p) => p.likes >= 150).map(renderPost)}
-                  </TabsContent>
                 </Tabs>
               </div>
 
-              {/* DESKTOP VIEW (Untouched logic and spacing) */}
               <div className="hidden md:block space-y-4">
-                <FeedHeader 
-                  avatarUrl={profile?.avatar_url || null} 
-                  userName={profile?.full_name || ''}
-                />
                 <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="w-full">
-                    <TabsTrigger value="all" className="flex-1">Tous</TabsTrigger>
-                    <TabsTrigger value="following" className="flex-1">Abonnements</TabsTrigger>
-                    <TabsTrigger value="trending" className="flex-1">Tendances</TabsTrigger>
-                  </TabsList>
+                  <div className="space-y-2">
+                    <div className="relative pb-2">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        placeholder="Rechercher..."
+                        className="w-full pl-10 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+                    <TabsList className="w-full">
+                      <TabsTrigger value="all" className="flex-1">Tous</TabsTrigger>
+                      <TabsTrigger value="following" className="flex-1">Abonnements</TabsTrigger>
+                    </TabsList>
+                  </div>
                   <TabsContent value="all" className="space-y-4 mt-4 divide-y divide-border">
                     {posts.map(renderPost)}
                   </TabsContent>
                   <TabsContent value="following" className="space-y-4 mt-4 divide-y divide-border">
                     {posts.slice(0, 3).map(renderPost)}
-                  </TabsContent>
-                  <TabsContent value="trending" className="space-y-4 mt-4 divide-y divide-border">
-                    {posts.filter((p) => p.likes >= 150).map(renderPost)}
                   </TabsContent>
                 </Tabs>
               </div>
@@ -169,7 +158,7 @@ export default async function FeedPage() {
         </section>
       </main>
 
-     
+
       <MobileNav />
     </div>
   );

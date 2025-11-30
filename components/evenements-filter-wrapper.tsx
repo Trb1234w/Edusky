@@ -83,6 +83,10 @@ export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
         tags: undefined,
         hasCapacity: undefined,
         dateFilter: undefined,
+        // Nouveaux filtres
+        prix: undefined,
+        statut_evenement: undefined,
+        placesDisponibles: undefined,
     })
 
     useEffect(() => {
@@ -224,6 +228,27 @@ export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
                 }
             })()
 
+            // Prix filter
+            const prixMatch = (() => {
+                if (!filters.prix) return true;
+                if (filters.prix === 'gratuit') {
+                    return evenement.est_gratuit || evenement.prix === 0 || evenement.prix === null;
+                }
+                return true;
+            })();
+
+            // Statut filter
+            const statutMatch = !filters.statut_evenement ||
+                evenement.statut_evenement === filters.statut_evenement;
+
+            // Places disponibles filter
+            const placesDisponiblesMatch = !filters.placesDisponibles || (
+                evenement.capacite &&
+                evenement.nombre_participants !== null &&
+                evenement.nombre_participants !== undefined &&
+                evenement.nombre_participants < evenement.capacite
+            );
+
             return (
                 searchMatch &&
                 categoryMatch &&
@@ -234,7 +259,10 @@ export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
                 typeMatch &&
                 tagsMatch &&
                 capacityMatch &&
-                dateMatch
+                dateMatch &&
+                prixMatch &&
+                statutMatch &&
+                placesDisponiblesMatch
             )
         })
     }, [filters, allEvenements])
@@ -307,6 +335,34 @@ export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
         {
             name: "hasCapacity",
             label: "Capacité",
+            icon: "Users",
+            options: [
+                { label: "Toutes", value: undefined },
+                { label: "Places disponibles", value: true }
+            ]
+        },
+        {
+            name: "prix",
+            label: "Prix",
+            options: [
+                { label: "Tous", value: undefined },
+                { label: "Gratuit", value: "gratuit" }
+            ]
+        },
+        {
+            name: "statut_evenement",
+            label: "Statut",
+            options: [
+                { label: "Tous", value: undefined },
+                { label: "Ouvert", value: "ouvert" },
+                { label: "Complet", value: "complet" },
+                { label: "Annulé", value: "annule" },
+                { label: "Reporté", value: "reporte" }
+            ]
+        },
+        {
+            name: "placesDisponibles",
+            label: "Disponibilité",
             icon: "Users",
             options: [
                 { label: "Toutes", value: undefined },

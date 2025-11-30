@@ -1,27 +1,78 @@
-import { getFormationById, getRelatedFormationsByCategory } from "@/lib/data/formations.server";
-import { notFound } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { RelatedFormations } from "@/components/related-formations";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { InscriptionModal } from "@/components/inscription-modal";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Clock, BarChart3, Star, BookOpen, Video, FileText, Award, Calendar, User, MapPin, Users,
-  ChevronLeft, Heart, Share2, Info, Book, MessageSquare, VideoIcon, FileTextIcon, ListVideo, GraduationCap, Computer,
-  Briefcase, Tag, CheckCircle2, Building2, Globe
-} from "lucide-react";
+import React from 'react';
+import { notFound } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 
-// --- Helpers ---
+// Icons
+import {
+  MapPin,
+  Clock,
+  Calendar,
+  Users,
+  Award,
+  CheckCircle2,
+  Globe,
+  Share2,
+  Heart,
+  ChevronLeft,
+  BookOpen,
+  BarChart3,
+  Computer,
+  GraduationCap,
+  Info,
+  Accessibility,
+  Book,
+  Briefcase,
+  Building2,
+  FileText,
+  List,
+  ListVideo,
+  Star,
+} from 'lucide-react';
+
+// UI Components
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+// Server Data
+import {
+  getFormationById,
+  getRelatedFormationsByCategory,
+} from '@/lib/data/formations.server';
+
+// Utils
+import { normalizeArray } from '@/lib/utils/data-format';
+
+// Modals / Components
+import { InscriptionModal } from '@/components/inscription-modal';
+import { RelatedFormations } from '@/components/related-formations';
+
+// Formation Tabs
+import { PrerequisTab } from '@/components/formations/tabs/PrerequisTab';
+import { PublicCibleTab } from '@/components/formations/tabs/PublicCibleTab';
+import { JobsTab } from '@/components/formations/tabs/JobsTab';
+import { RessourcesTab } from '@/components/formations/tabs/RessourcesTab';
+import { ModalitesTab } from '@/components/formations/tabs/ModalitesTab';
+import { AccessibiliteTab } from '@/components/formations/tabs/AccessibiliteTab';
+import { CurriculumTab } from '@/components/formations/tabs/CurriculumTab';
+import { ProgrammeTab } from '@/components/formations/tabs/ProgrammeTab';
+import { HorairesTab } from '@/components/formations/tabs/HorairesTab';
+import { InfosTab } from '@/components/formations/tabs/InfosTab';
+import { SessionsTab } from '@/components/formations/tabs/SessionsTab';
+
 
 const formatPrice = (price: number | null | undefined) => {
-  if (price === null || price === undefined) return "N/A";
+  if (price === null || price === undefined) return "Gratuit";
   if (price === 0) return "Gratuit";
-  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "GNF", minimumFractionDigits: 0 }).format(price);
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(price);
 };
 
 const formatDate = (dateString: string | null | undefined) => {
@@ -45,7 +96,10 @@ const StarRating = ({ rating, totalStars = 5 }: { rating: number, totalStars?: n
   );
 };
 
-// --- Page Component ---
+const dayMap: { [key: string]: string } = {
+  lu: 'Lundi', ma: 'Mardi', me: 'Mercredi', je: 'Jeudi', ve: 'Vendredi', sa: 'Samedi', di: 'Dimanche',
+  lundi: 'Lundi', mardi: 'Mardi', mercredi: 'Mercredi', jeudi: 'Jeudi', vendredi: 'Vendredi', samedi: 'Samedi', dimanche: 'Dimanche'
+};
 
 export default async function FormationDetailsPage({ params }: { params: { id: string } }) {
   const resolvedParams = await params;
@@ -163,8 +217,8 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                 )}
               </Card>
 
-              {/* Barre de statistiques rapide */}
-              <Card className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-xl rounded-2xl border-none">
+              {/* Barre de statistiques rapide (Mobile/Tablet) - Visible only on small screens if needed, but here we keep it as part of the flow or move to right col */}
+              <Card className="lg:hidden grid grid-cols-2 gap-4 p-4 bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-xl rounded-2xl border-none">
                 <div className="flex items-center gap-3">
                   <Clock className="h-8 w-8 text-primary" />
                   <div><p className="text-sm text-muted-foreground">Durée</p><p className="font-bold">{formation.duree_texte || 'N/A'}</p></div>
@@ -185,12 +239,24 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
 
               {/* Contenu principal avec onglets */}
               <Tabs defaultValue="about" className="w-full">
-                <TabsList className="flex w-full overflow-x-auto justify-start md:grid md:grid-cols-4 gap-2 bg-transparent md:bg-muted/50 p-0 md:p-1 mb-6 no-scrollbar">
-                  <TabsTrigger value="about" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-2" />À propos</TabsTrigger>
-                  <TabsTrigger value="curriculum" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Book className="h-4 w-4 mr-2" />Programme</TabsTrigger>
-                  <TabsTrigger value="sessions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Calendar className="h-4 w-4 mr-2" />Sessions</TabsTrigger>
-                  <TabsTrigger value="reviews" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><MessageSquare className="h-4 w-4 mr-2" />Avis</TabsTrigger>
+                <TabsList className="flex w-full overflow-x-auto justify-start md:flex md:flex-wrap gap-2 bg-transparent md:bg-muted/50 p-0 md:p-1 mb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  <TabsTrigger value="about" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">À propos</span></TabsTrigger>
+                  <TabsTrigger value="infos" className="lg:hidden flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Infos</span></TabsTrigger>
+                  {curriculum.length > 0 && <TabsTrigger value="curriculum" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Book className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Curriculum</span></TabsTrigger>}
+                  {formation.programme && <TabsTrigger value="programme" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><List className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Programme</span></TabsTrigger>}
+                  {(formation.horaires || formation.jours_formation) && <TabsTrigger value="horaires" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Calendar className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Horaires</span></TabsTrigger>}
+                  {sessions.length > 0 && <TabsTrigger value="sessions" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Calendar className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Sessions</span></TabsTrigger>}
+                  {formation.ressources && <TabsTrigger value="ressources" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><FileText className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Ressources</span></TabsTrigger>}
+                  {formation.prerequis && <TabsTrigger value="prerequis" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><CheckCircle2 className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Prérequis</span></TabsTrigger>}
+                  {formation.public_cible && <TabsTrigger value="public_cible" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Users className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Public</span></TabsTrigger>}
+                  {formation.jobs_relies && <TabsTrigger value="jobs" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Briefcase className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Débouchés</span></TabsTrigger>}
+                  {formation.modalites_evaluation && <TabsTrigger value="modalites" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Award className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Modalités</span></TabsTrigger>}
+                  {formation.accessibilite && <TabsTrigger value="accessibilite" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Accessibility className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Accessibilité</span></TabsTrigger>}
                 </TabsList>
+
+                <TabsContent value="infos">
+                  <InfosTab formation={formation} formatPrice={formatPrice} formatDate={formatDate} />
+                </TabsContent>
 
                 <TabsContent value="about" className="p-6 bg-background rounded-2xl shadow-lg">
                   <h3 className="text-xl font-bold mb-4">Description de la formation</h3>
@@ -198,142 +264,67 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                     {formation.description || "Aucune description disponible."}
                   </div>
 
-                  <div className="space-y-6 border-t pt-6">
-                    {/* Jobs Relies */}
-                    {formation.jobs_relies && formation.jobs_relies.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2 flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary" /> Débouchés métiers</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {formation.jobs_relies.map((job: string, i: number) => (
-                            <Badge key={i} variant="outline" className="bg-primary/5 border-primary/20 text-primary">{job}</Badge>
-                          ))}
-                        </div>
-                      </div>
+                  {/* Infos supplémentaires non couvertes par les autres onglets */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4 mt-6">
+                    {formation.date_publication && (
+                      <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(String(formation.date_publication))}</div>
                     )}
-
-                    {/* Tags */}
-                    {formation.tags && formation.tags.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2 flex items-center gap-2"><Tag className="h-4 w-4 text-primary" /> Tags</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {formation.tags.map((tag: string, i: number) => (
-                            <Badge key={i} variant="secondary">{tag}</Badge>
-                          ))}
-                        </div>
-                      </div>
+                    {formation.updated_at && (
+                      <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(String(formation.updated_at))}</div>
                     )}
-
-                    {/* Ressources */}
-                    {formation.ressources && (
-                      <div>
-                        <h4 className="font-semibold mb-2 flex items-center gap-2"><FileText className="h-4 w-4 text-primary" /> Ressources incluses</h4>
-                        <div className="grid gap-2">
-                          {Array.isArray(formation.ressources) ? (
-                            formation.ressources.map((res: any, i: number) => (
-                              <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                <span>{typeof res === 'string' ? res : res.titre || res.name || JSON.stringify(res)}</span>
-                              </div>
-                            ))
-                          ) : (
-                            <p className="text-sm text-muted-foreground">Des ressources pédagogiques sont fournies avec ce cours.</p>
-                          )}
-                        </div>
-                      </div>
+                    {formation.ville && (
+                      <div className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Ville : {formation.ville.nom}</div>
                     )}
-
-                    {formation.video_intro_url && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
-                        <VideoIcon className="h-4 w-4 text-primary" />
-                        <span className="font-medium">Lien vidéo direct : </span>
-                        <a href={formation.video_intro_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate max-w-md">
-                          {formation.video_intro_url}
-                        </a>
-                      </div>
+                    {formation.pays && (
+                      <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Pays : {formation.pays.nom}</div>
                     )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4">
-                      {formation.date_publication && (
-                        <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(String(formation.date_publication))}</div>
-                      )}
-                      {formation.updated_at && (
-                        <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(String(formation.updated_at))}</div>
-                      )}
-                      {formation.ville && (
-                        <div className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Ville : {formation.ville.nom}</div>
-                      )}
-                      {formation.pays && (
-                        <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Pays : {formation.pays.nom}</div>
-                      )}
-                      {formation.capacite && (
-                        <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {formation.capacite} places</div>
-                      )}
-                    </div>
+                    {formation.capacite && (
+                      <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {formation.capacite} places</div>
+                    )}
+                    {formation.langue_enseignement && (
+                      <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Langue : <span className="capitalize">{formation.langue_enseignement}</span></div>
+                    )}
                   </div>
                 </TabsContent>
 
-                <TabsContent value="curriculum" className="p-0">
-                  <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
-                    {curriculum.length > 0 ? curriculum.map((module: any, index: number) => (
-                      <AccordionItem value={`item-${index}`} key={index} className="border-b-0 mb-3">
-                        <Card className="shadow-md rounded-xl">
-                          <AccordionTrigger className="text-lg font-semibold p-5 hover:no-underline">
-                            {module.title || `Module ${index + 1}`}
-                          </AccordionTrigger>
-                          <AccordionContent className="px-5 pb-5 space-y-3">
-                            {module.lessons && module.lessons.map((lesson: any, lessonIndex: number) => (
-                              <div key={lessonIndex} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                                {lesson.type === 'video' ? <VideoIcon className="h-5 w-5 text-primary" /> : <FileTextIcon className="h-5 w-5 text-primary" />}
-                                <span className="flex-1 font-medium text-foreground/90">{lesson.title}</span>
-                                <span className="text-sm text-muted-foreground">{lesson.duration}</span>
-                              </div>
-                            ))}
-                          </AccordionContent>
-                        </Card>
-                      </AccordionItem>
-                    )) : <p className="text-muted-foreground p-6">Le programme détaillé n'est pas encore disponible.</p>}
-                  </Accordion>
+                <TabsContent value="curriculum">
+                  <CurriculumTab curriculum={curriculum} />
                 </TabsContent>
 
-                <TabsContent value="sessions" className="p-6 bg-background rounded-2xl shadow-lg">
-                  {sessions.length > 0 ? (
-                    <div className="space-y-4">
-                      {sessions.map((session: any) => (
-                        <div key={session.id} className="p-4 border rounded-xl bg-background/50">
-                          <p className="font-bold text-lg">Session du {formatDate(session.debut)} au {formatDate(session.fin)}</p>
-                          {session.lieu && <div className="flex items-center gap-3 text-sm mt-2 text-muted-foreground"><MapPin className="h-4 w-4 text-primary" /><p>{session.lieu}</p></div>}
-                          {session.capacite && <div className="flex items-center gap-3 text-sm mt-1 text-muted-foreground"><Users className="h-4 w-4 text-primary" /><p>{session.places_reservees || 0} / {session.capacite} places</p></div>}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Aucune session n'est programmée pour le moment.</p>
-                  )}
+                <TabsContent value="programme">
+                  <ProgrammeTab programme={formation.programme} />
                 </TabsContent>
 
-                <TabsContent value="reviews" className="p-6 bg-background rounded-2xl shadow-lg">
-                  {avis.length > 0 ? (
-                    <div className="space-y-6">
-                      {avis.map((review: any) => (
-                        <div key={review.id} className="flex gap-4 border-b pb-4 last:border-b-0">
-                          <Avatar>
-                            <AvatarImage src={review.author?.avatar_url || ''} alt={review.author?.full_name || ''} />
-                            <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <p className="font-bold">{review.author?.full_name || "Anonyme"}</p>
-                              <span className="text-xs text-muted-foreground">{formatDate(review.created_at)}</span>
-                            </div>
-                            <div className="my-1.5"><StarRating rating={review.note} /></div>
-                            <p className="text-muted-foreground text-sm">{review.commentaire}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Il n'y a pas encore d'avis pour cette formation.</p>
-                  )}
+                <TabsContent value="horaires">
+                  <HorairesTab horaires={formation.horaires} joursFormation={formation.jours_formation} />
+                </TabsContent>
+
+                <TabsContent value="sessions">
+                  <SessionsTab sessions={sessions} formatDate={formatDate} />
+                </TabsContent>
+
+                <TabsContent value="ressources">
+                  <RessourcesTab ressources={formation.ressources} />
+                </TabsContent>
+
+                <TabsContent value="prerequis">
+                  <PrerequisTab prerequis={formation.prerequis} />
+                </TabsContent>
+
+                <TabsContent value="public_cible">
+                  <PublicCibleTab publicCible={formation.public_cible} />
+                </TabsContent>
+
+                <TabsContent value="jobs">
+                  <JobsTab jobs={formation.jobs_relies} />
+                </TabsContent>
+
+                <TabsContent value="modalites">
+                  <ModalitesTab modalites={formation.modalites_evaluation} />
+                </TabsContent>
+
+                <TabsContent value="accessibilite">
+                  <AccessibiliteTab accessibilite={formation.accessibilite} />
                 </TabsContent>
               </Tabs>
             </div>
@@ -352,6 +343,8 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                   <h3 className="font-bold text-lg mb-2">Ce cours inclut :</h3>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground"><Clock className="h-4 w-4 text-primary" /><span>Durée de {formation.duree_texte || 'N/A'}</span></div>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground"><ListVideo className="h-4 w-4 text-primary" /><span>{nbLecons} leçons dans {nbModules} modules</span></div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><BarChart3 className="h-4 w-4 text-primary" /><span>Niveau {formation.niveau || 'Tous'}</span></div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground"><Computer className="h-4 w-4 text-primary" /><span>Mode {formation.mode?.replace('_', ' ') || 'Non spécifié'}</span></div>
                   {formation.certificat && <div className="flex items-center gap-3 text-sm text-muted-foreground"><Award className="h-4 w-4 text-primary" /><span>Certificat de fin de formation</span></div>}
                   <div className="flex items-center gap-3 text-sm text-muted-foreground"><Users className="h-4 w-4 text-primary" /><span>Accès aux sessions de groupe</span></div>
                 </CardFooter>

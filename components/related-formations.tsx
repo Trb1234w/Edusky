@@ -42,7 +42,7 @@ export function RelatedFormations({ formations }: RelatedFormationsProps) {
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Autres formations</h2>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory">
                 {formations.map((formation) => (
-                    <div key={formation.id} className="flex-none w-[280px] md:w-[320px] snap-start">
+                    <div key={formation.id} className="flex-none w-[300px] md:w-[360px] snap-start">
                         <CourseCard
                             id={formation.id}
                             title={formation.titre}

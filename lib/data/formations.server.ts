@@ -27,8 +27,8 @@ export async function getFormationById(id: string) {
         pays:pays_id(*),
         ville:ville_id(*),
         quartier:quartier_id(*),
-        sessions:sessions_formation(*),
-        avis:avis_formation(*, author:profiles(full_name, avatar_url))
+        avis:avis_formation(*, author:profiles(full_name, avatar_url)),
+        sessions:sessions_formation(*)
       `
     )
     .eq("id", id)

@@ -72,6 +72,11 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
     pays_id: undefined,
     ville_id: undefined,
     quartier_id: undefined,
+    // Nouveaux filtres
+    type_cotisation: undefined,
+    prix_inscription: undefined,
+    niveau_requis: undefined,
+    placesDisponibles: undefined,
   })
 
   useEffect(() => {
@@ -199,8 +204,34 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       // Location filter (text field, not cascade)
       const lieuMatch = !filters.lieu || club.lieu === filters.lieu
 
+      // Type de cotisation filter
+      const typeCotisationMatch = !filters.type_cotisation ||
+        club.type_cotisation === filters.type_cotisation
+
+      // Prix d'inscription filter
+      const prixInscriptionMatch = (() => {
+        if (!filters.prix_inscription) return true;
+        if (filters.prix_inscription === 'gratuit') {
+          return club.prix_inscription === 0 || club.prix_inscription === null;
+        }
+        return true;
+      })();
+
+      // Niveau requis filter
+      const niveauMatch = !filters.niveau_requis ||
+        club.niveau_requis === filters.niveau_requis
+
+      // Places disponibles filter
+      const placesDisponiblesMatch = !filters.placesDisponibles || (
+        club.capacite &&
+        club.nombre_membres !== null &&
+        club.nombre_membres !== undefined &&
+        club.nombre_membres < club.capacite
+      )
+
       return searchMatch && categoryMatch && statusMatch && capacityMatch &&
-        tagsMatch && themeMatch && paysMatch && villeMatch && quartierMatch && lieuMatch
+        tagsMatch && themeMatch && paysMatch && villeMatch && quartierMatch && lieuMatch &&
+        typeCotisationMatch && prixInscriptionMatch && niveauMatch && placesDisponiblesMatch
     })
   }, [filters, allClubs])
 
@@ -233,6 +264,43 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       options: [
         { label: "Tous les thèmes", value: undefined },
         ...availableThemes.map(theme => ({ label: theme, value: theme }))
+      ],
+    },
+    {
+      label: "Type cotisation",
+      name: "type_cotisation",
+      options: [
+        { label: "Tous", value: undefined },
+        { label: "Gratuit", value: "gratuit" },
+        { label: "Mensuelle", value: "mensuelle" },
+        { label: "Annuelle", value: "annuelle" },
+      ],
+    },
+    {
+      label: "Prix inscription",
+      name: "prix_inscription",
+      options: [
+        { label: "Tous", value: undefined },
+        { label: "Gratuit", value: "gratuit" },
+      ],
+    },
+    {
+      label: "Niveau",
+      name: "niveau_requis",
+      options: [
+        { label: "Tous", value: undefined },
+        { label: "Débutant", value: "débutant" },
+        { label: "Intermédiaire", value: "intermédiaire" },
+        { label: "Avancé", value: "avancé" },
+      ],
+    },
+    {
+      label: "Disponibilité",
+      icon: "Users",
+      name: "placesDisponibles",
+      options: [
+        { label: "Toutes", value: undefined },
+        { label: "Places disponibles", value: true },
       ],
     },
   ]

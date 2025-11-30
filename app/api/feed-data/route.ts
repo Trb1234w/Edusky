@@ -1,14 +1,11 @@
-import { createRouteHandlerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { getAllFeedPosts } from '@/lib/data/posts.server';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const cookieStore = cookies();
-  // createRouteHandlerClient est la méthode fiable pour les API Routes
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = await createClient();
 
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser();

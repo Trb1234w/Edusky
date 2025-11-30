@@ -12,7 +12,8 @@ import { InscriptionEvenementModal } from "@/components/inscription-evenement-mo
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar, User, MapPin, Users, Tag, Clock, ChevronLeft, Heart, Share2, Ticket,
-  Info, Users2, Map, Handshake
+  Info, Users2, Map, Handshake, Link as LinkIcon, Video, Award, Activity, Globe,
+  ExternalLink, CheckCircle2, Book
 } from "lucide-react";
 
 // --- Helpers ---
@@ -33,6 +34,13 @@ const formatTime = (date: string | null | undefined) => {
   });
 };
 
+const normalizeArray = (data: any) => {
+  if (Array.isArray(data)) return data;
+  if (typeof data === 'object' && data !== null) {
+    return Object.values(data);
+  }
+  return [];
+};
 
 // --- Page Component (Redesigné) ---
 
@@ -46,8 +54,14 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
   }
 
   const inscriptions = Array.isArray(evenement.inscriptions) ? evenement.inscriptions : [];
-  const intervenants = Array.isArray(evenement.intervenants) ? evenement.intervenants : []; // Assumant que cette donnée puisse exister
+
+  // Normalize JSONB data
+  const intervenants = normalizeArray(evenement.intervenants);
+  const sponsors = normalizeArray(evenement.sponsors);
+  const programme = evenement.programme;
+
   const lieuComplet = [evenement.lieu, evenement.quartier?.nom, evenement.ville?.nom, evenement.pays?.nom].filter(Boolean).join(', ');
+  const hasLinks = evenement.lien_streaming || evenement.lien_billetterie || evenement.code_acces_streaming;
 
   // Fetch related evenements
   const { data: relatedEvenements } = await getRelatedEvenementsByCategory(evenement.id, evenement.categorie_id);
@@ -107,11 +121,24 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
               </Card>
 
               <Tabs defaultValue="details" className="w-full">
-                <TabsList className="flex w-full overflow-x-auto justify-start md:grid md:grid-cols-4 gap-2 bg-transparent md:bg-muted/50 p-0 md:p-1 mb-6 no-scrollbar">
-                  <TabsTrigger value="details" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-2" />Détails</TabsTrigger>
-                  {intervenants.length > 0 && <TabsTrigger value="speakers" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Users2 className="h-4 w-4 mr-2" />Intervenants</TabsTrigger>}
-                  <TabsTrigger value="location" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Map className="h-4 w-4 mr-2" />Lieu</TabsTrigger>
-                  {inscriptions.length > 0 && <TabsTrigger value="attendees" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Handshake className="h-4 w-4 mr-2" />Participants</TabsTrigger>}
+                <TabsList className="flex w-full overflow-x-auto justify-start md:grid md:grid-cols-7 gap-2 bg-transparent md:bg-muted/50 p-0 md:p-1 mb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  <TabsTrigger value="details" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">À propos</span></TabsTrigger>
+                  <TabsTrigger value="infos" className="lg:hidden flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><MapPin className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Infos</span></TabsTrigger>
+                  {programme && (
+                    <TabsTrigger value="programme" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Book className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Programme</span></TabsTrigger>
+                  )}
+                  {intervenants.length > 0 && (
+                    <TabsTrigger value="speakers" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Users2 className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Intervenants</span></TabsTrigger>
+                  )}
+                  {sponsors.length > 0 && (
+                    <TabsTrigger value="sponsors" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Handshake className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Sponsors</span></TabsTrigger>
+                  )}
+                  {hasLinks && (
+                    <TabsTrigger value="liens" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><LinkIcon className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Liens</span></TabsTrigger>
+                  )}
+                  {inscriptions.length > 0 && (
+                    <TabsTrigger value="attendees" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Users className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Participants</span></TabsTrigger>
+                  )}
                 </TabsList>
 
                 <TabsContent value="details" className="p-6 bg-background rounded-2xl shadow-lg">
@@ -122,6 +149,74 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
                   {/* Additional Event Information */}
                   <div className="space-y-6 border-t pt-6">
+
+
+                    {/* Heure d'ouverture des portes */}
+                    {evenement.heure_ouverture_portes && (
+                      <div className="flex items-center gap-2 text-sm bg-muted/30 p-3 rounded-lg">
+                        <Clock className="h-4 w-4 text-primary" />
+                        <span className="font-medium">Ouverture des portes:</span>
+                        <span className="text-muted-foreground">{evenement.heure_ouverture_portes}</span>
+                      </div>
+                    )}
+
+
+
+                    {/* Contact */}
+                    {(evenement.email_contact || evenement.telephone_contact) && (
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center gap-2">Contact organisateur</h4>
+                        <div className="space-y-1 text-sm">
+                          {evenement.email_contact && (
+                            <p className="text-muted-foreground">
+                              Email: <a href={`mailto:${evenement.email_contact}`} className="text-primary hover:underline">{evenement.email_contact}</a>
+                            </p>
+                          )}
+                          {evenement.telephone_contact && (
+                            <p className="text-muted-foreground">
+                              Tél: <a href={`tel:${evenement.telephone_contact}`} className="text-primary hover:underline">{evenement.telephone_contact}</a>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Informations pratiques */}
+                    {(evenement.dress_code || evenement.conditions_annulation || evenement.politique_remboursement) && (
+                      <div className="bg-muted/20 p-4 rounded-lg border">
+                        <h4 className="font-semibold mb-3 flex items-center gap-2"><Info className="h-4 w-4 text-primary" /> Informations pratiques</h4>
+                        <div className="space-y-3 text-sm">
+                          {evenement.dress_code && (
+                            <div>
+                              <span className="font-medium block mb-1">Dress Code:</span>
+                              <p className="text-muted-foreground">{evenement.dress_code}</p>
+                            </div>
+                          )}
+                          {evenement.conditions_annulation && (
+                            <div>
+                              <span className="font-medium block mb-1">Conditions d'annulation:</span>
+                              <p className="text-muted-foreground">{evenement.conditions_annulation}</p>
+                            </div>
+                          )}
+                          {evenement.politique_remboursement && (
+                            <div>
+                              <span className="font-medium block mb-1">Politique de remboursement:</span>
+                              <p className="text-muted-foreground">{evenement.politique_remboursement}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Age minimum */}
+                    {evenement.age_minimum && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4 text-primary" />
+                        <span className="font-medium">Âge minimum:</span>
+                        <span className="text-muted-foreground">{evenement.age_minimum} ans</span>
+                      </div>
+                    )}
+
                     {/* Type d'événement */}
                     {evenement.type_evenement && (
                       <div>
@@ -160,36 +255,336 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                   </div>
                 </TabsContent>
 
+                {/* Onglet Infos - Visible uniquement sur mobile */}
+                <TabsContent value="infos" className="lg:hidden p-6 bg-background rounded-2xl shadow-lg">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Info className="h-6 w-6 text-primary" /> Informations de l'événement</h3>
+                  <div className="space-y-4">
+                    {/* Date et heure */}
+                    <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+                      <Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="font-bold text-sm block mb-1">Date et heure</span>
+                        <span className="text-muted-foreground text-sm block">
+                          Du {formatDate(evenement.date_debut)} à {formatTime(evenement.date_debut)}
+                        </span>
+                        {evenement.date_fin && (
+                          <span className="text-muted-foreground text-sm block">
+                            Au {formatDate(evenement.date_fin)} à {formatTime(evenement.date_fin)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Lieu */}
+                    <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+                      <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="font-bold text-sm block mb-1">
+                          {evenement.mode === 'en_ligne' ? 'Événement en ligne' : 'Lieu'}
+                        </span>
+                        <span className="text-muted-foreground text-sm">
+                          {evenement.mode === 'en_ligne' ? 'Le lien sera partagé aux inscrits' : lieuComplet || 'À définir'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Prix */}
+                    <div className="flex items-start gap-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                      <Ticket className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="font-bold text-sm block mb-1">Tarif</span>
+                        <span className="text-primary text-lg font-bold">
+                          {evenement.prix > 0 ? new Intl.NumberFormat("fr-FR", { style: "currency", currency: "GNF", minimumFractionDigits: 0 }).format(evenement.prix) : "Gratuit"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Capacité */}
+                    {evenement.capacite && (
+                      <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+                        <Users className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                        <div className="flex-1">
+                          <span className="font-bold text-sm block mb-1">Places</span>
+                          <span className="text-muted-foreground text-sm">
+                            {inscriptions.length} / {evenement.capacite} inscrits
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mode */}
+                    <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+                      <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="font-bold text-sm block mb-1">Mode</span>
+                        <Badge variant="outline" className="capitalize">
+                          {evenement.mode === 'en_ligne' ? '💻 En ligne' : evenement.mode === 'presentiel' ? '📍 Présentiel' : '🔄 Hybride'}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Statut */}
+                    {evenement.statut_evenement && (
+                      <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+                        <CheckCircle2 className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                        <div className="flex-1">
+                          <span className="font-bold text-sm block mb-1">Statut</span>
+                          <Badge
+                            variant={evenement.statut_evenement === 'ouvert' ? 'default' : 'secondary'}
+                            className="capitalize"
+                          >
+                            {evenement.statut_evenement === 'ouvert' ? '✅ Ouvert' :
+                              evenement.statut_evenement === 'complet' ? '🔒 Complet' :
+                                evenement.statut_evenement === 'annule' ? '❌ Annulé' :
+                                  evenement.statut_evenement === 'reporte' ? '⏰ Reporté' : '✔️ Terminé'}
+                          </Badge>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                {/* Onglet Programme */}
+                {programme && (
+                  <TabsContent value="programme" className="p-6 bg-background rounded-2xl shadow-lg">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Book className="h-6 w-6 text-primary" /> Programme de l'événement</h3>
+                    {programme.agenda && programme.agenda.length > 0 ? (
+                      <div className="space-y-4">
+                        {programme.agenda.map((item: any, index: number) => (
+                          <Card key={index} className="p-4 hover:shadow-md transition-shadow">
+                            <div className="flex items-start gap-4">
+                              <div className="flex-shrink-0 w-20 text-center">
+                                <div className="bg-primary/10 rounded-lg p-2">
+                                  <Clock className="h-5 w-5 text-primary mx-auto mb-1" />
+                                  <span className="text-sm font-bold text-primary block">{item.heure}</span>
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-lg mb-1">{item.titre}</h4>
+                                {item.description && <p className="text-sm text-muted-foreground mb-2">{item.description}</p>}
+                                <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                                  {item.intervenant && (
+                                    <span className="flex items-center gap-1">
+                                      <User className="h-3 w-3" />
+                                      {item.intervenant}
+                                    </span>
+                                  )}
+                                  {item.duree_minutes && (
+                                    <span className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      {item.duree_minutes} min
+                                    </span>
+                                  )}
+                                  {item.lieu && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      {item.lieu}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : typeof programme === 'string' ? (
+                      <div className="prose dark:prose-invert max-w-none">
+                        <p className="whitespace-pre-line text-muted-foreground">{programme}</p>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <Book className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
+                        <p className="text-muted-foreground">Programme détaillé à venir.</p>
+                      </div>
+                    )}
+                  </TabsContent>
+                )}
+
+                {/* Onglet Intervenants */}
                 {intervenants.length > 0 && (
                   <TabsContent value="speakers" className="p-6 bg-background rounded-2xl shadow-lg">
-                    <h3 className="text-xl font-bold mb-4">Intervenants</h3>
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Users2 className="h-6 w-6 text-primary" /> Intervenants</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {intervenants.map((speaker: any) => (
-                        <Card key={speaker.id} className="p-4 flex items-center gap-4">
-                          <Avatar>
-                            <AvatarImage src={speaker.avatar_url || ''} alt={speaker.full_name || ''} />
-                            <AvatarFallback>{speaker.full_name?.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-bold">{speaker.full_name}</p>
-                            <p className="text-sm text-muted-foreground">{speaker.titre}</p>
-                          </div>
-                        </Card>
-                      ))}
+                      {intervenants.map((intervenant: any, index: number) => {
+                        const isString = typeof intervenant === 'string';
+                        const nom = isString ? intervenant : (intervenant.nom || 'Intervenant');
+                        const titre = !isString && intervenant.titre ? intervenant.titre : null;
+                        const bio = !isString && intervenant.bio ? intervenant.bio : null;
+                        const photo = !isString && intervenant.photo_url ? intervenant.photo_url : null;
+                        const expertise = !isString && intervenant.expertise ? intervenant.expertise : [];
+                        const linkedin = !isString && intervenant.linkedin ? intervenant.linkedin : null;
+                        const twitter = !isString && intervenant.twitter ? intervenant.twitter : null;
+
+                        return (
+                          <Card key={index} className="p-4 hover:shadow-lg transition-shadow">
+                            <div className="flex items-start gap-4">
+                              {photo ? (
+                                <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                                  <Image src={photo} alt={nom} fill className="object-cover" />
+                                </div>
+                              ) : (
+                                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <User className="h-8 w-8 text-primary" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-base truncate">{nom}</h4>
+                                {titre && <p className="text-xs text-muted-foreground mb-2">{titre}</p>}
+                                {bio && <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{bio}</p>}
+                                {expertise.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mb-2">
+                                    {expertise.slice(0, 3).map((exp: string, i: number) => (
+                                      <Badge key={i} variant="secondary" className="text-xs">{exp}</Badge>
+                                    ))}
+                                  </div>
+                                )}
+                                {(linkedin || twitter) && (
+                                  <div className="flex gap-2">
+                                    {linkedin && (
+                                      <a href={linkedin} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs flex items-center gap-1">
+                                        <Globe className="h-3 w-3" /> LinkedIn
+                                      </a>
+                                    )}
+                                    {twitter && (
+                                      <a href={twitter} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs flex items-center gap-1">
+                                        <Globe className="h-3 w-3" /> Twitter
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </TabsContent>
                 )}
 
-                <TabsContent value="location" className="p-6 bg-background rounded-2xl shadow-lg">
-                  <h3 className="text-xl font-bold mb-4">Lieu de l'événement</h3>
-                  <p className="text-lg text-foreground mb-4">{lieuComplet}</p>
-                  <div className="aspect-video bg-secondary rounded-lg">
-                    {/* Placeholder pour une carte Google Maps ou OpenStreetMap */}
-                    <div className="h-full w-full flex items-center justify-center">
-                      <p className="text-muted-foreground">Carte à venir</p>
+                {/* Onglet Sponsors */}
+                {sponsors.length > 0 && (
+                  <TabsContent value="sponsors" className="p-6 bg-background rounded-2xl shadow-lg">
+                    <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Handshake className="h-6 w-6 text-primary" /> Nos Partenaires et Sponsors</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {sponsors.map((sponsor: any, index: number) => {
+                        const isString = typeof sponsor === 'string';
+                        const nom = isString ? sponsor : (sponsor.nom || sponsor.name || 'Sponsor');
+                        const logo = !isString && sponsor.logo_url ? sponsor.logo_url : null;
+                        const description = !isString && sponsor.description ? sponsor.description : null;
+                        const siteWeb = !isString && sponsor.site_web ? sponsor.site_web : null;
+                        const categorie = !isString && sponsor.categorie ? sponsor.categorie : null;
+                        const niveau = !isString && sponsor.niveau ? sponsor.niveau : null;
+
+                        // Emoji selon le niveau
+                        const niveauEmoji = niveau === 1 ? '🥇' : niveau === 2 ? '🥈' : niveau === 3 ? '🥉' : '';
+                        const categorieEmoji = categorie === 'platine' ? '🥇' : categorie === 'or' ? '🥈' : categorie === 'argent' ? '🥉' : '';
+
+                        return (
+                          <Card key={index} className="p-4 hover:shadow-md transition-shadow">
+                            <div className="flex flex-col items-center text-center gap-3">
+                              {logo ? (
+                                <div className="relative w-24 h-24 bg-muted rounded-lg overflow-hidden">
+                                  <Image src={logo} alt={nom} fill className="object-contain p-2" />
+                                </div>
+                              ) : (
+                                <div className="w-24 h-24 bg-primary/10 rounded-lg flex items-center justify-center">
+                                  <Handshake className="h-12 w-12 text-primary" />
+                                </div>
+                              )}
+                              <div>
+                                <h4 className="font-bold text-base mb-1">
+                                  {niveauEmoji || categorieEmoji} {nom}
+                                </h4>
+                                {categorie && (
+                                  <Badge variant="outline" className="capitalize mb-2 text-xs">
+                                    {categorie}
+                                  </Badge>
+                                )}
+                                {description && <p className="text-xs text-muted-foreground mb-2">{description}</p>}
+                                {siteWeb && (
+                                  <a href={siteWeb} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center justify-center gap-1">
+                                    <Globe className="h-3 w-3" />
+                                    Visiter le site
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        );
+                      })}
                     </div>
-                  </div>
-                </TabsContent>
+                  </TabsContent>
+                )}
+
+                {/* Onglet Liens */}
+                {hasLinks && (
+                  <TabsContent value="liens" className="p-6 bg-background rounded-2xl shadow-lg">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><LinkIcon className="h-6 w-6 text-primary" /> Liens utiles</h3>
+                    <div className="space-y-4">
+                      {/* Lien de streaming */}
+                      {evenement.lien_streaming && (
+                        <Card className="p-4 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Video className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-base mb-1">Lien de streaming</h4>
+                              <p className="text-sm text-muted-foreground mb-3">Rejoignez l'événement en ligne</p>
+                              <Button asChild size="sm" className="w-full sm:w-auto">
+                                <a href={evenement.lien_streaming} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Accéder au streaming
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      )}
+
+                      {/* Code d'accès streaming */}
+                      {evenement.code_acces_streaming && (
+                        <Card className="p-4 bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-800">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Tag className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-base mb-1">Code d'accès</h4>
+                              <p className="text-sm text-muted-foreground mb-2">Utilisez ce code pour rejoindre</p>
+                              <code className="bg-white dark:bg-gray-900 px-4 py-2 rounded-lg text-lg font-mono font-bold block text-center">
+                                {evenement.code_acces_streaming}
+                              </code>
+                            </div>
+                          </div>
+                        </Card>
+                      )}
+
+                      {/* Lien billetterie */}
+                      {evenement.lien_billetterie && (
+                        <Card className="p-4 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Ticket className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-base mb-1">Billetterie</h4>
+                              <p className="text-sm text-muted-foreground mb-3">Réservez vos billets en ligne</p>
+                              <Button asChild size="sm" variant="default" className="w-full sm:w-auto">
+                                <a href={evenement.lien_billetterie} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Acheter un billet
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      )}
+                    </div>
+                  </TabsContent>
+                )}
+
+
 
                 {inscriptions.length > 0 && (
                   <TabsContent value="attendees" className="p-6 bg-background rounded-2xl shadow-lg">
@@ -244,6 +639,9 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
           </div>
         </div>
+
+        {/* Related Evenements Section */}
+        <RelatedEvenements evenements={relatedEvenements || []} />
       </main>
 
       <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-sm border-t z-40">
@@ -257,9 +655,6 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
           </div>
         </div>
       </div>
-
-      {/* Related Evenements Section */}
-      <RelatedEvenements evenements={relatedEvenements || []} />
 
     </div>
   );

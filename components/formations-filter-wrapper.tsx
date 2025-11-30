@@ -92,6 +92,10 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
     lieu: undefined,
     tags: undefined,
     hasCapacity: undefined,
+    // Nouveaux filtres pour colonnes ajoutées
+    prix_inscription: undefined,
+    langue_enseignement: undefined,
+    placesDisponibles: undefined,
   })
 
   useEffect(() => {
@@ -238,6 +242,27 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
         formation.capacite && formation.capacite > 0
       )
 
+      // Prix d'inscription filter
+      const prixInscriptionMatch = (() => {
+        if (!filters.prix_inscription) return true;
+        if (filters.prix_inscription === 'gratuit') {
+          return formation.prix_inscription === 0 || formation.prix_inscription === null;
+        }
+        return true;
+      })();
+
+      // Langue d'enseignement filter
+      const langueMatch = !filters.langue_enseignement ||
+        formation.langue_enseignement === filters.langue_enseignement;
+
+      // Places disponibles filter (nombre_inscrits < capacite)
+      const placesDisponiblesMatch = !filters.placesDisponibles || (
+        formation.capacite &&
+        formation.nombre_inscrits !== null &&
+        formation.nombre_inscrits !== undefined &&
+        formation.nombre_inscrits < formation.capacite
+      );
+
       return (
         searchMatch &&
         categoryMatch &&
@@ -252,7 +277,10 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
         quartierMatch &&
         lieuMatch &&
         tagsMatch &&
-        capacityMatch
+        capacityMatch &&
+        prixInscriptionMatch &&
+        langueMatch &&
+        placesDisponiblesMatch
       )
     }).map(formation => ({
       ...formation,
@@ -280,6 +308,9 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
     { label: "Popularité", name: "minRating", options: [{ label: "Popularité", value: undefined }, { label: "4 étoiles et +", value: 4 }, { label: "3 étoiles et +", value: 3 }] },
     { label: "Tags", name: "tags", icon: "Tag", options: [{ label: "Tous les tags", value: undefined }, ...availableTags.map(t => ({ label: t, value: t }))] },
     { label: "Capacité", name: "hasCapacity", icon: "Users", options: [{ label: "Toutes", value: undefined }, { label: "Places disponibles", value: true }] },
+    { label: "Prix inscription", name: "prix_inscription", options: [{ label: "Tous", value: undefined }, { label: "Gratuit", value: "gratuit" }] },
+    { label: "Langue", name: "langue_enseignement", options: [{ label: "Toutes", value: undefined }, { label: "Français", value: "français" }, { label: "Anglais", value: "anglais" }, { label: "Arabe", value: "arabe" }] },
+    { label: "Disponibilité", name: "placesDisponibles", icon: "Users", options: [{ label: "Toutes", value: undefined }, { label: "Places disponibles", value: true }] },
   ]
 
   return (
