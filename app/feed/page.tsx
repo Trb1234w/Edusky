@@ -12,6 +12,9 @@ import { redirect } from "next/navigation"
 import { SharedPostCard } from "@/components/shared-post-card"
 import { FeedHeader } from "@/components/feed-header"
 import { getSuggestedProfiles } from "@/lib/data/users.server" // Import de la nouvelle fonction
+import { Skeleton } from "@/components/ui/skeleton";
+import { Header } from "@radix-ui/react-accordion";
+import { Footer } from "react-day-picker";
 
 export const dynamic = 'force-dynamic'; // Forcer le rendu dynamique
 
@@ -65,8 +68,8 @@ export default async function FeedPage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <SocialHeader />
-      <main className="pt-16">
+
+      <main className="pt-10">
         <section className="container mx-auto py-2 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left Sidebar - Hidden on mobile */}
@@ -223,7 +226,6 @@ function FeedSkeleton() {
           </div>
         </div>
       </main>
-      <Footer />
       <MobileNav />
     </div>
   );

@@ -37,8 +37,8 @@ export function FeedHeader({ avatarUrl, userName }: FeedHeaderProps) {
   }
 
   return (
-    <div className="w-full bg-card border-b border-border p-4 shadow-sm">
-      <div className="flex items-center gap-3">
+    <div className="w-full bg-card border-b border-border py-4 px-0 lg:px-4 shadow-sm">
+      <div className="flex items-center gap-3 px-4 lg:px-0">
         {/* Avatar Utilisateur */}
         <Link href="/dashboard">
           <Avatar className="cursor-pointer hover:ring-2 hover:ring-primary transition-all">

@@ -65,7 +65,7 @@ export default async function HomePage() {
         {/* Posts Slider */}
         {postes.length > 0 && (
           <SectionSlider
-            title="Dernières publications"
+            title="Publications"
             icon={<Sparkles className="w-5 h-5 text-primary" />}
             href="/feed"
           >
@@ -80,7 +80,7 @@ export default async function HomePage() {
         {/* Formations Slider */}
         {formations.length > 0 && (
           <SectionSlider
-            title="Formations à la une"
+            title="Formations"
             icon={<BookOpen className="w-5 h-5 text-primary" />}
             href="/formations"
           >
@@ -95,7 +95,7 @@ export default async function HomePage() {
         {/* Événements Slider */}
         {evenements.length > 0 && (
           <SectionSlider
-            title="Événements à venir"
+            title="Événements"
             icon={<Calendar className="w-5 h-5 text-primary" />}
             href="/evenements"
           >
@@ -110,7 +110,7 @@ export default async function HomePage() {
         {/* Professeurs Slider */}
         {professeurs.length > 0 && (
           <SectionSlider
-            title="Nos meilleurs professeurs"
+            title="Professeurs"
             icon={<Users className="w-5 h-5 text-primary" />}
             href="/professeurs"
           >
@@ -125,7 +125,7 @@ export default async function HomePage() {
         {/* Clubs Slider */}
         {clubs.length > 0 && (
           <SectionSlider
-            title="Clubs étudiants"
+            title="Clubs"
             icon={<Users className="w-5 h-5 text-primary" />}
             href="/clubs"
           >
@@ -140,7 +140,7 @@ export default async function HomePage() {
         {/* Blog Slider */}
         {articles.length > 0 && (
           <SectionSlider
-            title="Articles récents"
+            title="Articles"
             icon={<BookOpen className="w-5 h-5 text-primary" />}
             href="/blog"
           >

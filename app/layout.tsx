@@ -17,7 +17,37 @@ export const metadata: Metadata = {
   title: "EduSky - Plateforme Éducative Sociale",
   description: "Découvrez des professeurs, formations, événements et clubs éducatifs en Guinée",
   generator: "v0.app",
+  manifest: "/manifest.json",
+  keywords: ["éducation", "formation", "événements", "clubs", "professeurs", "Guinée", "apprentissage"],
+  authors: [{ name: "Edusky" }],
+  themeColor: "#3B82F6",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Edusky",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Edusky",
+    title: "EduSky - Plateforme Éducative Sociale",
+    description: "Découvrez des professeurs, formations, événements et clubs éducatifs en Guinée",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EduSky - Plateforme Éducative Sociale",
+    description: "Découvrez des professeurs, formations, événements et clubs éducatifs en Guinée",
+  },
 }
+
 
 export default function RootLayout({
   children,
@@ -26,6 +56,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
+      <head>
+        <link rel="icon" href="/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content="#3B82F6" />
+      </head>
       <body className={`${poppins.className} font-sans antialiased`}>
         <LayoutWrapper>
           {children}

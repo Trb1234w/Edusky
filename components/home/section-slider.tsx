@@ -18,8 +18,8 @@ export function SectionSlider({ title, href, icon, children, className }: Sectio
 
     return (
         <section className={cn("", className)}>
-            <div className="container px-4 md:px-8 mb-8 flex items-center justify-between">
-                <div className="flex items-center gap-3">
+            <div className="container px-4 md:px-8 mb-2 md:mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
                     {icon}
                     <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
                         {title}
@@ -30,7 +30,7 @@ export function SectionSlider({ title, href, icon, children, className }: Sectio
                         href={href}
                         className="group flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                     >
-                        Voir tout
+                        All
                         <ChevronRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 )}
