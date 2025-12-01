@@ -97,7 +97,24 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
 
   return (
     <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
+
       <div className="flex gap-2 px-4 py-2 min-w-max">
+        {/* Dialog for all categories - always show */}
+        <CategoryDialog
+          categories={categoryTree}
+          selectedSlugs={selectedSlugs}
+          onCategorySelect={onCategorySelect}
+          trigger={
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full whitespace-nowrap border-dashed"
+            >
+              <FolderTree className="mr-1.5 h-4 w-4" />
+              Toutes ({categoryTree.length})
+            </Button>
+          }
+        />
         <Button
           key="all-categories"
           variant={!selectedSlugs ? "default" : "outline"}
@@ -119,22 +136,7 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
           />
         ))}
 
-        {/* Dialog for all categories - always show */}
-        <CategoryDialog
-          categories={categoryTree}
-          selectedSlugs={selectedSlugs}
-          onCategorySelect={onCategorySelect}
-          trigger={
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full whitespace-nowrap border-dashed"
-            >
-              <FolderTree className="mr-1.5 h-4 w-4" />
-              Toutes ({categoryTree.length})
-            </Button>
-          }
-        />
+
       </div>
     </div>
   );

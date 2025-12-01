@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, FileText, Users, GraduationCap, Calendar, UsersRound, BookmarkIcon, UserCheck } from 'lucide-react'
 import {
     searchAll,
     searchPosts,
@@ -17,6 +17,7 @@ import {
     searchEvents,
     searchClubs,
     searchBlogArticles,
+    searchProfesseurs,
     SearchFilters
 } from '@/app/actions/search'
 import { SearchResultPost } from '@/components/search/search-result-post'
@@ -25,10 +26,11 @@ import { SearchResultFormation } from '@/components/search/search-result-formati
 import { SearchResultEvent } from '@/components/search/search-result-event'
 import { SearchResultClub } from '@/components/search/search-result-club'
 import { SearchResultArticle } from '@/components/search/search-result-article'
+import { SearchResultProfesseur } from '@/components/search/search-result-professeur'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-type TabValue = 'all' | 'posts' | 'users' | 'formations' | 'events' | 'clubs' | 'articles'
+type TabValue = 'all' | 'posts' | 'users' | 'formations' | 'events' | 'clubs' | 'articles' | 'professeurs'
 
 export default function SearchPage() {
     const searchParams = useSearchParams()
@@ -67,6 +69,8 @@ export default function SearchPage() {
                 data = await searchClubs(searchQuery, filters)
             } else if (tab === 'articles') {
                 data = await searchBlogArticles(searchQuery, filters)
+            } else if (tab === 'professeurs') {
+                data = await searchProfesseurs(searchQuery, filters)
             }
             setResults(data)
         } catch (error) {
@@ -124,6 +128,7 @@ export default function SearchPage() {
             events: results.events?.length || 0,
             clubs: results.clubs?.length || 0,
             articles: results.articles?.length || 0,
+            professeurs: results.professeurs?.length || 0,
         }
 
         return counts[tab]
@@ -132,7 +137,7 @@ export default function SearchPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header avec barre de recherche */}
-            <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+            <div className="sticky top-0 lg:top-16 z-30 bg-background/95 backdrop-blur-lg border-b border-border">
                 <div className="container max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center gap-3">
                         {/* Barre de recherche */}
@@ -222,22 +227,67 @@ export default function SearchPage() {
                 ) : (
                     // Résultats
                     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
-                        <TabsList className="w-full grid grid-cols-7 mb-6">
-                            <TabsTrigger value="all" className="relative">
-                                Tous
-                                {getTabCount('all') !== null && (
-                                    <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1 text-xs">
-                                        {getTabCount('all')}
-                                    </Badge>
-                                )}
-                            </TabsTrigger>
-                            <TabsTrigger value="posts">Postes</TabsTrigger>
-                            <TabsTrigger value="users">Personnes</TabsTrigger>
-                            <TabsTrigger value="formations">Formations</TabsTrigger>
-                            <TabsTrigger value="events">Événements</TabsTrigger>
-                            <TabsTrigger value="clubs">Clubs</TabsTrigger>
-                            <TabsTrigger value="articles">Articles</TabsTrigger>
-                        </TabsList>
+                        {/* TABS LIST - STICKY BELOW HEADER */}
+                        <div className="sticky top-[72px] lg:top-[180px] z-20 bg-background pb-4 -mx-4 px-4">
+                            <TabsList className="w-full grid grid-cols-8 h-auto p-1 overflow-x-auto scrollbar-hide bg-muted">
+                                <TabsTrigger
+                                    value="all"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <Search className="h-4 w-4" />
+                                    <span className="hidden md:inline">Tous</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="posts"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    <span className="hidden md:inline">Postes</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="users"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <Users className="h-4 w-4" />
+                                    <span className="hidden md:inline">Personnes</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="formations"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <GraduationCap className="h-4 w-4" />
+                                    <span className="hidden md:inline">Formations</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="events"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <Calendar className="h-4 w-4" />
+                                    <span className="hidden md:inline">Événements</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="clubs"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <UsersRound className="h-4 w-4" />
+                                    <span className="hidden md:inline">Clubs</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="articles"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <BookmarkIcon className="h-4 w-4" />
+                                    <span className="hidden md:inline">Articles</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="professeurs"
+                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                >
+                                    <UserCheck className="h-4 w-4" />
+                                    <span className="hidden md:inline">Professeurs</span>
+                                </TabsTrigger>
+                            </TabsList>
+                        </div>
 
                         {loading ? (
                             <div className="space-y-4">
@@ -316,6 +366,16 @@ export default function SearchPage() {
                                             </div>
                                         </div>
                                     )}
+                                    {results?.professeurs?.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold mb-3">Professeurs</h3>
+                                            <div className="space-y-3">
+                                                {results.professeurs.map((prof: any) => (
+                                                    <SearchResultProfesseur key={prof.id} {...prof} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                     {results && getTotalResults() === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun résultat trouvé pour "{query}"</p>
@@ -385,6 +445,17 @@ export default function SearchPage() {
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun article trouvé</p>
+                                        </Card>
+                                    )}
+                                </TabsContent>
+
+                                <TabsContent value="professeurs" className="space-y-3 mt-0">
+                                    {results?.data?.map((prof: any) => (
+                                        <SearchResultProfesseur key={prof.id} {...prof} />
+                                    ))}
+                                    {results?.data?.length === 0 && (
+                                        <Card className="p-12 text-center">
+                                            <p className="text-muted-foreground">Aucun professeur trouvé</p>
                                         </Card>
                                     )}
                                 </TabsContent>

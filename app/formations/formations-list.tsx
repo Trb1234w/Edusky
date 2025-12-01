@@ -14,11 +14,13 @@ interface FormationListItem {
   note_moyenne?: number;
   prix_indicatif?: number;
   image_url?: string;
-  is_favorited?: boolean; // Add this prop
+  is_favorited?: boolean;
+  langue_enseignement?: string;
+  certificat?: boolean;
 }
 
 interface FormationsListProps {
-  formations: FormationListItem[]; // Use the new interface
+  formations: FormationListItem[];
   isLoading: boolean;
 }
 
@@ -54,7 +56,9 @@ export function FormationsList({ formations, isLoading }: FormationsListProps) {
           rating={course.note_moyenne || 0}
           price={course.prix_indicatif ? `${course.prix_indicatif} GNF` : "Gratuit"}
           image={course.image_url || "/placeholder.png"}
-          is_favorited={course.is_favorited || false} // Pass the new prop
+          is_favorited={course.is_favorited || false}
+          language={course.langue_enseignement}
+          certificate={course.certificat}
         />
       ))}
     </div>

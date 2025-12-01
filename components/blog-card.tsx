@@ -28,6 +28,7 @@ interface BlogCardProps {
   comments: number
   featured?: boolean
   is_favorited: boolean
+  tags?: string[]
 }
 
 export function BlogCard({
@@ -46,6 +47,7 @@ export function BlogCard({
   comments,
   featured = false,
   is_favorited: initialIsFavorited,
+  tags,
 }: BlogCardProps) {
   const router = useRouter();
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -119,6 +121,16 @@ export function BlogCard({
           <p className="text-base text-muted-foreground mb-2 line-clamp-2 leading-relaxed">
             {excerpt}
           </p>
+
+          {tags && tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {tags.slice(0, 3).map((tag, index) => (
+                <span key={index} className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-4">

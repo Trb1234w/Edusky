@@ -15,10 +15,11 @@ interface ArticleListItem {
   likes_count?: number;
   comment_count?: number;
   is_favorited?: boolean;
+  tags?: string[];
 }
 
 interface ArticlesListProps {
-  articles: ArticleListItem[]; // Use the new interface
+  articles: ArticleListItem[];
   isLoading: boolean;
 }
 
@@ -51,12 +52,13 @@ export function ArticlesList({ articles, isLoading }: ArticlesListProps) {
           authorAvatar={article.auteur_avatar_url || "/placeholder.svg"}
           category={article.category_nom || ""}
           date={new Date(article.publie_at || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-          readTime="5 min de lecture" // Placeholder
+          readTime="5 min de lecture"
           image={article.image_couverture || "/placeholder.png"}
           views={article.vues || 0}
           likes={article.likes_count || 0}
           comments={article.comment_count || 0}
-          is_favorited={article.is_favorited || false} // Pass the new prop
+          is_favorited={article.is_favorited || false}
+          tags={article.tags}
         />
       ))}
     </div>

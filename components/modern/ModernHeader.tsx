@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, X, Bell, Sparkles } from 'lucide-react'
+import { Menu, X, Bell, Sparkles, MessageCircle, Info, User as UserIcon, LogIn } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -146,67 +146,58 @@ export function ModernHeader() {
                         )}
                     </div>
 
-                    {/* Menu Mobile Toggle */}
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className={cn(
-                            'lg:hidden p-2 rounded-xl transition-all duration-300',
-                            'hover:bg-primary/10',
-                            isMenuOpen && 'bg-primary/10'
-                        )}
-                        aria-label="Menu"
-                    >
-                        {isMenuOpen ? (
-                            <X size={24} className="text-primary" />
-                        ) : (
-                            <Menu size={24} className="text-foreground" />
-                        )}
-                    </button>
-                </div>
+                    {/* Mobile Actions (No Hamburger) */}
+                    <div className="lg:hidden flex items-center gap-3">
+                        {user ? (
+                            <>
+                                {/* Notifications */}
+                                <div className="relative">
+                                    <NotificationsDropdown />
+                                </div>
 
-                {/* Menu Mobile Dropdown */}
-                {isMenuOpen && (
-                    <div className="lg:hidden py-4 border-t border-border/50 animate-fade-in-up bg-background/95 backdrop-blur-xl absolute left-0 right-0 px-4 shadow-xl border-b border-primary/10">
-                        <nav className="flex flex-col gap-2">
-                            {navLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className="text-sm md:text-base font-medium text-foreground/80 hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5 flex items-center justify-between group"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    {link.label}
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/0 group-hover:bg-primary transition-colors" />
+                                {/* Messages */}
+                                <Link href="/messages" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                    <MessageCircle className="w-6 h-6" />
                                 </Link>
-                            ))}
 
-                            {/* Actions Mobile */}
-                            <div className="flex flex-col gap-3 pt-4 mt-2 border-t border-border/50">
-                                {user ? (
-                                    <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                                        <GlossyButton variant="primary" size="md" className="w-full text-sm md:text-base">
-                                            Mon Espace
-                                        </GlossyButton>
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <Link href="/connexion" onClick={() => setIsMenuOpen(false)}>
-                                            <GlossyButton variant="outline" size="md" className="w-full text-sm md:text-base">
-                                                Connexion
-                                            </GlossyButton>
-                                        </Link>
-                                        <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
-                                            <GlossyButton variant="primary" size="md" className="w-full text-sm md:text-base">
-                                                S'inscrire
-                                            </GlossyButton>
-                                        </Link>
-                                    </>
-                                )}
-                            </div>
-                        </nav>
+                                {/* Info / About Us */}
+                                <Link href="/about-us" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                    <Info className="w-6 h-6" />
+                                </Link>
+
+                                {/* User Profile */}
+                                <Link href="/dashboard" className="relative group">
+                                    <div className="w-8 h-8 rounded-full overflow-hidden border border-border group-hover:border-primary transition-colors">
+                                        {user.user_metadata?.avatar_url ? (
+                                            <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
+                                                <UserIcon className="w-4 h-4" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                {/* Info / About Us */}
+                                <Link href="/about-us" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                    <Info className="w-6 h-6" />
+                                </Link>
+
+                                {/* Connexion Button */}
+                                <Link href="/connexion">
+                                    <GlossyButton variant="primary" size="sm" className="rounded-full px-4 text-xs font-medium flex items-center gap-2">
+                                        <LogIn className="w-3 h-3" />
+                                        <span>Connexion</span>
+                                    </GlossyButton>
+                                </Link>
+                            </>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </header>
     )
 }
+

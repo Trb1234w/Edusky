@@ -24,6 +24,8 @@ interface CourseCardProps {
   price: string
   image: string
   is_favorited: boolean
+  language?: string
+  certificate?: boolean
 }
 
 export function CourseCard({
@@ -39,6 +41,8 @@ export function CourseCard({
   price,
   image,
   is_favorited: initialIsFavorited,
+  language,
+  certificate,
 }: CourseCardProps) {
   const router = useRouter();
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -112,9 +116,18 @@ export function CourseCard({
 
         <div className="p-2 flex flex-col flex-1">
           <div className="flex justify-between items-start mb-1.5">
-            <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5 text-primary">
-              {category}
-            </Badge>
+            <div className="flex gap-1">
+              {language && (
+                <Badge variant="outline" className="text-[10px] px-1.5 h-5 border-primary/20 bg-primary/5 text-primary">
+                  {language.substring(0, 2).toUpperCase()}
+                </Badge>
+              )}
+              {certificate && (
+                <Badge variant="outline" className="text-[10px] px-1.5 h-5 border-green-500/20 bg-green-500/5 text-green-600">
+                  Certifiant
+                </Badge>
+              )}
+            </div>
             <div className="flex items-center gap-1 bg-yellow-500/10 px-2 py-1 rounded-full">
               <Star size={12} className="fill-yellow-500 text-yellow-500" />
               <span className="text-xs font-bold text-yellow-600">{rating}</span>
@@ -130,17 +143,17 @@ export function CourseCard({
           </p>
 
           <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Users size={16} className="text-primary" />
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Users size={14} className="text-primary" />
                 <span>{students}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <BookOpen size={16} className="text-primary" />
-                <span>{level}</span>
+              <div className="flex items-center gap-1">
+                <Clock size={14} className="text-primary" />
+                <span>{duration}</span>
               </div>
             </div>
-            <span className="text-lg font-bold text-primary">{price}</span>
+            <span className="text-base font-bold text-primary">{price}</span>
           </div>
         </div>
       </Card>

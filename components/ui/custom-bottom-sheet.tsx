@@ -62,7 +62,7 @@ const CustomBottomSheetContent = React.forwardRef<
 CustomBottomSheetContent.displayName = DialogPrimitive.Content.displayName
 
 const CustomBottomSheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
+  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left pt-4 pb-2", className)} {...props} />
 )
 CustomBottomSheetHeader.displayName = "CustomBottomSheetHeader"
 

@@ -16,10 +16,12 @@ interface EventListItem {
   organisateur_avatar_url?: string;
   image_url?: string;
   is_favorited?: boolean;
+  prix?: number;
+  est_gratuit?: boolean;
 }
 
 interface EvenementsListProps {
-  events: EventListItem[]; // Use the new interface
+  events: EventListItem[];
   isLoading: boolean;
 }
 
@@ -56,7 +58,9 @@ export function EvenementsList({ events, isLoading }: EvenementsListProps) {
           organizer={event.organisateur_full_name || "Inconnu"}
           image={event.image_url || "/placeholder.png"}
           status={new Date(event.date_debut || "") > new Date() ? "upcoming" : "past"}
-          is_favorited={event.is_favorited || false} // Pass the new prop
+          is_favorited={event.is_favorited || false}
+          price={event.prix}
+          isFree={event.est_gratuit}
         />
       ))}
     </div>

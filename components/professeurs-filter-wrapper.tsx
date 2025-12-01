@@ -31,6 +31,7 @@ import {
     CustomBottomSheetClose,
 } from "@/components/ui/custom-bottom-sheet"
 import { ProfesseurSidebar } from "@/components/ui/professeur-sidebar"
+import { HorizontalSpecialtyNav } from "./professeurs/HorizontalSpecialtyNav"
 
 const iconMap: { [key: string]: React.ElementType } = {
     Star,
@@ -167,7 +168,7 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
         return allProfesseurs.filter(prof => {
             const searchMatch =
                 !filters.search ||
-                prof.profile_full_name?.toLowerCase().includes(filters.search.toLowerCase()) ||
+                prof.full_name?.toLowerCase().includes(filters.search.toLowerCase()) ||
                 prof.titre?.toLowerCase().includes(filters.search.toLowerCase()) ||
                 prof.specialites?.some((spec: string) => spec.toLowerCase().includes(filters.search.toLowerCase()))
 
@@ -210,9 +211,9 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
             })();
 
             const langueMatch = !filters.langue || (
-                prof.profile_langues &&
-                Array.isArray(prof.profile_langues) &&
-                prof.profile_langues.includes(filters.langue)
+                prof.langues_enseignement &&
+                Array.isArray(prof.langues_enseignement) &&
+                prof.langues_enseignement.includes(filters.langue)
             )
 
             const etudiantsMatch = (() => {
@@ -221,8 +222,8 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                 return nb >= parseInt(filters.etudiants);
             })();
 
-            const verifiedMatch = !filters.is_verified || prof.profile_is_verified === true
-            const genreMatch = !filters.genre || prof.profile_genre === filters.genre
+            const verifiedMatch = filters.is_verified === undefined || filters.is_verified === null
+            const genreMatch = filters.genre === undefined || filters.genre === null
 
             return (
                 searchMatch &&
@@ -544,6 +545,12 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                             </CustomBottomSheet>
                         )}
                     </div>
+
+                    <HorizontalSpecialtyNav
+                        specialties={availableSpecialties}
+                        selectedSpecialty={filters.specialite}
+                        onSelect={(spec) => handleFilterChange('specialite', spec)}
+                    />
                 </div>
             </div>
 

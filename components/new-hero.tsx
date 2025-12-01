@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Sparkles, Users, BookOpen, Award, Briefcase, 
 import Link from 'next/link'
 import Image from 'next/image'
 import { GlossyButton } from './modern/GlossyButton'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
 // Slides avec le contenu spécifique demandé
@@ -77,6 +77,38 @@ export function NewHero() {
     const [phraseIndex, setPhraseIndex] = useState(0)
     const [isDeleting, setIsDeleting] = useState(false)
     const [typingSpeed, setTypingSpeed] = useState(150)
+
+    // Refs for auto-scroll - Removed in favor of CSS Marquee
+    // const quickAccessScrollRef = useRef<HTMLDivElement>(null)
+    // const featureListScrollRef = useRef<HTMLDivElement>(null)
+
+    // Effect for auto-scroll - Removed in favor of CSS Marquee
+    /*
+    useEffect(() => {
+        const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>) => {
+            const element = ref.current
+            if (!element) return null
+
+            const interval = setInterval(() => {
+                if (element.scrollLeft + element.clientWidth >= element.scrollWidth) {
+                    element.scrollLeft = 0
+                } else {
+                    element.scrollLeft += 1
+                }
+            }, 50) // Adjust speed here (higher ms = slower)
+
+            return interval
+        }
+
+        const quickAccessInterval = scrollContainer(quickAccessScrollRef)
+        const featureListInterval = scrollContainer(featureListScrollRef)
+
+        return () => {
+            if (quickAccessInterval) clearInterval(quickAccessInterval)
+            if (featureListInterval) clearInterval(featureListInterval)
+        }
+    }, [])
+    */
 
     // Auto-play slider
     useEffect(() => {
@@ -161,62 +193,119 @@ export function NewHero() {
                             Profitez d'un suivi personnalisé par IA, de formations certifiantes et d'un réseau professionnel actif.
                         </p>
 
-                        {/* Quick Access Chips (Scrollable) */}
-                        <div className="pt-2">
+                        {/* Quick Access Chips (Marquee) */}
+                        <div className="pt-2 overflow-hidden">
                             <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Accès Rapide</p>
-                            <div className="flex overflow-x-auto pb-4 gap-3 -mx-4 px-4 md:mx-0 md:px-0 snap-x touch-pan-x scrollbar-hide">
-                                {quickAccessChips.map((chip, index) => (
-                                    <Link
-                                        key={index}
-                                        href={chip.href}
-                                        className={cn(
-                                            "flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 whitespace-nowrap snap-start hover:scale-105 active:scale-95",
-                                            "bg-background/50 backdrop-blur-sm hover:bg-background/80 shadow-sm",
-                                            chip.color
-                                        )}
-                                    >
-                                        <chip.icon className="w-5 h-5" />
-                                        <span className="text-base font-medium">{chip.label}</span>
-                                    </Link>
-                                ))}
+                            <div className="marquee-container mask-linear-fade">
+                                <div className="animate-marquee flex gap-3">
+                                    {/* Original Items */}
+                                    {quickAccessChips.map((chip, index) => (
+                                        <Link
+                                            key={`original-${index}`}
+                                            href={chip.href}
+                                            className={cn(
+                                                "flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 whitespace-nowrap hover:scale-105 active:scale-95",
+                                                "bg-background/50 backdrop-blur-sm hover:bg-background/80 shadow-sm",
+                                                chip.color
+                                            )}
+                                        >
+                                            <chip.icon className="w-5 h-5" />
+                                            <span className="text-base font-medium">{chip.label}</span>
+                                        </Link>
+                                    ))}
+                                    {/* Duplicated Items for seamless loop */}
+                                    {quickAccessChips.map((chip, index) => (
+                                        <Link
+                                            key={`duplicate-${index}`}
+                                            href={chip.href}
+                                            className={cn(
+                                                "flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 whitespace-nowrap hover:scale-105 active:scale-95",
+                                                "bg-background/50 backdrop-blur-sm hover:bg-background/80 shadow-sm",
+                                                chip.color
+                                            )}
+                                        >
+                                            <chip.icon className="w-5 h-5" />
+                                            <span className="text-base font-medium">{chip.label}</span>
+                                        </Link>
+                                    ))}
+                                    {/* Triplicated Items for wide screens */}
+                                    {quickAccessChips.map((chip, index) => (
+                                        <Link
+                                            key={`triplicate-${index}`}
+                                            href={chip.href}
+                                            className={cn(
+                                                "flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 whitespace-nowrap hover:scale-105 active:scale-95",
+                                                "bg-background/50 backdrop-blur-sm hover:bg-background/80 shadow-sm",
+                                                chip.color
+                                            )}
+                                        >
+                                            <chip.icon className="w-5 h-5" />
+                                            <span className="text-base font-medium">{chip.label}</span>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
-                        {/* Feature List (Scrollable on Mobile) */}
-                        <div className="flex overflow-x-auto pb-4 md:pb-0 md:flex-col gap-3 md:gap-3 -mx-4 px-4 md:mx-0 md:px-0 snap-x mt-4 touch-pan-x scrollbar-hide">
-                            {heroSlides.map((slide, index) => (
-                                <div
-                                    key={slide.id}
-                                    className={cn(
-                                        "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer min-w-[240px] md:min-w-0 snap-center border md:border-transparent",
-                                        currentSlide === index
-                                            ? "bg-primary/10 border-primary/20 md:bg-primary/5 md:translate-x-2"
-                                            : "bg-card/50 border-border/50 md:bg-transparent md:hover:bg-primary/5 md:hover:translate-x-1 opacity-70"
-                                    )}
-                                    onClick={() => setCurrentSlide(index)}
-                                >
-                                    <div className={cn(
-                                        "w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0",
-                                        currentSlide === index ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
-                                    )}>
-                                        <slide.icon className="w-5 h-5" />
-                                    </div>
-                                    <span className={cn(
-                                        "text-lg font-medium transition-colors whitespace-nowrap",
-                                        currentSlide === index ? "text-foreground" : "text-muted-foreground"
-                                    )}>
-                                        {slide.title}
-                                    </span>
-                                    {currentSlide === index && (
-                                        <ArrowRight className="w-5 h-5 text-primary ml-auto animate-pulse hidden md:block" />
-                                    )}
+                        {/* Feature List (Marquee on Mobile, Stack on Desktop) */}
+                        <div className="mt-4 md:mt-0">
+                            {/* Mobile Marquee View */}
+                            <div className="md:hidden overflow-hidden -mx-4 px-4">
+                                <div className="animate-marquee flex gap-3">
+                                    {[...heroSlides, ...heroSlides].map((slide, index) => (
+                                        <div
+                                            key={`mobile-feature-${index}`}
+                                            className={cn(
+                                                "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 min-w-[240px] border bg-card/50 border-border/50 opacity-90"
+                                            )}
+                                        >
+                                            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-muted text-muted-foreground shrink-0">
+                                                <slide.icon className="w-5 h-5" />
+                                            </div>
+                                            <span className="text-lg font-medium text-muted-foreground whitespace-nowrap">
+                                                {slide.title}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+
+                            {/* Desktop Stack View (Unchanged) */}
+                            <div className="hidden md:flex flex-col gap-3">
+                                {heroSlides.map((slide, index) => (
+                                    <div
+                                        key={slide.id}
+                                        className={cn(
+                                            "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer border border-transparent",
+                                            currentSlide === index
+                                                ? "bg-primary/10 border-primary/20 translate-x-2"
+                                                : "hover:bg-primary/5 hover:translate-x-1 opacity-70"
+                                        )}
+                                        onClick={() => setCurrentSlide(index)}
+                                    >
+                                        <div className={cn(
+                                            "w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0",
+                                            currentSlide === index ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                                        )}>
+                                            <slide.icon className="w-5 h-5" />
+                                        </div>
+                                        <span className={cn(
+                                            "text-lg font-medium transition-colors whitespace-nowrap",
+                                            currentSlide === index ? "text-foreground" : "text-muted-foreground"
+                                        )}>
+                                            {slide.title}
+                                        </span>
+                                        {currentSlide === index && (
+                                            <ArrowRight className="w-5 h-5 text-primary ml-auto animate-pulse" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
                     {/* Right Column: Coursera-style Slider */}
-                    <div className={`relative h-[280px] md:h-[450px] lg:h-[550px] w-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+                    <div className={`relative h-[350px] md:h-[450px] lg:h-[550px] w-full md:w-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
                         {/* Main Image Container */}
                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
                             {heroSlides.map((slide, index) => (
@@ -264,8 +353,8 @@ export function NewHero() {
                             ))}
                         </div>
 
-                        {/* Floating Stats Cards - Decorative (Hidden on mobile to save space) */}
-                        <div className="absolute -top-4 -right-4 bg-card/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl animate-float hidden lg:block">
+                        {/* Floating Stats Cards - Decorative (Visible on mobile now) */}
+                        <div className="absolute -top-4 -right-4 md:-top-4 md:-right-4 bg-card/90 backdrop-blur-md border border-border/50 p-2 md:p-3 rounded-xl shadow-xl animate-float z-20 scale-90 md:scale-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
                                     <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -277,7 +366,7 @@ export function NewHero() {
                             </div>
                         </div>
 
-                        <div className="absolute -bottom-4 -left-4 bg-card/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl animate-float animation-delay-2000 hidden lg:block">
+                        <div className="absolute -bottom-4 -left-4 md:-bottom-4 md:-left-4 bg-card/90 backdrop-blur-md border border-border/50 p-2 md:p-3 rounded-xl shadow-xl animate-float animation-delay-2000 z-20 scale-90 md:scale-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                                     <Users className="w-4 h-4 text-blue-500" />

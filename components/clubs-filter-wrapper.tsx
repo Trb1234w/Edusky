@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getAllClubs, getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations, getDistinctClubLocationsData } from "@/app/clubs/get-data"
+import { getAllClubs, getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations, getDistinctClubLocationsData, getDistinctClubLangues } from "@/app/clubs/get-data"
 import { ClubsList } from "@/app/clubs/clubs-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -60,6 +60,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
   const [availableTags, setAvailableTags] = useState<string[]>([])
   const [availableThemes, setAvailableThemes] = useState<string[]>([])
   const [availableLieux, setAvailableLieux] = useState<string[]>([])
+  const [availableLangues, setAvailableLangues] = useState<string[]>([])
 
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
@@ -77,6 +78,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
     prix_inscription: undefined,
     niveau_requis: undefined,
     placesDisponibles: undefined,
+    langues: undefined,
   })
 
   useEffect(() => {
@@ -112,14 +114,15 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
     fetchClubsAndFavorites()
   }, [])
 
-  // Fetch tags, themes, and locations on mount
+  // Fetch tags, themes, locations, and langues on mount
   useEffect(() => {
     const fetchFiltersData = async () => {
-      const [tagsResult, themesResult, lieuxResult, locationsResult] = await Promise.all([
+      const [tagsResult, themesResult, lieuxResult, locationsResult, languesResult] = await Promise.all([
         getDistinctClubTags(),
         getDistinctClubThemes(),
         getDistinctClubLocations(),
-        getDistinctClubLocationsData()
+        getDistinctClubLocationsData(),
+        getDistinctClubLangues()
       ]);
 
       if (tagsResult.data) {
@@ -136,6 +139,10 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
 
       if (locationsResult.data) {
         setLocations(locationsResult.data);
+      }
+
+      if (languesResult.data) {
+        setAvailableLangues(languesResult.data);
       }
     };
 
@@ -229,9 +236,17 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
         club.nombre_membres < club.capacite
       )
 
+      // Langues filter
+      const languesMatch = !filters.langues || (
+        club.langues &&
+        Array.isArray(club.langues) &&
+        club.langues.includes(filters.langues)
+      )
+
       return searchMatch && categoryMatch && statusMatch && capacityMatch &&
         tagsMatch && themeMatch && paysMatch && villeMatch && quartierMatch && lieuMatch &&
-        typeCotisationMatch && prixInscriptionMatch && niveauMatch && placesDisponiblesMatch
+        typeCotisationMatch && prixInscriptionMatch && niveauMatch && placesDisponiblesMatch &&
+        languesMatch
     })
   }, [filters, allClubs])
 
@@ -301,6 +316,14 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
       options: [
         { label: "Toutes", value: undefined },
         { label: "Places disponibles", value: true },
+      ],
+    },
+    {
+      label: "Langue",
+      name: "langues",
+      options: [
+        { label: "Toutes les langues", value: undefined },
+        ...availableLangues.map(langue => ({ label: langue, value: langue }))
       ],
     },
   ]

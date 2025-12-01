@@ -316,42 +316,6 @@
 }
 
 a,
-button {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23667eea"><circle cx="12" cy="12" r="6"/></svg>') 12 12, pointer;
-}
-
-/* Utility to hide scrollbar but keep functionality */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Floating Animation for Hero Icons */
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.delay-300 {
-  animation-delay: 300ms;
-}
 
 .delay-500 {
   animation-delay: 500ms;
@@ -363,4 +327,38 @@ button {
 
 .delay-1000 {
   animation-delay: 1000ms;
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Ensure container allows overflow for marquee but hides it at parent level */
+.marquee-container {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: 1rem;
+}
+
+.marquee-content {
+  flex-shrink: 0;
+  display: flex;
+  gap: 1rem;
+  min-width: 100%;
 }

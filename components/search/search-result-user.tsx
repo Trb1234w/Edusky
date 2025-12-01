@@ -51,7 +51,7 @@ export function SearchResultUser({
         <Card className="p-4 hover:bg-accent/50 transition-all duration-200 border-border group">
             <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <Link href={`/users/${id}`}>
+                <Link href={`/profile/${username || id}`}>
                     <Avatar className="h-14 w-14 ring-2 ring-background hover:ring-primary transition-all cursor-pointer">
                         <AvatarImage src={avatar_url || undefined} alt={full_name} />
                         <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-lg font-semibold">
@@ -62,7 +62,7 @@ export function SearchResultUser({
 
                 {/* Informations */}
                 <div className="flex-1 min-w-0">
-                    <Link href={`/users/${id}`} className="block group/link">
+                    <Link href={`/profile/${username || id}`} className="block group/link">
                         <div className="flex items-center gap-1.5 mb-0.5">
                             <h3 className="font-semibold text-base group-hover/link:underline truncate">
                                 {full_name}
@@ -125,7 +125,7 @@ export function SearchResultUser({
                     size="sm"
                     className="shrink-0"
                 >
-                    {isFollowing ? 'Suivi' : 'Suivre'}
+                    {isFollowing ? 'Abonné' : 'S\'abonner'}
                 </Button>
             </div>
         </Card>

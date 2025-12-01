@@ -11,7 +11,6 @@ export async function getProfesseurById(id: string) {
     .select(
       `
         *,
-        profile:id(*),
         pays:pays_id(*),
         ville:ville_id(*),
         quartier:quartier_id(*)
@@ -41,12 +40,7 @@ export async function getRelatedProfesseursBySpecialty(currentProfesseurId: stri
   // Get all professors that have at least one specialty in common
   const { data, error } = await supabaseAdmin
     .from('professeurs')
-    .select(
-      `
-        *,
-        profiles:id(full_name, avatar_url)
-      `
-    )
+    .select('*')
     .neq('id', currentProfesseurId)
     .limit(7)
     .order('note_moyenne', { ascending: false });

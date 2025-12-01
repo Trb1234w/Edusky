@@ -169,3 +169,28 @@ export async function getAllClubs(): Promise<{ data: any[] | null; error: string
         return { data: null, error: e.message || "An unexpected error occurred." };
     }
 }
+
+/**
+ * Fetches all distinct langues used in clubs
+ */
+export async function getDistinctClubLangues(): Promise<{ data: string[] | null; error: string | null }> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase.rpc('get_distinct_club_langues');
+
+        if (error) {
+            console.error("Error fetching club langues:", error);
+            return { data: null, error: error.message };
+        }
+
+        // The RPC returns an array of objects with a 'langue' property
+        const langues = data?.map((item: any) => item.langue) || [];
+
+        return { data: langues.sort(), error: null };
+    } catch (e: any) {
+        console.error("Unexpected error in getDistinctClubLangues:", e);
+        return { data: null, error: e.message || "An unexpected error occurred." };
+    }
+}
+

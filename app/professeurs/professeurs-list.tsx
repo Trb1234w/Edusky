@@ -4,8 +4,8 @@ import { ProfesseurCard } from "@/components/professeur-card"
 
 interface ProfesseurListItem {
   id: string;
-  profile_full_name?: string;
-  profile_avatar_url?: string;
+  full_name?: string;
+  image_url?: string;
   titre?: string;
   type?: string;
   specialites?: string[];
@@ -13,9 +13,17 @@ interface ProfesseurListItem {
   nb_etudiants_formes?: number;
   annees_experience?: number;
   tarif_indicatif?: number;
-  profile_is_verified?: boolean;
+  is_verified?: boolean;
   pays_nom?: string;
   ville_nom?: string;
+  langues_enseignement?: string[];
+  methodes_pedagogiques?: string[];
+  domaines_intervention?: string[];
+  modalites_cours?: string[];
+  reseaux_sociaux?: Record<string, string>;
+  site_web?: string;
+  email_contact?: string;
+  telephone_professionnel?: string;
 }
 
 interface ProfesseursListProps {
@@ -45,8 +53,8 @@ export function ProfesseursList({ professeurs, isLoading }: ProfesseursListProps
         <ProfesseurCard
           key={professeur.id}
           id={professeur.id}
-          full_name={professeur.profile_full_name || "Inconnu"}
-          avatar_url={professeur.profile_avatar_url || "/placeholder.svg"}
+          full_name={professeur.full_name || "Inconnu"}
+          avatar_url={professeur.image_url || "/placeholder.svg"}
           titre={professeur.titre || "Professeur"}
           type={professeur.type}
           specialites={professeur.specialites || []}
@@ -54,7 +62,7 @@ export function ProfesseursList({ professeurs, isLoading }: ProfesseursListProps
           nb_etudiants_formes={professeur.nb_etudiants_formes || 0}
           annees_experience={professeur.annees_experience}
           tarif_indicatif={professeur.tarif_indicatif}
-          is_verified={professeur.profile_is_verified}
+          is_verified={professeur.is_verified}
           pays_nom={professeur.pays_nom}
           ville_nom={professeur.ville_nom}
         />

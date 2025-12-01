@@ -27,6 +27,8 @@ interface EventCardProps {
     image: string
     status: string
     is_favorited: boolean
+    price?: number
+    isFree?: boolean
 }
 
 export function EventCard({
@@ -43,6 +45,8 @@ export function EventCard({
     image,
     status,
     is_favorited: initialIsFavorited,
+    price,
+    isFree,
 }: EventCardProps) {
     const router = useRouter();
     const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -63,6 +67,12 @@ export function EventCard({
     const isValidDate = !isNaN(eventDate.getTime())
     const day = isValidDate ? format(eventDate, 'dd', { locale: fr }) : '??'
     const month = isValidDate ? format(eventDate, 'MMM', { locale: fr }).toUpperCase() : '??'
+
+    const formatPrice = (price?: number, isFree?: boolean) => {
+        if (isFree) return "Gratuit";
+        if (!price) return "Prix non spécifié";
+        return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "GNF" }).format(price);
+    }
 
     return (
         <Link href={`/evenements/${id}`} className="group block h-full">
@@ -114,9 +124,14 @@ export function EventCard({
 
                 {/* Content Section */}
                 <div className="flex-1 p-2 flex flex-col">
-                    <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors">
-                        {title}
-                    </h3>
+                    <div className="flex justify-between items-start mb-1">
+                        <h3 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors flex-1 mr-2">
+                            {title}
+                        </h3>
+                        <Badge variant={isFree ? "secondary" : "default"} className="shrink-0 text-[10px] px-1.5 h-5">
+                            {isFree ? "Gratuit" : (price ? `${price.toLocaleString()} GNF` : "Payant")}
+                        </Badge>
+                    </div>
 
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                         {description}

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { MessageSquare, Plus, Search } from 'lucide-react'
+import { MessageSquare, Plus, Search, ArrowRight } from 'lucide-react'
 
 interface FeedHeaderProps {
   avatarUrl: string | null;
@@ -16,14 +16,19 @@ interface FeedHeaderProps {
 export function FeedHeader({ avatarUrl, userName }: FeedHeaderProps) {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
 
-  const handleSearchClick = () => {
-    router.push('/search')
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    } else {
+      router.push('/search')
+    }
   }
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    if (e.key === 'Enter') {
+      handleSearch()
     }
   }
 
@@ -32,38 +37,56 @@ export function FeedHeader({ avatarUrl, userName }: FeedHeaderProps) {
   }
 
   return (
-    <div className="w-full bg-card border-b border-border p-4 mb-6 rounded-lg">
-      <div className="flex items-center gap-4">
+    <div className="w-full bg-card border-b border-border p-4 shadow-sm">
+      <div className="flex items-center gap-3">
         {/* Avatar Utilisateur */}
         <Link href="/dashboard">
           <Avatar className="cursor-pointer hover:ring-2 hover:ring-primary transition-all">
             <AvatarImage src={avatarUrl || undefined} alt={userName} />
-            <AvatarFallback>{userName ? userName[0].toUpperCase() : 'U'}</AvatarFallback>
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10">
+              {userName ? userName[0].toUpperCase() : 'U'}
+            </AvatarFallback>
           </Avatar>
         </Link>
 
-        {/* Barre de recherche */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+        {/* Barre de recherche avec bouton */}
+        <div className="relative flex-1 group">
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors ${isFocused ? 'text-primary' : 'text-muted-foreground'
+            }`} />
           <Input
             value={searchQuery}
             onChange={handleSearchChange}
             onKeyDown={handleSearchKeyDown}
-            onClick={handleSearchClick}
-            placeholder="Rechercher sur EduSky..."
-            className="pl-10 w-full cursor-pointer hover:border-primary/50 transition-colors"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="Rechercher des postes, personnes, formations..."
+            className={`pl-10 pr-12 w-full transition-all duration-200 ${isFocused
+              ? 'border-primary shadow-sm ring-1 ring-primary/20'
+              : 'hover:border-primary/50'
+              }`}
           />
+          <Button
+            onClick={handleSearch}
+            size="icon"
+            variant="ghost"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md hover:bg-primary hover:text-primary-foreground transition-all"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Icônes d'action */}
         <div className="flex items-center gap-2">
           <Link href="/messages">
-            <Button variant="ghost" size="icon" className="hover:bg-accent">
-              <MessageSquare className="h-6 w-6 text-muted-foreground" />
+            <Button variant="ghost" size="icon" className="hover:bg-accent transition-colors">
+              <MessageSquare className="h-5 w-5 text-muted-foreground" />
             </Button>
           </Link>
-          <Button size="icon" className="rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all">
-            <Plus className="h-6 w-6" />
+          <Button
+            size="icon"
+            className="rounded-full bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all hover:scale-105"
+          >
+            <Plus className="h-5 w-5" />
           </Button>
         </div>
       </div>

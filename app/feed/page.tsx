@@ -106,14 +106,10 @@ export default async function FeedPage() {
               <div className="md:hidden">
                 <Tabs defaultValue="all" className="w-full">
                   <div className="bg-background border-b p-2 space-y-2">
-                    <div className="relative pb-2">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        placeholder="Rechercher..."
-                        className="w-full pl-10 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
+                    <FeedHeader
+                      avatarUrl={profile?.avatar_url || null}
+                      userName={profile?.full_name || ''}
+                    />
                     <TabsList className="grid w-full grid-cols-2 bg-background">
                       <TabsTrigger value="all">Tous</TabsTrigger>
                       <TabsTrigger value="following">Abonnements</TabsTrigger>
@@ -129,16 +125,12 @@ export default async function FeedPage() {
               </div>
 
               <div className="hidden md:block space-y-4">
+                <FeedHeader
+                  avatarUrl={profile?.avatar_url || null}
+                  userName={profile?.full_name || ''}
+                />
                 <Tabs defaultValue="all" className="w-full">
                   <div className="space-y-2">
-                    <div className="relative pb-2">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        placeholder="Rechercher..."
-                        className="w-full pl-10 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
                     <TabsList className="w-full">
                       <TabsTrigger value="all" className="flex-1">Tous</TabsTrigger>
                       <TabsTrigger value="following" className="flex-1">Abonnements</TabsTrigger>

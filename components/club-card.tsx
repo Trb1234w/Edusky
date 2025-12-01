@@ -22,6 +22,7 @@ interface ClubCardProps {
   image: string
   verified?: boolean
   is_favorited: boolean
+  fees?: string | number
 }
 
 export function ClubCard({
@@ -35,6 +36,7 @@ export function ClubCard({
   image,
   verified = false,
   is_favorited: initialIsFavorited,
+  fees,
 }: ClubCardProps) {
   const router = useRouter();
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -97,17 +99,24 @@ export function ClubCard({
 
         <div className="flex-1 p-2 flex flex-col">
           <div className="flex justify-between items-start mb-1.5">
-            <div>
+            <div className="flex-1 mr-2">
               <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
                 {name}
               </h3>
               <p className="text-sm text-muted-foreground line-clamp-1">{category}</p>
             </div>
-            {verified && (
-              <div className="bg-blue-500/10 p-1.5 rounded-full" title="Club vérifié">
-                <CheckCircle size={16} className="text-blue-500" />
-              </div>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {verified && (
+                <div className="bg-blue-500/10 p-1.5 rounded-full" title="Club vérifié">
+                  <CheckCircle size={16} className="text-blue-500" />
+                </div>
+              )}
+              {fees && (
+                <Badge variant="outline" className="text-[10px] px-1.5 h-5 border-primary/20 bg-primary/5 text-primary whitespace-nowrap">
+                  {typeof fees === 'number' ? `${fees.toLocaleString()} GNF` : fees}
+                </Badge>
+              )}
+            </div>
           </div>
 
           <p className="text-base text-muted-foreground mb-2 line-clamp-2 leading-relaxed">

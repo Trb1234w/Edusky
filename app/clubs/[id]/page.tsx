@@ -263,6 +263,20 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
                       </div>
                     )}
 
+                    {/* Langues */}
+                    {club.langues && club.langues.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-primary" /> Langues
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {club.langues.map((langue: string, i: number) => (
+                            <Badge key={i} variant="outline" className="capitalize">{langue}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Contact */}
                     {club.email_contact && (
                       <div className="flex items-center gap-2 text-sm">

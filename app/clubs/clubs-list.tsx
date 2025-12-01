@@ -9,14 +9,18 @@ interface ClubListItem {
   category_nom?: string;
   capacite?: number;
   theme_principal?: string;
+  langues?: string[];
   leader_full_name?: string;
   leader_avatar_url?: string;
   image_url?: string;
   is_favorited?: boolean;
+  cotisation_mensuelle?: number;
+  cotisation_annuelle?: number;
+  prix_inscription?: number;
 }
 
 interface ClubsListProps {
-  clubs: ClubListItem[]; // Use the new interface
+  clubs: ClubListItem[];
   isLoading: boolean;
 }
 
@@ -45,12 +49,13 @@ export function ClubsList({ clubs, isLoading }: ClubsListProps) {
           name={club.nom || ""}
           description={club.description || ""}
           category={club.category_nom || ""}
-          members={club.capacite || 0} // Using capacite as a proxy for members
-          activities="Activités non spécifiées" // Placeholder
+          members={club.capacite || 0}
+          activities="Activités non spécifiées"
           president={club.leader_full_name || "Inconnu"}
           image={club.image_url || "/placeholder.png"}
-          verified={false} // Placeholder
-          is_favorited={club.is_favorited || false} // Pass the new prop
+          verified={false}
+          is_favorited={club.is_favorited || false}
+          fees={club.cotisation_mensuelle || club.cotisation_annuelle || club.prix_inscription}
         />
       ))}
     </div>
