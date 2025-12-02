@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, X, Bell, Sparkles, MessageCircle, Info, User as UserIcon, LogIn } from 'lucide-react'
+import { Menu, X, Bell, Sparkles, MessageCircle, Info, User as UserIcon, LogIn, Search, ArrowRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { NotificationsDropdown } from '@/components/notifications-dropdown'
 import { User } from '@supabase/supabase-js'
 import { GlossyButton } from './GlossyButton'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 /**
  * ModernHeader - Header moderne avec effets glossy et animations
@@ -25,7 +27,10 @@ export function ModernHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [user, setUser] = useState<User | null>(null)
     const [scrolled, setScrolled] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [isFocused, setIsFocused] = useState(false)
     const pathname = usePathname()
+    const router = useRouter()
     const supabase = createClient()
 
     // Détection du scroll pour effet de header
@@ -61,6 +66,24 @@ export function ModernHeader() {
         { href: '/blog', label: 'Blog' },
         { href: '/feed', label: 'Réseau' },
     ]
+
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        } else {
+            router.push('/search')
+        }
+    }
+
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch()
+        }
+    }
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value)
+    }
 
     const isHomepage = pathname === '/'
     const shouldShowOnMobile = true // Controlled by LayoutWrapper
@@ -194,6 +217,33 @@ export function ModernHeader() {
                                 </Link>
                             </>
                         )}
+                    </div>
+                </div>
+
+                {/* Mobile Search Bar - Only visible on mobile */}
+                <div className="lg:hidden pb-3 pt-2 border-t border-border/50">
+                    <div className="relative group">
+                        <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${isFocused ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <Input
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyDown}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            placeholder="Rechercher..."
+                            className={`pl-9 pr-10 h-9 text-sm transition-all duration-200 ${isFocused
+                                ? 'border-primary shadow-sm ring-1 ring-primary/20'
+                                : 'hover:border-primary/50'
+                                }`}
+                        />
+                        <Button
+                            onClick={handleSearch}
+                            size="icon"
+                            variant="ghost"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 rounded-md hover:bg-primary hover:text-primary-foreground transition-all"
+                        >
+                            <ArrowRight className="h-3.5 w-3.5" />
+                        </Button>
                     </div>
                 </div>
             </div>

@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import Link from 'next/link';
+import { Share2 } from 'lucide-react';
 
 // Interface simplifiée pour les props du SharedPostCard
 interface SharedPostCardProps {
@@ -37,29 +38,38 @@ export function SharedPostCard(props: SharedPostCardProps) {
   };
 
   return (
-    <Card className="rounded-none shadow-sm hover:shadow-md transition-shadow lg:rounded-xl lg:border-border lg:hover:shadow-lg">
+    <Card className="rounded-none md:rounded-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden group">
       <CardContent className="p-2 lg:p-6">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-          <Link href={authorUsername ? `/profile/${authorUsername}` : '#'} className="flex items-center gap-2 hover:underline">
-            <Avatar className="w-6 h-6">
-              <AvatarImage src={authorAvatar || undefined} alt={author} />
-              <AvatarFallback>{author[0]}</AvatarFallback>
-            </Avatar>
-            <span className="font-semibold text-foreground">{author}</span>
-          </Link>
-          <span>a republié</span>
-          <span className="text-xs ml-2">
-            • {timestamp ? formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: fr }) : ''}
-          </span>
+        <div className="flex flex-col gap-1 mb-4">
+          {/* Ligne 1: Auteur */}
+          <div className="flex items-center gap-2">
+            <Link href={authorUsername ? `/profile/${authorUsername}` : '#'} className="flex items-center gap-2 hover:underline group/author">
+              <Avatar className="w-8 h-8 ring-2 ring-primary/10 group-hover/author:ring-primary/30 transition-all">
+                <AvatarImage src={authorAvatar || undefined} alt={author} />
+                <AvatarFallback>{author[0]}</AvatarFallback>
+              </Avatar>
+              <span className="font-semibold text-foreground">{author}</span>
+            </Link>
+          </div>
+
+          {/* Ligne 2: "a republié" + Date */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-10">
+            <Share2 size={14} className="text-primary/70" />
+            <span>a republié</span>
+            <span>•</span>
+            <span>{timestamp ? formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: fr }) : ''}</span>
+          </div>
         </div>
 
         {/* Affiche le commentaire du partageur s'il y en a un */}
         {props.content &&
-          <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-wrap mb-4 ml-8">{props.content}</p>
+          <div className="mb-4 ml-2 pl-4 border-l-2 border-primary/20">
+            <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-wrap">{props.content}</p>
+          </div>
         }
 
         {/* Conteneur pour le post original */}
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border border-border/60 rounded-xl overflow-hidden bg-background/50">
           <PostCard {...childPostCardProps} />
         </div>
       </CardContent>

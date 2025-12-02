@@ -148,7 +148,7 @@ export function NewHero() {
     }, [text, isDeleting, phraseIndex, typingSpeed])
 
     return (
-        <section className="relative pt-20 pb-6 md:pt-28 md:pb-12 lg:py-20 overflow-hidden">
+        <section className="relative pt-32 pb-6 md:pt-28 md:pb-12 lg:py-20 overflow-hidden">
             {/* Advanced Background Elements */}
             <div className="absolute inset-0 -z-10">
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />

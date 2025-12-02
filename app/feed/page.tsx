@@ -109,10 +109,6 @@ export default async function FeedPage() {
               <div className="md:hidden">
                 <Tabs defaultValue="all" className="w-full">
                   <div className="bg-background border-b p-2 space-y-2">
-                    <FeedHeader
-                      avatarUrl={profile?.avatar_url || null}
-                      userName={profile?.full_name || ''}
-                    />
                     <TabsList className="grid w-full grid-cols-2 bg-background">
                       <TabsTrigger value="all">Tous</TabsTrigger>
                       <TabsTrigger value="following">Abonnements</TabsTrigger>

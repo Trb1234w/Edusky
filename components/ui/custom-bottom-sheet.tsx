@@ -31,8 +31,8 @@ CustomBottomSheetOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const CustomBottomSheetContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { noBodyStyles?: boolean }
+>(({ className, children, noBodyStyles, ...props }, ref) => (
   <CustomBottomSheetPortal>
     <CustomBottomSheetOverlay />
     <DialogPrimitive.Content
@@ -44,7 +44,7 @@ const CustomBottomSheetContent = React.forwardRef<
       {...props}
     >
       {/* Fixed header with close button */}
-      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b bg-background rounded-t-2xl">
+      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b bg-background rounded-t-2xl shrink-0">
         <div className="w-12 h-1 bg-muted rounded-full mx-auto absolute left-1/2 -translate-x-1/2 -top-3" />
         <DialogPrimitive.Close className="ml-auto rounded-full p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
           <X className="h-5 w-5" />
@@ -52,10 +52,14 @@ const CustomBottomSheetContent = React.forwardRef<
         </DialogPrimitive.Close>
       </div>
 
-      {/* Scrollable content */}
-      <div className="overflow-y-auto px-6 pb-6">
-        {children}
-      </div>
+      {/* Content */}
+      {noBodyStyles ? (
+        children
+      ) : (
+        <div className="overflow-y-auto px-6 pb-6">
+          {children}
+        </div>
+      )}
     </DialogPrimitive.Content>
   </CustomBottomSheetPortal>
 ))

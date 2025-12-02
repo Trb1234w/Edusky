@@ -5,9 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Share2, MoreHorizontal, Loader2, Link as LinkIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { Heart, MessageCircle, Share2, MoreHorizontal, Loader2, Link as LinkIcon, Send } from "lucide-react";
+import {
+  CustomBottomSheet,
+  CustomBottomSheetContent,
+  CustomBottomSheetHeader,
+  CustomBottomSheetTitle,
+  CustomBottomSheetTrigger,
+  CustomBottomSheetDescription,
+} from "@/components/ui/custom-bottom-sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -226,7 +234,7 @@ export function PostCard(props: PostCardProps) {
   };
 
   return (
-    <Card className="rounded-none shadow-sm hover:shadow-md transition-shadow lg:rounded-xl lg:border-border lg:hover:shadow-lg">
+    <Card className="rounded-none md:rounded-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden group">
       <CardContent className="p-2 lg:p-6">
         {/* Post Header */}
         <div className="flex items-start justify-between mb-1 lg:mb-4">
@@ -325,90 +333,110 @@ export function PostCard(props: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className={`flex-1 rounded-none lg:rounded-md ${isLiked ? "text-red-500 hover:text-red-600" : "text-muted-foreground"}`}
+            className={`flex-1 h-8 text-xs lg:text-sm rounded-full transition-all ${isLiked
+              ? "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30"
+              : "bg-secondary/30 hover:bg-secondary/50 text-secondary-foreground"}`}
             onClick={handleLikeClick}
             disabled={!currentUserId}
           >
-            <Heart size={20} className={isLiked ? "fill-current" : ""} />
-            <span className="ml-2">J'aime</span>
+            <Heart size={16} className={`mr-1.5 ${isLiked ? "fill-current" : ""}`} />
+            <span>J'aime</span>
           </Button>
-          <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
-            <DialogTrigger asChild>
+          <CustomBottomSheet open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
+            <CustomBottomSheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex-1 rounded-none lg:rounded-md text-muted-foreground"
+                className="flex-1 h-8 text-xs lg:text-sm rounded-full bg-gradient-to-r from-primary via-secondary to-accent text-white hover:opacity-90 transition-all shadow-sm transition-all"
                 onClick={fetchComments}
               >
-                <MessageCircle size={20} />
-                <span className="ml-2">Commenter</span>
+                <MessageCircle size={16} className="mr-1.5" />
+                <span>Commenter</span>
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Commentaires</DialogTitle>
-                <DialogDescription>
+            </CustomBottomSheetTrigger>
+            <CustomBottomSheetContent noBodyStyles className="h-[85vh] max-h-[85vh]">
+              <CustomBottomSheetHeader className="px-6 pb-2">
+                <CustomBottomSheetTitle>Commentaires</CustomBottomSheetTitle>
+                <CustomBottomSheetDescription>
                   Voir et ajouter des commentaires pour ce post.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4 max-h-[400px] overflow-y-auto">
+                </CustomBottomSheetDescription>
+              </CustomBottomSheetHeader>
+
+              {/* Scrollable Comments List */}
+              <div className="flex-1 overflow-y-auto px-6 py-2 min-h-0">
                 {loadingComments ? (
                   <div className="flex justify-center items-center h-24">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : commentsData.length === 0 ? (
-                  <p className="text-center text-muted-foreground">Aucun commentaire pour le moment.</p>
+                  <div className="flex flex-col items-center justify-center h-40 text-center">
+                    <MessageCircle className="h-12 w-12 text-muted-foreground/20 mb-3" />
+                    <p className="text-muted-foreground font-medium">Aucun commentaire</p>
+                    <p className="text-xs text-muted-foreground">Soyez le premier à réagir !</p>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 pb-4">
                     {commentsData.map((comment) => (
-                      <div key={comment.id} className="flex items-start gap-3">
-                        <Avatar className="w-8 h-8">
+                      <div key={comment.id} className="flex items-start gap-3 group">
+                        <Avatar className="w-8 h-8 border border-border shrink-0 mt-1">
                           <AvatarImage src={comment.auteur?.avatar_url || "/placeholder.svg"} alt={comment.auteur?.full_name || "User"} />
                           <AvatarFallback>{comment.auteur?.full_name?.charAt(0) || "U"}</AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm">{comment.auteur?.full_name || "Utilisateur inconnu"}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: fr })}
-                          </p>
-                          <p className="text-sm mt-1">{comment.contenu}</p>
+                        <div className="flex-1 bg-muted/30 p-3 rounded-2xl rounded-tl-none hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-semibold text-sm">{comment.auteur?.full_name || "Utilisateur inconnu"}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: fr })}
+                            </p>
+                          </div>
+                          <p className="text-sm text-foreground/90 leading-relaxed">{comment.contenu}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
+
+              {/* Fixed Input Footer */}
               {currentUserId && (
-                <div className="flex items-start gap-2 pt-4 border-t border-border">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={authorAvatar || undefined} alt={author} />
-                    <AvatarFallback>{author[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <Textarea
-                      placeholder="Ajouter un commentaire..."
-                      value={newCommentContent}
-                      onChange={(e) => setNewCommentContent(e.target.value)}
-                      className="min-h-[60px] resize-none mb-2"
-                    />
-                    <Button
-                      size="sm"
-                      onClick={handleAddComment}
-                      disabled={!newCommentContent.trim() || addingComment}
-                    >
-                      {addingComment ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                      Commenter
-                    </Button>
+                <div className="p-4 border-t border-border bg-background mt-auto shrink-0 pb-6 lg:pb-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-8 h-8 shrink-0 hidden sm:block">
+                      <AvatarImage src={authorAvatar || undefined} alt={author} />
+                      <AvatarFallback>{author[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 relative">
+                      <Input
+                        placeholder="Ajouter un commentaire..."
+                        value={newCommentContent}
+                        onChange={(e) => setNewCommentContent(e.target.value)}
+                        className="min-h-[44px] pr-12 rounded-full bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all"
+                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (newCommentContent.trim() && !addingComment) handleAddComment();
+                          }
+                        }}
+                      />
+                      <Button
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                        onClick={handleAddComment}
+                        disabled={!newCommentContent.trim() || addingComment}
+                      >
+                        {addingComment ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
-            </DialogContent>
-          </Dialog>
+            </CustomBottomSheetContent>
+          </CustomBottomSheet>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex-1 rounded-none lg:rounded-md text-muted-foreground">
-                <Share2 size={20} />
-                <span className="ml-2">Partager</span>
+              <Button variant="ghost" size="sm" className="flex-1 h-8 text-xs lg:text-sm rounded-full bg-gradient-to-r from-primary via-secondary to-accent text-white hover:opacity-90 transition-all shadow-sm">
+                <Share2 size={16} className="mr-1.5" />
+                <span>Partager</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
