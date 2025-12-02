@@ -18,19 +18,13 @@
             "src": "/icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any"
+            "purpose": "any maskable"
         },
         {
             "src": "/icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-maskable-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
+            "purpose": "any maskable"
         }
     ],
     "screenshots": [
@@ -39,56 +33,12 @@
             "sizes": "1280x720",
             "type": "image/jpeg",
             "form_factor": "wide"
-        }
-    ],
-    "shortcuts": [
-        {
-            "name": "Formations",
-            "short_name": "Formations",
-            "description": "Parcourir les formations disponibles",
-            "url": "/formations",
-            "icons": [
-                {
-                    "src": "/icon-192x192.png",
-                    "sizes": "192x192"
-                }
-            ]
         },
         {
-            "name": "Événements",
-            "short_name": "Événements",
-            "description": "Découvrir les événements à venir",
-            "url": "/evenements",
-            "icons": [
-                {
-                    "src": "/icon-192x192.png",
-                    "sizes": "192x192"
-                }
-            ]
-        },
-        {
-            "name": "Clubs",
-            "short_name": "Clubs",
-            "description": "Rejoindre des clubs étudiants",
-            "url": "/clubs",
-            "icons": [
-                {
-                    "src": "/icon-192x192.png",
-                    "sizes": "192x192"
-                }
-            ]
-        },
-        {
-            "name": "Blog",
-            "short_name": "Blog",
-            "description": "Lire les articles du blog",
-            "url": "/blog",
-            "icons": [
-                {
-                    "src": "/icon-192x192.png",
-                    "sizes": "192x192"
-                }
-            ]
+            "src": "/placeholder.jpg",
+            "sizes": "1280x720",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
         }
     ],
     "related_applications": [],
