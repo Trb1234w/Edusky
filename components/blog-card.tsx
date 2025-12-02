@@ -118,7 +118,7 @@ export function BlogCard({
             {title}
           </h3>
 
-          <p className="text-base text-muted-foreground mb-2 line-clamp-2 leading-relaxed">
+          <p className="text-sm text-muted-foreground line-clamp-1">
             {excerpt}
           </p>
 
