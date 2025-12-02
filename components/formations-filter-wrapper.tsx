@@ -318,7 +318,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
       {/* Mobile-only Filter UI */}
       <div className="lg:hidden">
         <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-          <div className="md:hidden px-4 py-2 border-b flex items-center">
+          <div className="md:hidden px-0 py-2 border-b flex items-center">
             <Button
               variant="ghost"
               size="icon"
@@ -329,7 +329,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
             </Button>
             <span className="text-lg font-semibold ml-2">Formations</span>
           </div>
-          <div className="px-4 py-2 border-b">
+          <div className="px-0 py-2 border-b">
             <form onSubmit={handleSearchSubmit} className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
@@ -341,7 +341,7 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
             </form>
           </div>
 
-          <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <div className="flex items-center gap-2 px-0 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
             <CustomBottomSheet>
               <CustomBottomSheetTrigger asChild>
                 <Button variant="outline" size="sm" className="rounded-xl">
