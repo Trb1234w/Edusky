@@ -214,7 +214,7 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
 
                     {/* Membres */}
                     {(club.nombre_membres !== null && club.nombre_membres !== undefined) && (
-                      <div className="flex items-center gap-2 text-sm bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center gap-2 text-sm bg-blue-50 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                         <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                         <span className="font-medium">Membres actuels:</span>
                         <span className="text-muted-foreground font-bold">{club.nombre_membres}</span>

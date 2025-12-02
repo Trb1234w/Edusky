@@ -218,7 +218,7 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
               </Card>
 
               {/* Barre de statistiques rapide (Mobile/Tablet) - Visible only on small screens if needed, but here we keep it as part of the flow or move to right col */}
-              <Card className="lg:hidden grid grid-cols-2 gap-4 p-4 bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-xl rounded-2xl border-none">
+              <Card className="lg:hidden grid grid-cols-2 gap-4 p-4 bg-background/80 backdrop-blur-sm shadow-xl rounded-2xl border-none">
                 <div className="flex items-center gap-3">
                   <Clock className="h-8 w-8 text-primary" />
                   <div><p className="text-sm text-muted-foreground">Durée</p><p className="font-bold">{formation.duree_texte || 'N/A'}</p></div>

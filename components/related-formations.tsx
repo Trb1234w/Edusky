@@ -38,7 +38,7 @@ export function RelatedFormations({ formations }: RelatedFormationsProps) {
     }
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50/50 dark:bg-gray-900/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-white">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Autres formations</h2>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory">
                 {formations.map((formation) => (

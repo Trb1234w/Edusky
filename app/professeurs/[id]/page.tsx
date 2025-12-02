@@ -122,7 +122,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
 
                 <TabsContent value="parcours" className="space-y-6">
                   {/* Expérience Professionnelle */}
-                  <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
+                  <Card className="p-6 md:p-8 bg-white shadow-lg rounded-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold mb-6 text-foreground flex items-center gap-3">
                       <Briefcase className="h-6 w-6 text-primary" /> Expérience
                     </h2>
@@ -151,7 +151,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                   </Card>
 
                   {/* Diplômes */}
-                  <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
+                  <Card className="p-6 md:p-8 bg-white shadow-lg rounded-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold mb-6 text-foreground flex items-center gap-3">
                       <GraduationCap className="h-6 w-6 text-primary" /> Diplômes
                     </h2>
@@ -159,7 +159,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                       <div className="space-y-4">
                         {diplomes.map((diplome: any, index: number) => (
                           <div key={index} className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors">
-                            <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                            <div className="p-2 bg-white rounded-lg shadow-sm">
                               <Award className="h-6 w-6 text-primary" />
                             </div>
                             <div>
@@ -180,7 +180,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
 
                   {/* Certifications */}
                   {certifications.length > 0 && (
-                    <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl space-y-4">
+                    <Card className="p-6 md:p-8 bg-white shadow-lg rounded-2xl space-y-4">
                       <h2 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
                         <Award className="h-6 w-6 text-primary" /> Certifications
                       </h2>
@@ -197,7 +197,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                 </TabsContent>
 
                 <TabsContent value="availability" className="space-y-6">
-                  <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
+                  <Card className="p-6 md:p-8 bg-white shadow-lg rounded-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold mb-4 text-foreground flex items-center gap-3">
                       <BookOpen className="h-6 w-6 text-primary" /> Disponibilités
                     </h2>
@@ -219,7 +219,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                 </TabsContent>
 
                 <TabsContent value="portfolio" className="space-y-6">
-                  <Card className="p-6 md:p-8 bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
+                  <Card className="p-6 md:p-8 bg-white shadow-lg rounded-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold mb-4 text-foreground flex items-center gap-3">
                       <Briefcase className="h-6 w-6 text-primary" /> Portfolio
                     </h2>
@@ -251,7 +251,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
             {/* Colonne de droite : Contact & Tarifs (Sticky) */}
             <div className="lg:col-span-1 mt-8 lg:mt-0">
               <div className="lg:sticky lg:top-24 space-y-6">
-                <Card className="p-6 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-none">
+                <Card className="p-6 bg-white shadow-xl rounded-2xl border-none">
                   <h3 className="text-xl font-bold mb-4">Tarifs indicatifs</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center pb-4 border-b">
@@ -271,7 +271,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                 </Card>
 
                 {/* Coordonnées (si disponibles) */}
-                <Card className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
+                <Card className="p-6 bg-white shadow-lg rounded-2xl">
                   <h3 className="text-lg font-bold mb-4">Coordonnées</h3>
                   <div className="space-y-3">
                     {professeur.email_contact && (
@@ -307,7 +307,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
       </main>
 
       {/* Related Professeurs Section */}
-      <div className="bg-white dark:bg-black py-12">
+      <div className="bg-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <RelatedProfesseurs professeurs={relatedProfesseurs || []} />
         </div>

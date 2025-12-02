@@ -46,7 +46,7 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
     }
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 bg-gray-50/50 dark:bg-gray-900/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 bg-white">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Autres articles de blog</h2>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory">
                 {articles.map((article) => (

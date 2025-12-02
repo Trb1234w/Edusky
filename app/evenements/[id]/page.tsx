@@ -523,7 +523,7 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                     <div className="space-y-4">
                       {/* Lien de streaming */}
                       {evenement.lien_streaming && (
-                        <Card className="p-4 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+                        <Card className="p-4 bg-blue-50 border-blue-200 dark:border-blue-800">
                           <div className="flex items-start gap-4">
                             <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
                               <Video className="h-6 w-6 text-white" />
@@ -544,7 +544,7 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
                       {/* Code d'accès streaming */}
                       {evenement.code_acces_streaming && (
-                        <Card className="p-4 bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-800">
+                        <Card className="p-4 bg-purple-50 border-purple-200 dark:border-purple-800">
                           <div className="flex items-start gap-4">
                             <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
                               <Tag className="h-6 w-6 text-white" />
@@ -552,7 +552,7 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                             <div className="flex-1">
                               <h4 className="font-bold text-base mb-1">Code d'accès</h4>
                               <p className="text-sm text-muted-foreground mb-2">Utilisez ce code pour rejoindre</p>
-                              <code className="bg-white dark:bg-gray-900 px-4 py-2 rounded-lg text-lg font-mono font-bold block text-center">
+                              <code className="bg-white px-4 py-2 rounded-lg text-lg font-mono font-bold block text-center">
                                 {evenement.code_acces_streaming}
                               </code>
                             </div>
@@ -562,7 +562,7 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
 
                       {/* Lien billetterie */}
                       {evenement.lien_billetterie && (
-                        <Card className="p-4 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800">
+                        <Card className="p-4 bg-green-50 border-green-200 dark:border-green-800">
                           <div className="flex items-start gap-4">
                             <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
                               <Ticket className="h-6 w-6 text-white" />
