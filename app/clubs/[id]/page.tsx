@@ -78,7 +78,7 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
   console.log("-----------------------");
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Mobile-only Header */}
       <div className="lg:hidden p-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between">
         <Link href="/clubs" className="p-2 -ml-2 rounded-full hover:bg-muted">
@@ -116,7 +116,7 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
 
             <div className="lg:col-span-2 space-y-6">
 
-              <Card className="p-6 pt-10 md:pt-12 text-center bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-2xl rounded-2xl border-none">
+              <Card className="p-6 pt-10 md:pt-12 text-center bg-white backdrop-blur-sm shadow-2xl rounded-2xl border-none">
                 {club.categorie && (
                   <Link href={`/clubs?categorie=${club.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
                     {club.categorie.nom}

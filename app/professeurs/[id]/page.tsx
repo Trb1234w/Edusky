@@ -77,7 +77,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
         <div className="w-12"></div>
       </div>
 
-      <main className="flex-1 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-black">
+      <main className="flex-1 bg-gradient-to-br from-indigo-50 to-purple-50">
         <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-12 xl:gap-16">
             {/* Colonne de gauche : Contenu principal */}
@@ -90,7 +90,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
               </nav>
 
               {/* Section Hero du Professeur */}
-              <Card className="p-6 md:p-8 lg:p-10 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-none">
+              <Card className="p-6 md:p-8 lg:p-10 bg-white shadow-xl rounded-2xl border-none">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
                   <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-primary/20 shadow-lg transition-transform duration-300 hover:scale-105">
                     <AvatarImage src={professeur.image_url || ''} alt={professeur.full_name || ''} />

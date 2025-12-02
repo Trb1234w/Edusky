@@ -68,7 +68,7 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
   const { data: relatedArticles } = await getRelatedArticlesByCategory(article.id, article.categorie_id);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black">
+    <div className="min-h-screen flex flex-col bg-white">
       <div className="hidden lg:block">
         <Header />
       </div>
