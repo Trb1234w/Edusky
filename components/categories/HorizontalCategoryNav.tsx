@@ -98,7 +98,7 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
   return (
     <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
 
-      <div className="flex gap-2 px-0 py-2 min-w-max">
+      <div className="flex gap-2 px-4 py-2 min-w-max">
         {/* Dialog for all categories - always show */}
         <CategoryDialog
           categories={categoryTree}

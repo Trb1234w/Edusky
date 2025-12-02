@@ -336,12 +336,12 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
   ]
 
   return (
-    <div className="container mx-auto px-4 lg:px-8">
-      {/* Mobile-only Filter UI */}
+    <>
+      {/* Mobile-only Filter UI - Fixed at top */}
       <div className="lg:hidden">
-        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+        <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
           {/* Back button */}
-          <div className="md:hidden px-0 py-2 border-b flex items-center">
+          <div className="md:hidden px-4 py-2 border-b flex items-center">
             <Button
               variant="ghost"
               size="icon"
@@ -354,7 +354,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
           </div>
 
           {/* Search */}
-          <div className="px-0 py-2 border-b">
+          <div className="px-4 py-2 border-b">
             <form onSubmit={e => e.preventDefault()} className="relative">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -370,7 +370,7 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
           </div>
 
           {/* Filters */}
-          <div className="flex items-center gap-2 px-0 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
             <CustomBottomSheet>
               <CustomBottomSheetTrigger asChild>
                 <Button variant="outline" size="sm" className="rounded-xl">
@@ -522,32 +522,36 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
         </div>
       </div>
 
-      {/* Desktop layout */}
-      <div className="hidden lg:flex items-center justify-between mb-6 mt-8">
-        <div>
-          <h2 className="text-2xl font-bold">Tous les clubs</h2>
-          <p className="text-muted-foreground">Découvrez et rejoignez des communautés passionnées</p>
-        </div>
-        <div className="px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
-          {filteredClubs.length} club{filteredClubs.length > 1 ? 's' : ''}
-        </div>
-      </div>
+      {/* Main Content with proper spacing for fixed header on mobile */}
+      <div className="container mx-auto px-4 lg:px-8 pt-48 lg:pt-0">
 
-      <div className="flex gap-8 lg:animate-fade-in-up mt-2">
-        <div className="hidden lg:block w-full max-w-xs mt-2 lg:animate-fade-in-left lg:animation-delay-300">
-          <ClubSidebar
-            filters={filters}
-            handleFilterChange={handleFilterChange}
-            filtersConfig={filtersConfig}
-            locationFiltersConfig={locationFiltersConfig}
-            availableTags={availableTags}
-          />
+        {/* Desktop layout */}
+        <div className="hidden lg:flex items-center justify-between mb-6 mt-8">
+          <div>
+            <h2 className="text-2xl font-bold">Tous les clubs</h2>
+            <p className="text-muted-foreground">Découvrez et rejoignez des communautés passionnées</p>
+          </div>
+          <div className="px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
+            {filteredClubs.length} club{filteredClubs.length > 1 ? 's' : ''}
+          </div>
         </div>
 
-        <div className="flex-1 py-2">
-          <ClubsList clubs={filteredClubs} isLoading={isLoading} />
+        <div className="flex gap-8 lg:animate-fade-in-up mt-2">
+          <div className="hidden lg:block w-full max-w-xs mt-2 lg:animate-fade-in-left lg:animation-delay-300">
+            <ClubSidebar
+              filters={filters}
+              handleFilterChange={handleFilterChange}
+              filtersConfig={filtersConfig}
+              locationFiltersConfig={locationFiltersConfig}
+              availableTags={availableTags}
+            />
+          </div>
+
+          <div className="flex-1 py-2">
+            <ClubsList clubs={filteredClubs} isLoading={isLoading} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

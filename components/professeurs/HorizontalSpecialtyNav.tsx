@@ -15,7 +15,7 @@ interface HorizontalSpecialtyNavProps {
 export function HorizontalSpecialtyNav({ specialties, selectedSpecialty, onSelect }: HorizontalSpecialtyNavProps) {
     return (
         <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-            <div className="flex gap-2 px-0 py-2 min-w-max">
+            <div className="flex gap-2 px-4 py-2 min-w-max">
                 {/* Dialog for all specialties - always show */}
                 <SpecialtyDialog
                     specialties={specialties}
