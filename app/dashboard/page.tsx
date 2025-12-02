@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
         <section className="container mx-auto px-0 md:px-4">
           <Tabs defaultValue="posts" className="w-full">
-            <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-1 lg:gap-2 pb-2 border-b-2 border-gray-200 dark:border-gray-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-1 lg:gap-2 pb-2 px-4 md:px-0 border-b-2 border-gray-200 dark:border-gray-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <TabsTrigger
                 value="posts"
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
@@ -201,7 +201,7 @@ export default function DashboardPage() {
                 <span className="hidden lg:inline ml-2">Favoris</span>
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="posts" className="mt-6">
+            <TabsContent value="posts" className="mt-6 px-4 md:px-0">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                   <CreatePost profile={profile} />
@@ -261,7 +261,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="followers" className="mt-6">
+            <TabsContent value="followers" className="mt-6 px-4 md:px-0">
               {followersLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -278,7 +278,7 @@ export default function DashboardPage() {
                 />
               )}
             </TabsContent>
-            <TabsContent value="following" className="mt-6">
+            <TabsContent value="following" className="mt-6 px-4 md:px-0">
               {followingLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -295,7 +295,7 @@ export default function DashboardPage() {
                 />
               )}
             </TabsContent>
-            <TabsContent value="inscriptions" className="mt-6 space-y-12">
+            <TabsContent value="inscriptions" className="mt-6 space-y-12 px-4 md:px-0">
               {/* Événements */}
               <section>
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -412,7 +412,7 @@ export default function DashboardPage() {
                 )}
               </section>
             </TabsContent>
-            <TabsContent value="favorites" className="mt-6">
+            <TabsContent value="favorites" className="mt-6 px-4 md:px-0">
               {favoritesLoading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {Array.from({ length: 3 }).map((_, i) => (

@@ -7,6 +7,7 @@ import AOSInitializer from "./components/AOSInitializer"
 import { Toaster } from "@/components/ui/toaster"
 import { MobileNav } from "@/components/mobile-nav"
 import { LayoutWrapper } from "@/components/layout-wrapper"
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -66,6 +67,7 @@ export default function RootLayout({
           {children}
         </LayoutWrapper>
         <MobileNav />
+        <ServiceWorkerRegister />
         <Toaster />
         <AOSInitializer />
         <Analytics />
