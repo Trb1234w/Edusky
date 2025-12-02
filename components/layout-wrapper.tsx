@@ -20,7 +20,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             {children}
 
             {/* Footer : Visible sur mobile UNIQUEMENT pour Accueil et Feed */}
-            <div className={pathname === '/' || pathname.startsWith('/feed') ? "block" : "hidden lg:block"}>
+            <div className={pathname === '/' ? "block" : "hidden lg:block"}>
                 <ModernFooter />
             </div>
         </>

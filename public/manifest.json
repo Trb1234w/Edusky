@@ -3,6 +3,7 @@
     "short_name": "Edusky",
     "description": "Plateforme éducative pour formations, événements, clubs et ressources pédagogiques en Guinée",
     "start_url": "/",
+    "id": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#3B82F6",
