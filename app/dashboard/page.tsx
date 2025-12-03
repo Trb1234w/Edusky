@@ -224,7 +224,7 @@ export default function DashboardPage() {
                             authorAvatar: post.authorAvatar,
                             authorUsername: post.authorUsername,
                             content: post.content,
-                            image: post.image,
+                            media: post.media,
                             timestamp: post.timestamp,
                             likes: post.likes || 0,
                             comments: post.comments || 0,

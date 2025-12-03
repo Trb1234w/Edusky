@@ -22,44 +22,63 @@ interface CreatePostProps {
 export function CreatePost({ profile }: CreatePostProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setPreviewUrl(URL.createObjectURL(selectedFile));
+    const selectedFiles = event.target.files;
+    if (!selectedFiles) return;
+
+    const newFiles = Array.from(selectedFiles);
+    const videoFile = newFiles.find(file => file.type.startsWith('video/'));
+
+    if (videoFile) {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        if (video.duration > 60) {
+          toast.error("La vidéo ne doit pas dépasser 1 minute.");
+        } else {
+          setFiles(prevFiles => [...prevFiles, videoFile]);
+          setPreviewUrls(prevUrls => [...prevUrls, URL.createObjectURL(videoFile)]);
+        }
+      };
+      video.src = URL.createObjectURL(videoFile);
     }
+
+    const imageFiles = newFiles.filter(file => file.type.startsWith('image/'));
+    setFiles(prevFiles => [...prevFiles, ...imageFiles]);
+    setPreviewUrls(prevUrls => [...prevUrls, ...imageFiles.map(file => URL.createObjectURL(file))]);
   };
 
-  const removeImage = () => {
-    setFile(null);
-    setPreviewUrl(null);
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+    setPreviewUrls(previewUrls.filter((_, i) => i !== index));
     if(fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   }
 
   const handlePost = async () => {
-    if (!content.trim() && !file) return;
+    if (!content.trim() && files.length === 0) return;
 
     startTransition(async () => {
-      let imageUrl: string | undefined = undefined;
+      const supabase = createClient();
+      const imageUrls: string[] = [];
+      let videoUrl: string | undefined = undefined;
 
-      // Étape 1: Uploader l'image si elle existe
-      if (file) {
-        const supabase = createClient();
+      // Étape 1: Uploader les fichiers
+      for (const file of files) {
         const filePath = `posts/${profile.id}/${Date.now()}-${file.name}`;
-        
         const { error: uploadError } = await supabase.storage
-          .from('posts-media') // ASSUMPTION: Le bucket 'posts-media' existe et est public.
+          .from('posts-media')
           .upload(filePath, file);
 
         if (uploadError) {
-          toast.error("Erreur lors de l'upload de l'image: " + uploadError.message);
+          toast.error(`Erreur d'upload: ${uploadError.message}`);
           return;
         }
 
@@ -67,19 +86,28 @@ export function CreatePost({ profile }: CreatePostProps) {
           .from('posts-media')
           .getPublicUrl(filePath);
         
-        imageUrl = publicUrl;
+        if (file.type.startsWith('image/')) {
+          imageUrls.push(publicUrl);
+        } else if (file.type.startsWith('video/')) {
+          videoUrl = publicUrl;
+        }
       }
 
-      // Étape 2: Appeler la Server Action avec l'URL de l'image (si elle existe)
-      const result = await createPostAction(content, profile.id, imageUrl);
+      const media = {
+        images: imageUrls,
+        video: videoUrl,
+      };
+
+      // Étape 2: Appeler la Server Action
+      const result = await createPostAction(content, profile.id, media);
 
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Votre publication a été créée avec succès.");
-        // Reset state
+        toast.success("Publication créée !");
         setContent("");
-        removeImage();
+        setFiles([]);
+        setPreviewUrls([]);
         setIsOpen(false);
       }
     });
@@ -133,19 +161,26 @@ export function CreatePost({ profile }: CreatePostProps) {
               autoFocus
             />
 
-            {previewUrl && (
-              <div className="relative">
-                <Image src={previewUrl} alt="Aperçu" width={500} height={300} className="rounded-lg object-cover w-full" />
-                <button onClick={removeImage} className="absolute top-2 right-2 bg-gray-900/50 text-white rounded-full p-1.5 hover:bg-gray-900/80 transition-colors">
-                  <X size={18} />
-                </button>
-              </div>
-            )}
+            <div className="grid grid-cols-2 gap-2">
+              {previewUrls.map((url, index) => (
+                <div key={index} className="relative">
+                  {files[index].type.startsWith('image/') ? (
+                    <Image src={url} alt={`Aperçu ${index}`} width={250} height={150} className="rounded-lg object-cover w-full" />
+                  ) : (
+                    <video src={url} controls className="rounded-lg object-cover w-full" />
+                  )}
+                  <button onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-gray-900/50 text-white rounded-full p-1 hover:bg-gray-900/80 transition-colors">
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
           </div>
 
           <DialogFooter className="flex-col sm:flex-row sm:justify-between items-center">
             <div className="flex gap-2 items-center">
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" id="file-upload" />
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*,video/mp4,video/quicktime" className="hidden" id="file-upload" multiple />
                 <Button asChild variant="ghost" size="icon" className="rounded-full">
                     <label htmlFor="file-upload" className="cursor-pointer">
                         <ImageIcon className="text-green-500" />
@@ -154,7 +189,7 @@ export function CreatePost({ profile }: CreatePostProps) {
             </div>
             <Button 
               onClick={handlePost} 
-              disabled={(!content.trim() && !file) || isPending}
+              disabled={(!content.trim() && files.length === 0) || isPending}
               className="w-full sm:w-auto"
             >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} 

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Share2, MoreHorizontal, Loader2, Link as LinkIcon, Send } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreHorizontal, Loader2, Link as LinkIcon, Send, X } from "lucide-react";
 import {
   CustomBottomSheet,
   CustomBottomSheetContent,
@@ -37,7 +37,10 @@ interface PostCardProps {
   authorAvatar: string;
   authorUsername: string;
   content: string;
-  image: string | null;
+  media: {
+    images?: string[];
+    video?: string;
+  } | null;
   timestamp: string;
   likes: number;
   comments: number;
@@ -57,6 +60,92 @@ interface Comment {
   } | null;
 }
 
+import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+function MediaGallery({ media }: { media: PostCardProps['media'] }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  if (!media || (!media.images?.length && !media.video)) {
+    return null;
+  }
+
+  const images = media.images || [];
+  const video = media.video;
+
+  const openLightbox = (index: number) => {
+    setSelectedImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => setLightboxOpen(false);
+
+  const goToNext = () => {
+    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const goToPrevious = () => {
+    setSelectedImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+  };
+
+  const totalMedia = images.length + (video ? 1 : 0);
+
+  if (totalMedia === 0) return null;
+
+  return (
+    <>
+      <div className="mb-2 lg:mb-4 rounded-lg overflow-hidden">
+        {video && (
+          <video src={video} controls className="w-full rounded-lg bg-black" />
+        )}
+        {images.length > 0 && (
+          <div className={`grid ${images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-1 mt-1`}>
+            {images.slice(0, 4).map((image, index) => (
+              <div 
+                key={index} 
+                className={`relative ${images.length === 3 && index === 0 ? 'row-span-2' : ''} ${images.length >= 4 ? 'h-40' : 'h-64'}`}
+                onClick={() => openLightbox(index)}
+              >
+                <Image src={image} alt={`Post media ${index + 1}`} layout="fill" className="object-cover cursor-pointer" />
+                {images.length > 4 && index === 3 && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">+{images.length - 4}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="p-0 bg-transparent border-none max-w-4xl w-full h-[90vh]">
+          <VisuallyHidden.Root>
+            <DialogTitle>Aperçu de l'image du post</DialogTitle>
+          </VisuallyHidden.Root>
+            <Image src={images[selectedImageIndex]} alt="Post media" layout="fill" className="object-contain" />
+            
+            {images.length > 1 && (
+              <>
+                <Button onClick={goToPrevious} variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
+                  <ChevronLeft size={24} />
+                </Button>
+                <Button onClick={goToNext} variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
+                  <ChevronRight size={24} />
+                </Button>
+              </>
+            )}
+             <DialogClose className="absolute top-2 right-2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
+                <X size={24} />
+            </DialogClose>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 export function PostCard(props: PostCardProps) {
   const {
     id,
@@ -66,7 +155,7 @@ export function PostCard(props: PostCardProps) {
     authorAvatar,
     authorUsername,
     content,
-    image,
+    media,
     timestamp,
     likes,
     comments,
@@ -312,12 +401,8 @@ export function PostCard(props: PostCardProps) {
           <p className="text-foreground leading-relaxed whitespace-pre-wrap">{content}</p>
         </div>
 
-        {/* Post Image */}
-        {image && (
-          <div className="mb-1 lg:mb-4 rounded-xl overflow-hidden">
-            <div className="w-full h-64 lg:h-80 bg-cover bg-center" style={{ backgroundImage: `url('${image}')` }} />
-          </div>
-        )}
+        {/* Post Media */}
+        <MediaGallery media={media} />
 
         {/* Post Stats */}
         <div className="flex items-center justify-between py-1 lg:py-3 border-y lg:border-border mb-1 lg:mb-3">

@@ -7,17 +7,16 @@ import { revalidatePath } from "next/cache";
 import { createNotification } from "@/lib/notifications";
 
 // La fonction accepte maintenant l'ID de l'auteur en argument
-export async function createPostAction(content: string, authorId: string, imageUrl?: string) {
+export async function createPostAction(content: string, authorId: string, media: { images: string[], video: string | undefined }) {
   if (!authorId) {
     return { error: "Utilisateur non identifié. Action non autorisée." };
   }
 
-  // On autorise un post avec seulement une image
-  if (!content.trim() && !imageUrl) {
+  // On autorise un post avec seulement des médias
+  if (!content.trim() && media.images.length === 0 && !media.video) {
     return { error: "Le contenu ne peut pas être vide." };
   }
 
-  // On utilise le client ADMIN pour insérer, comme le font les autres fonctions serveur du projet
   const supabaseAdmin = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -26,12 +25,8 @@ export async function createPostAction(content: string, authorId: string, imageU
   const postData: any = {
     auteur_id: authorId,
     contenu: content,
+    media: media, // On insère directement l'objet media
   };
-
-  if (imageUrl) {
-    // La colonne media est un jsonb, on peut y stocker une structure
-    postData.media = [{ type: 'image', url: imageUrl }];
-  }
 
   const { error } = await supabaseAdmin.from("postes").insert([postData]);
 
