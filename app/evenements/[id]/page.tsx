@@ -11,10 +11,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { InscriptionEvenementModal } from "@/components/inscription-evenement-modal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Calendar, User, MapPin, Users, Tag, Clock, ChevronLeft, Heart, Share2, Ticket,
+  Calendar, User, MapPin, Users, Tag, Clock, ChevronLeft, Ticket,
   Info, Users2, Map, Handshake, Link as LinkIcon, Video, Award, Activity, Globe,
   ExternalLink, CheckCircle2, Book
 } from "lucide-react";
+import { ContentActions } from "@/components/content-actions";
 
 // --- Helpers ---
 
@@ -74,10 +75,13 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
           <ChevronLeft className="h-6 w-6" />
         </Link>
         <span className="font-bold text-lg truncate flex-1 text-center">{evenement.titre}</span>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="rounded-full"><Heart className="h-5 w-5" /></Button>
-          <Button variant="ghost" size="icon" className="rounded-full"><Share2 className="h-5 w-5" /></Button>
-        </div>
+        <ContentActions
+          itemId={evenement.id}
+          itemTitle={evenement.titre}
+          itemType="evenement"
+          initialIsFavorited={evenement.is_favorited}
+          variant="mobile"
+        />
       </div>
 
       <main className="flex-1 pb-32 lg:pb-0">
@@ -611,9 +615,12 @@ export default async function EvenementDetailsPage({ params }: { params: { id: s
                 </CardTitle>
                 <CardContent className="p-0 mt-6 space-y-3">
                   <InscriptionEvenementModal evenementId={evenement.id} evenementTitle={evenement.titre} />
-                  <Button size="lg" variant="outline" className="w-full text-lg font-semibold rounded-xl py-3">
-                    <Heart className="mr-2 h-5 w-5" /> Ajouter au calendrier
-                  </Button>
+                  <ContentActions
+                    itemId={evenement.id}
+                    itemTitle={evenement.titre}
+                    itemType="evenement"
+                    initialIsFavorited={evenement.is_favorited}
+                  />
                 </CardContent>
                 <CardFooter className="p-0 border-t mt-6 pt-6 flex flex-col items-start gap-4">
                   <div className="flex items-start gap-4 text-sm">

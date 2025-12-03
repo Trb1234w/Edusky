@@ -1,9 +1,10 @@
-import { Button } from "@/components/ui/button"
-import { Users } from "lucide-react"
 import { ClubsHero } from "@/components/clubs/ClubsHero"
+import { getAllClubs } from "./get-data"
 import { ClubsFilterWrapper } from "@/components/clubs-filter-wrapper"
 
 export default async function ClubsPage() {
+  const { data: clubs } = await getAllClubs()
+
   return (
     <main className="flex-1 pt-1 lg:pt-20">
       {/* Hero Section */}
@@ -12,7 +13,7 @@ export default async function ClubsPage() {
       </div>
 
       {/* Le wrapper gère maintenant toute la logique de filtrage et d'affichage */}
-      <ClubsFilterWrapper />
+      <ClubsFilterWrapper initialClubs={clubs || []} />
 
     </main>
   )

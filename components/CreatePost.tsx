@@ -133,12 +133,12 @@ export function CreatePost({ profile }: CreatePostProps) {
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg flex flex-col max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>Créer une publication</DialogTitle>
           </DialogHeader>
           
-          <div className="py-4 space-y-4">
+          <div className="py-4 space-y-4 flex-1 overflow-y-auto">
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name || 'User'} />
@@ -169,7 +169,7 @@ export function CreatePost({ profile }: CreatePostProps) {
                   ) : (
                     <video src={url} controls className="rounded-lg object-cover w-full" />
                   )}
-                  <button onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-gray-900/50 text-white rounded-full p-1 hover:bg-gray-900/80 transition-colors">
+                  <button onClick={() => removeFile(index)} className="absolute top-1 right-1 bg-gray-900/50 text-white rounded-full p-1 hover:bg-gray-900/80 transition-colors">
                     <X size={14} />
                   </button>
                 </div>

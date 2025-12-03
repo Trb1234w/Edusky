@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { BookOpen } from "lucide-react"
-import { BlogHero } from "@/components/blog/BlogHero"
+import { getAllArticles } from "./get-data"
 import { BlogFilterWrapper } from "@/components/blog-filter-wrapper"
+import { BlogHero } from "@/components/blog/BlogHero"
 
 export default async function BlogPage() {
+  const { data: articles } = await getAllArticles()
+
   return (
     <main className="flex-1 pt-1 lg:pt-20">
       {/* Hero Section */}
@@ -13,7 +13,7 @@ export default async function BlogPage() {
       </div>
 
       {/* Le wrapper gère maintenant toute la logique de filtrage et d'affichage */}
-      <BlogFilterWrapper />
+      <BlogFilterWrapper initialArticles={articles || []} />
 
     </main>
   )

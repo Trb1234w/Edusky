@@ -7,7 +7,6 @@ import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { useOptimistic, useTransition } from "react"
-import { useRouter } from "next/navigation"
 import { toggleFavoriteAction } from "@/app/actions/favorites"
 import { cn } from "@/lib/utils"
 
@@ -44,7 +43,6 @@ export function CourseCard({
   language,
   certificate,
 }: CourseCardProps) {
-  const router = useRouter();
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
     initialIsFavorited,
     (state) => !state
@@ -55,7 +53,6 @@ export function CourseCard({
     startTransition(async () => {
       addOptimisticFavorite(null);
       await toggleFavoriteAction('formation', id);
-      router.refresh();
     });
   };
 

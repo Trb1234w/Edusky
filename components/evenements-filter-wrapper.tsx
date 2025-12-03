@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getAllEvenements, getDistinctEventTags, getDistinctEventTypes } from "@/app/evenements/get-data"
+import { getDistinctEventTags, getDistinctEventTypes } from "@/app/evenements/get-data"
 import { getDistinctLocations } from "@/app/formations/get-locations"
 import { EvenementsList } from "@/app/evenements/evenements-list"
 import { Button } from "@/components/ui/button"
@@ -41,29 +41,31 @@ const iconMap: { [key: string]: React.ElementType } = {
     Calendar,
 }
 
-interface EvenementsFilterWrapperProps { }
+interface EvenementsFilterWrapperProps {
+    initialEvents: any[]
+}
 
-interface Location {
+interface FilterLocation {
     id: string;
     nom: string;
 }
 
-interface Ville extends Location {
+interface Ville extends FilterLocation {
     pays_id: string;
 }
 
-interface Quartier extends Location {
+interface Quartier extends FilterLocation {
     ville_id: string;
 }
 
-export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
+export function EvenementsFilterWrapper({ initialEvents }: EvenementsFilterWrapperProps) {
     const router = useRouter();
-    const [allEvenements, setAllEvenements] = useState<any[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const [allEvenements, setAllEvenements] = useState<any[]>(initialEvents)
+    const [isLoading, setIsLoading] = useState(false)
 
     // Location data
     const [locations, setLocations] = useState<{
-        countries: Location[];
+        countries: FilterLocation[];
         villes: Ville[];
         quartiers: Quartier[];
     }>({ countries: [], villes: [], quartiers: [] })
@@ -89,39 +91,10 @@ export function EvenementsFilterWrapper({ }: EvenementsFilterWrapperProps) {
         placesDisponibles: undefined,
     })
 
+    // Sync with initialEvents if they change (e.g. after server action revalidation)
     useEffect(() => {
-        const fetchEvenementsAndFavorites = async () => {
-            setIsLoading(true)
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            const currentUserId = user?.id;
-
-            const { data: evenementsData } = await getAllEvenements()
-            let fetchedEvenements = evenementsData || [];
-
-            if (currentUserId) {
-                const { data: favoritesData, error: favoritesError } = await supabase
-                    .from('favoris')
-                    .select('item_id')
-                    .eq('user_id', currentUserId)
-                    .eq('type_item', 'evenement');
-
-                if (favoritesError) {
-                    console.error("Error fetching user favorites:", favoritesError);
-                } else {
-                    const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id));
-                    fetchedEvenements = fetchedEvenements.map((evenement: any) => ({
-                        ...evenement,
-                        is_favorited: favoriteItemIds.has(evenement.id)
-                    }));
-                }
-            }
-
-            setAllEvenements(fetchedEvenements);
-            setIsLoading(false);
-        }
-        fetchEvenementsAndFavorites();
-    }, [])
+        setAllEvenements(initialEvents);
+    }, [initialEvents]);
 
     // Fetch locations, tags, and types on mount
     useEffect(() => {

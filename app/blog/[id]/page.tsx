@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, Eye, Heart, MessageSquare, ChevronLeft, Share2, Send, Bookmark } from "lucide-react";
+import { Calendar, User, Eye, MessageSquare, ChevronLeft, Send, Bookmark } from "lucide-react";
+import { ContentActions } from "@/components/content-actions";
 import { incrementArticleViews, getArticleComments, checkUserLiked } from "@/app/blog/actions";
 import { ArticleInteractions } from "@/components/blog/ArticleInteractions";
 import { CommentsList } from "@/components/blog/CommentsList";
@@ -87,7 +88,13 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
             <p className="font-bold text-sm truncate">{article.auteur.full_name}</p>
           </div>
         )}
-        <Button variant="ghost" size="icon" className="rounded-full"><Share2 className="h-5 w-5" /></Button>
+        <ContentActions
+          itemId={article.id}
+          itemTitle={article.titre}
+          itemType="article"
+          initialIsFavorited={article.is_favorited}
+          variant="mobile"
+        />
       </div>
 
       <main className="flex-1 lg:pt-24">
@@ -99,6 +106,7 @@ export default async function ArticleDetailsPage({ params }: { params: { id: str
             initialCommentsCount={article.comment_count || 0}
             initialViews={article.vues || 0}
             initialUserLiked={userLiked}
+            initialIsFavorited={article.is_favorited}
           />
 
           <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">

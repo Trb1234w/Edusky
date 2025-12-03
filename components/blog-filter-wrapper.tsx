@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getAllArticles, getDistinctArticleTags } from "@/app/blog/get-data"
+import { getDistinctArticleTags } from "@/app/blog/get-data"
 import { ArticlesList } from "@/app/blog/articles-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -40,12 +40,13 @@ const iconMap: { [key: string]: React.ElementType } = {
 
 interface BlogFilterWrapperProps {
   gradient?: string
+  initialArticles: any[]
 }
 
-export function BlogFilterWrapper({ gradient }: BlogFilterWrapperProps) {
+export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapperProps) {
   const router = useRouter()
-  const [allArticles, setAllArticles] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [allArticles, setAllArticles] = useState<any[]>(initialArticles)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Available tags
   const [availableTags, setAvailableTags] = useState<string[]>([])
@@ -61,38 +62,10 @@ export function BlogFilterWrapper({ gradient }: BlogFilterWrapperProps) {
     min_likes: undefined,
   })
 
+  // Sync with initialArticles if they change
   useEffect(() => {
-    const fetchArticlesAndFavorites = async () => {
-      setIsLoading(true)
-      const supabase = createClient()
-      const { data: { user } = {} } = await supabase.auth.getUser()
-      const currentUserId = user?.id
-
-      const { data: articlesData } = await getAllArticles()
-      let fetchedArticles = articlesData || []
-
-      if (currentUserId) {
-        const { data: favoritesData, error: favoritesError } = await supabase
-          .from('favoris')
-          .select('item_id')
-          .eq('user_id', currentUserId)
-          .eq('type_item', 'article')
-
-        if (favoritesError) console.error("Error fetching user favorites:", favoritesError)
-        else {
-          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id))
-          fetchedArticles = fetchedArticles.map((article: any) => ({
-            ...article,
-            is_favorited: favoriteItemIds.has(article.id),
-          }))
-        }
-      }
-
-      setAllArticles(fetchedArticles)
-      setIsLoading(false)
-    }
-    fetchArticlesAndFavorites()
-  }, [])
+    setAllArticles(initialArticles);
+  }, [initialArticles]);
 
   // Fetch tags on mount
   useEffect(() => {

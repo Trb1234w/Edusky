@@ -60,7 +60,6 @@ export function BlogCard({
     startTransition(async () => {
       addOptimisticFavorite(null);
       await toggleFavoriteAction('article', id);
-      router.refresh();
     });
   };
 
@@ -150,8 +149,8 @@ export function BlogCard({
             </div>
           </div>
         </div>
-      </Card>
-    </Link>
+      </Card >
+    </Link >
   )
 }
 

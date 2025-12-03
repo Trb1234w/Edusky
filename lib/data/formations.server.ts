@@ -68,13 +68,39 @@ export async function getFormationById(id: string) {
 
   console.log("Étape 2 réussie. Profil trouvé.");
 
-  // --- Étape 3: Combiner les données ---
+  // --- Étape 3: Vérifier si la formation est dans les favoris de l'utilisateur ---
+  console.log("Étape 3: Vérification du statut favori...");
+
+  // Import the server client to get the current user
+  const { createClient: createServerClient } = await import('@/lib/supabase/server');
+  const supabaseServer = await createServerClient();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  let isFavorited = false;
+
+  if (user) {
+    const { data: favoriteData } = await supabaseAdmin
+      .from('favoris')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('item_id', id)
+      .eq('type_item', 'formation')
+      .single();
+
+    isFavorited = !!favoriteData;
+    console.log(`Formation ${isFavorited ? 'est' : 'n\'est pas'} dans les favoris de l'utilisateur.`);
+  } else {
+    console.log("Aucun utilisateur connecté, is_favorited = false.");
+  }
+
+  // --- Étape 4: Combiner les données ---
   const finalData = {
     ...formationData,
     professeur: {
       ...formationData.professeur,
       profiles: profileData, // On injecte les données du profil dans l'objet professeur
     },
+    is_favorited: isFavorited, // Ajout du statut favori
   };
 
   console.log("--- SUCCÈS: Données finales combinées ---");

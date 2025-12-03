@@ -11,10 +11,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { InscriptionClubModal } from "@/components/inscription-club-modal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Calendar, User, MapPin, Users, Tag, ChevronLeft, Heart, Share2, Info, Users2,
+  Calendar, User, MapPin, Users, Tag, ChevronLeft, Info, Users2,
   Activity, MessageSquare, ShieldCheck, Clock, FileText, Globe, Handshake, Award,
   Book, Target, CheckCircle2, Share
 } from "lucide-react";
+import { ContentActions } from "@/components/content-actions";
 
 
 // --- Helpers ---
@@ -85,10 +86,13 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
           <ChevronLeft className="h-6 w-6" />
         </Link>
         <span className="font-bold text-lg truncate flex-1 text-center">{club.nom}</span>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="rounded-full"><Heart className="h-5 w-5" /></Button>
-          <Button variant="ghost" size="icon" className="rounded-full"><Share2 className="h-5 w-5" /></Button>
-        </div>
+        <ContentActions
+          itemId={club.id}
+          itemTitle={club.nom}
+          itemType="club"
+          initialIsFavorited={club.is_favorited}
+          variant="mobile"
+        />
       </div>
 
       <main className="flex-1 pb-32 lg:pb-0">
@@ -645,9 +649,12 @@ export default async function ClubDetailsPage({ params }: { params: { id: string
                   ) : (
                     <Button size="lg" disabled className="w-full text-lg rounded-xl py-3">Inscriptions fermées</Button>
                   )}
-                  <Button size="lg" variant="outline" className="w-full text-lg font-semibold rounded-xl py-3">
-                    <Heart className="mr-2 h-5 w-5" /> Suivre ce club
-                  </Button>
+                  <ContentActions
+                    itemId={club.id}
+                    itemTitle={club.nom}
+                    itemType="club"
+                    initialIsFavorited={club.is_favorited}
+                  />
                 </CardContent>
                 <CardFooter className="p-0 border-t mt-6 pt-6 flex flex-col items-start gap-4">
                   <div className="flex items-start gap-4 text-sm"><Tag className="h-5 w-5 text-primary mt-1 flex-shrink-0" /><p><span className="font-bold">Thème</span><br /><span className="text-muted-foreground">{club.theme_principal || 'Non défini'}</span></p></div>

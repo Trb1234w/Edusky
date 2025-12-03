@@ -43,7 +43,7 @@ export async function getAllArticles(): Promise<{ data: any[] | null; error: str
         const supabase = await createClient();
         console.log('[getAllArticles] Supabase client created');
 
-        const { data, error } = await supabase.rpc('get_articles', {
+        const { data: articlesData, error } = await supabase.rpc('get_articles', {
             search_term: null,
             category_slug: null,
             min_vues: null,
@@ -51,17 +51,39 @@ export async function getAllArticles(): Promise<{ data: any[] | null; error: str
             sort_by: 'publie_at_desc'
         });
 
-        console.log('[getAllArticles] RPC call completed');
-        console.log('[getAllArticles] Data received:', data ? `${data.length} articles` : 'null');
-        console.log('[getAllArticles] Error:', error);
-
         if (error) {
             console.error("Error fetching articles via RPC:", error);
             return { data: null, error: error.message };
         }
 
+        let articles = articlesData || [];
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            const { data: favoritesData, error: favoritesError } = await supabase
+                .from('favoris')
+                .select('item_id')
+                .eq('user_id', user.id)
+                .eq('type_item', 'article');
+
+            if (favoritesError) {
+                console.error("Error fetching user favorites:", favoritesError);
+            } else {
+                const favoriteItemIds = new Set(favoritesData?.map(fav => fav.item_id));
+                articles = articles.map((article: any) => ({
+                    ...article,
+                    is_favorited: favoriteItemIds.has(article.id)
+                }));
+            }
+        } else {
+            articles = articles.map((article: any) => ({
+                ...article,
+                is_favorited: false
+            }));
+        }
+
         console.log('[getAllArticles] Returning data successfully');
-        return { data: data || [], error: null };
+        return { data: articles, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllArticles:", e);
         return { data: null, error: e.message || "An unexpected error occurred." };

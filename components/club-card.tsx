@@ -49,7 +49,6 @@ export function ClubCard({
     startTransition(async () => {
       addOptimisticFavorite(null);
       await toggleFavoriteAction('club', id);
-      router.refresh();
     });
   };
 
@@ -134,8 +133,8 @@ export function ClubCard({
             </Button>
           </div>
         </div>
-      </Card>
-    </Link>
+      </Card >
+    </Link >
   )
 }
 

@@ -59,7 +59,6 @@ export function EventCard({
         startTransition(async () => {
             addOptimisticFavorite(null);
             await toggleFavoriteAction('evenement', id);
-            router.refresh();
         });
     };
 

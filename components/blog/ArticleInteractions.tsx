@@ -7,12 +7,15 @@ import { toggleArticleLike } from "@/app/blog/actions"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
+import { ContentActions } from "@/components/content-actions"
+
 interface ArticleInteractionsProps {
     articleId: string
     initialLikesCount: number
     initialCommentsCount: number
     initialViews: number
     initialUserLiked: boolean
+    initialIsFavorited: boolean
 }
 
 export function ArticleInteractions({
@@ -20,7 +23,8 @@ export function ArticleInteractions({
     initialLikesCount,
     initialCommentsCount,
     initialViews,
-    initialUserLiked
+    initialUserLiked,
+    initialIsFavorited
 }: ArticleInteractionsProps) {
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
@@ -89,21 +93,17 @@ export function ArticleInteractions({
                 </Button>
                 <div className="text-xs text-muted-foreground">{initialViews}</div>
 
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full bg-background/50 backdrop-blur-sm border-white/20 hover:bg-background/80"
-                >
-                    <Bookmark className="h-5 w-5" />
-                </Button>
-
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full bg-background/50 backdrop-blur-sm border-white/20 hover:bg-background/80"
-                >
-                    <Share2 className="h-5 w-5" />
-                </Button>
+                <div className="flex flex-col gap-4">
+                    <ContentActions
+                        itemId={articleId}
+                        itemTitle="Article" // We don't have the title here easily unless passed, but it's for sharing.
+                        itemType="article"
+                        initialIsFavorited={initialIsFavorited}
+                        variant="mobile"
+                        className="flex-col gap-4"
+                        FavoriteIcon={Bookmark}
+                    />
+                </div>
             </aside>
 
             {/* Mobile Sticky Bar - 5 boutons */}
@@ -130,15 +130,15 @@ export function ArticleInteractions({
                         <span className="text-xs">{initialViews}</span>
                     </Button>
 
-                    <Button variant="ghost" className="flex flex-col h-auto p-2 gap-1 text-muted-foreground rounded-lg">
-                        <Bookmark className="h-5 w-5" />
-                        <span className="text-xs">Sauver</span>
-                    </Button>
-
-                    <Button variant="ghost" className="flex flex-col h-auto p-2 gap-1 text-muted-foreground rounded-lg">
-                        <Share2 className="h-5 w-5" />
-                        <span className="text-xs">Partager</span>
-                    </Button>
+                    <ContentActions
+                        itemId={articleId}
+                        itemTitle="Article"
+                        itemType="article"
+                        initialIsFavorited={initialIsFavorited}
+                        variant="mobile"
+                        FavoriteIcon={Bookmark}
+                        className="gap-8" // Add some gap between the two buttons
+                    />
                 </div>
             </div>
         </>

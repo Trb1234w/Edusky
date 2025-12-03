@@ -145,7 +145,7 @@ export async function getAllClubs(): Promise<{ data: any[] | null; error: string
         const supabase = await createClient();
         console.log('[getAllClubs] Supabase client created');
 
-        const { data, error } = await supabase.rpc('get_clubs', {
+        const { data: clubsData, error } = await supabase.rpc('get_clubs', {
             search_term: null,
             category_slug: null,
             statut_filter: null,
@@ -153,17 +153,39 @@ export async function getAllClubs(): Promise<{ data: any[] | null; error: string
             sort_by: 'created_at_desc'
         });
 
-        console.log('[getAllClubs] RPC call completed');
-        console.log('[getAllClubs] Data received:', data ? `${data.length} clubs` : 'null');
-        console.log('[getAllClubs] Error:', error);
-
         if (error) {
             console.error("Error fetching clubs via RPC:", error);
             return { data: null, error: error.message };
         }
 
+        let clubs = clubsData || [];
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            const { data: favoritesData, error: favoritesError } = await supabase
+                .from('favoris')
+                .select('item_id')
+                .eq('user_id', user.id)
+                .eq('type_item', 'club');
+
+            if (favoritesError) {
+                console.error("Error fetching user favorites:", favoritesError);
+            } else {
+                const favoriteItemIds = new Set(favoritesData?.map(fav => fav.item_id));
+                clubs = clubs.map((club: any) => ({
+                    ...club,
+                    is_favorited: favoriteItemIds.has(club.id)
+                }));
+            }
+        } else {
+            clubs = clubs.map((club: any) => ({
+                ...club,
+                is_favorited: false
+            }));
+        }
+
         console.log('[getAllClubs] Returning data successfully');
-        return { data: data || [], error: null };
+        return { data: clubs, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllClubs:", e);
         return { data: null, error: e.message || "An unexpected error occurred." };

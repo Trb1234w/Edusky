@@ -67,6 +67,7 @@ import { ProgrammeTab } from '@/components/formations/tabs/ProgrammeTab';
 import { HorairesTab } from '@/components/formations/tabs/HorairesTab';
 import { InfosTab } from '@/components/formations/tabs/InfosTab';
 import { SessionsTab } from '@/components/formations/tabs/SessionsTab';
+import { FormationActions } from '@/components/formations/formation-actions';
 
 
 const formatPrice = (price: number | null | undefined) => {
@@ -128,12 +129,12 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
         </Link>
         <span className="font-bold text-lg truncate flex-1 text-center">{formation.titre}</span>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Heart className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Share2 className="h-5 w-5" />
-          </Button>
+          <FormationActions
+            formationId={formation.id}
+            formationTitle={formation.titre}
+            initialIsFavorited={formation.is_favorited || false}
+            variant="mobile"
+          />
         </div>
       </div>
 
@@ -335,9 +336,12 @@ export default async function FormationDetailsPage({ params }: { params: { id: s
                 <CardTitle className="text-3xl font-extrabold text-primary">{formatPrice(formation.prix_indicatif)}</CardTitle>
                 <CardContent className="p-0 mt-6 space-y-3">
                   <InscriptionModal formationId={formation.id} formationTitle={formation.titre} />
-                  <Button size="lg" variant="outline" className="w-full text-lg font-semibold rounded-xl py-3">
-                    <Heart className="mr-2 h-5 w-5" /> Ajouter aux favoris
-                  </Button>
+                  <FormationActions
+                    formationId={formation.id}
+                    formationTitle={formation.titre}
+                    initialIsFavorited={formation.is_favorited || false}
+                    variant="desktop"
+                  />
                 </CardContent>
                 <CardFooter className="p-0 border-t mt-6 pt-6 flex flex-col items-start gap-3">
                   <h3 className="font-bold text-lg mb-2">Ce cours inclut :</h3>

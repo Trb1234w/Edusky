@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { getAllClubs, getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations, getDistinctClubLocationsData, getDistinctClubLangues } from "@/app/clubs/get-data"
+import { getDistinctClubTags, getDistinctClubThemes, getDistinctClubLocations, getDistinctClubLocationsData, getDistinctClubLangues } from "@/app/clubs/get-data"
 import { ClubsList } from "@/app/clubs/clubs-list"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,12 +42,13 @@ const iconMap: { [key: string]: React.ElementType } = {
 
 interface ClubsFilterWrapperProps {
   gradient?: string
+  initialClubs: any[]
 }
 
-export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
+export function ClubsFilterWrapper({ gradient, initialClubs }: ClubsFilterWrapperProps) {
   const router = useRouter()
-  const [allClubs, setAllClubs] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [allClubs, setAllClubs] = useState<any[]>(initialClubs)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Location data
   const [locations, setLocations] = useState<{
@@ -81,38 +82,10 @@ export function ClubsFilterWrapper({ gradient }: ClubsFilterWrapperProps) {
     langues: undefined,
   })
 
+  // Sync with initialClubs if they change
   useEffect(() => {
-    const fetchClubsAndFavorites = async () => {
-      setIsLoading(true)
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      const currentUserId = user?.id
-
-      const { data: clubsData } = await getAllClubs()
-      let fetchedClubs = clubsData || []
-
-      if (currentUserId) {
-        const { data: favoritesData, error: favoritesError } = await supabase
-          .from('favoris')
-          .select('item_id')
-          .eq('user_id', currentUserId)
-          .eq('type_item', 'club')
-
-        if (favoritesError) console.error("Error fetching user favorites:", favoritesError)
-        else {
-          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id))
-          fetchedClubs = fetchedClubs.map((club: any) => ({
-            ...club,
-            is_favorited: favoriteItemIds.has(club.id),
-          }))
-        }
-      }
-
-      setAllClubs(fetchedClubs)
-      setIsLoading(false)
-    }
-    fetchClubsAndFavorites()
-  }, [])
+    setAllClubs(initialClubs);
+  }, [initialClubs]);
 
   // Fetch tags, themes, locations, and langues on mount
   useEffect(() => {

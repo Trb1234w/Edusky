@@ -75,7 +75,7 @@ export async function getAllEvenements(): Promise<{ data: any[] | null; error: s
         const supabase = await createClient();
         console.log('[getAllEvenements] Supabase client created');
 
-        const { data, error } = await supabase.rpc('get_evenements', {
+        const { data: eventsData, error } = await supabase.rpc('get_evenements', {
             search_term: null,
             category_slug: null,
             mode_filter: null,
@@ -86,17 +86,39 @@ export async function getAllEvenements(): Promise<{ data: any[] | null; error: s
             sort_by: 'date_debut_asc'
         });
 
-        console.log('[getAllEvenements] RPC call completed');
-        console.log('[getAllEvenements] Data received:', data ? `${data.length} events` : 'null');
-        console.log('[getAllEvenements] Error:', error);
-
         if (error) {
             console.error("Error fetching events via RPC:", error);
             return { data: null, error: error.message };
         }
 
+        let events = eventsData || [];
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            const { data: favoritesData, error: favoritesError } = await supabase
+                .from('favoris')
+                .select('item_id')
+                .eq('user_id', user.id)
+                .eq('type_item', 'evenement');
+
+            if (favoritesError) {
+                console.error("Error fetching user favorites:", favoritesError);
+            } else {
+                const favoriteItemIds = new Set(favoritesData?.map(fav => fav.item_id));
+                events = events.map((event: any) => ({
+                    ...event,
+                    is_favorited: favoriteItemIds.has(event.id)
+                }));
+            }
+        } else {
+            events = events.map((event: any) => ({
+                ...event,
+                is_favorited: false
+            }));
+        }
+
         console.log('[getAllEvenements] Returning data successfully');
-        return { data: data || [], error: null };
+        return { data: events, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllEvenements:", e);
         return { data: null, error: e.message || "An unexpected error occurred." };

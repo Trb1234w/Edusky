@@ -23,7 +23,24 @@ export async function getArticleById(id: string) {
     return { data: null, error };
   }
 
-  return { data, error };
+  // Check if favorited
+  const { createClient: createServerClient } = await import('@/lib/supabase/server');
+  const supabaseServer = await createServerClient();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  let isFavorited = false;
+  if (user) {
+    const { data: favoriteData } = await supabaseAdmin
+      .from('favoris')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('item_id', id)
+      .eq('type_item', 'article')
+      .single();
+    isFavorited = !!favoriteData;
+  }
+
+  return { data: { ...data, is_favorited: isFavorited }, error };
 }
 
 export async function getRelatedArticlesByCategory(currentArticleId: string, categoryId: number | null) {

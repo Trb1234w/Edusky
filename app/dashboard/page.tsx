@@ -246,19 +246,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
-                <div className="space-y-6">
-                  <Card className="border-border">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <Calendar size={20} className="text-accent" />
-                        Événements à venir
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground text-center py-8">Aucun événement à venir.</p>
-                    </CardContent>
-                  </Card>
-                </div>
+
               </div>
             </TabsContent>
             <TabsContent value="followers" className="mt-6 px-4 md:px-0">

@@ -44,7 +44,9 @@ const iconMap: { [key: string]: React.ElementType } = {
   Users,
 }
 
-interface FormationsFilterWrapperProps { }
+interface FormationsFilterWrapperProps {
+  initialFormations: any[];
+}
 
 interface Location {
   id: string;
@@ -59,10 +61,15 @@ interface Quartier extends Location {
   ville_id: string;
 }
 
-export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
+export function FormationsFilterWrapper({ initialFormations }: FormationsFilterWrapperProps) {
   const router = useRouter();
-  const [allFormations, setAllFormations] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [allFormations, setAllFormations] = useState<any[]>(initialFormations)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Update state when props change (e.g. after server action revalidation)
+  useEffect(() => {
+    setAllFormations(initialFormations);
+  }, [initialFormations]);
 
   // Location data
   const [locations, setLocations] = useState<{
@@ -97,40 +104,6 @@ export function FormationsFilterWrapper({ }: FormationsFilterWrapperProps) {
     langue_enseignement: undefined,
     placesDisponibles: undefined,
   })
-
-  useEffect(() => {
-    const fetchFormationsAndFavorites = async () => {
-      setIsLoading(true)
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      const currentUserId = user?.id;
-
-      const { data: formationsData } = await getAllFormations()
-      let fetchedFormations = formationsData || [];
-
-      if (currentUserId) {
-        const { data: favoritesData, error: favoritesError } = await supabase
-          .from('favoris')
-          .select('item_id')
-          .eq('user_id', currentUserId)
-          .eq('type_item', 'formation');
-
-        if (favoritesError) {
-          console.error("Error fetching user favorites:", favoritesError);
-        } else {
-          const favoriteItemIds = new Set(favoritesData.map(fav => fav.item_id));
-          fetchedFormations = fetchedFormations.map((formation: any) => ({
-            ...formation,
-            is_favorited: favoriteItemIds.has(formation.id)
-          }));
-        }
-      }
-
-      setAllFormations(fetchedFormations);
-      setIsLoading(false);
-    }
-    fetchFormationsAndFavorites();
-  }, [])
 
   // Fetch locations and tags on mount
   useEffect(() => {

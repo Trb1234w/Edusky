@@ -115,6 +115,9 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
         const supabase = await createClient();
         console.log('[getAllFormations] Supabase client created');
 
+        const { data: { user } } = await supabase.auth.getUser();
+        const currentUserId = user?.id;
+
         const { data: formations, error } = await supabase
             .from('formations')
             .select(`
@@ -136,9 +139,11 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
             return { data: null, error: error.message };
         }
 
+        let formationsWithFavorites = formations || [];
+
         // Manually fetch profiles for professors to avoid missing FK constraint issues
-        if (formations && formations.length > 0) {
-            const professorIds = Array.from(new Set(formations
+        if (formationsWithFavorites.length > 0) {
+            const professorIds = Array.from(new Set(formationsWithFavorites
                 .map((f: any) => f.professeur?.id)
                 .filter((id: any) => id)));
 
@@ -151,7 +156,7 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
                 if (profiles) {
                     const profilesMap = new Map(profiles.map((p: any) => [p.id, p]));
 
-                    formations.forEach((f: any) => {
+                    formationsWithFavorites.forEach((f: any) => {
                         if (f.professeur && f.professeur.id) {
                             f.professeur.profiles = profilesMap.get(f.professeur.id);
                         }
@@ -160,7 +165,27 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
             }
         }
 
-        return { data: formations || [], error: null };
+        // Add is_favorited status
+        if (currentUserId && formationsWithFavorites.length > 0) {
+            const { data: favoritesData } = await supabase
+                .from('favoris')
+                .select('item_id')
+                .eq('user_id', currentUserId)
+                .eq('type_item', 'formation');
+
+            const favoriteItemIds = new Set(favoritesData?.map(fav => fav.item_id) || []);
+            formationsWithFavorites = formationsWithFavorites.map((formation: any) => ({
+                ...formation,
+                is_favorited: favoriteItemIds.has(formation.id)
+            }));
+        } else {
+            formationsWithFavorites = formationsWithFavorites.map((formation: any) => ({
+                ...formation,
+                is_favorited: false
+            }));
+        }
+
+        return { data: formationsWithFavorites, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllFormations:", e);
         return { data: null, error: e.message || "An unexpected error occurred." };

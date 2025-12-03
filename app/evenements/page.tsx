@@ -1,9 +1,10 @@
-import { Button } from "@/components/ui/button"
-import { Calendar } from "lucide-react"
-import { EvenementsHero } from "@/components/evenements/EvenementsHero"
+import { getAllEvenements } from "./get-data"
 import { EvenementsFilterWrapper } from "@/components/evenements-filter-wrapper"
+import { EvenementsHero } from "@/components/evenements/EvenementsHero"
 
 export default async function EvenementsPage() {
+  const { data: events } = await getAllEvenements()
+
   return (
     <main className="flex-1 pt-1 lg:pt-20">
       {/* Hero Section */}
@@ -12,7 +13,7 @@ export default async function EvenementsPage() {
       </div>
 
       {/* Le wrapper gère maintenant toute la logique de filtrage et d'affichage */}
-      <EvenementsFilterWrapper />
+      <EvenementsFilterWrapper initialEvents={events || []} />
 
     </main>
   )
