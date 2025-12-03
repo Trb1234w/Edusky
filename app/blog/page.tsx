@@ -1,10 +1,11 @@
-import { getAllArticles } from "./get-data"
-import { BlogFilterWrapper } from "@/components/blog-filter-wrapper"
+import { Suspense } from "react"
 import { BlogHero } from "@/components/blog/BlogHero"
+import { BlogContent } from "./blog-content"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Card } from "@/components/ui/card"
+import { BlogStickyHeaderStatic } from "@/components/blog/BlogStickyHeaderStatic"
 
-export default async function BlogPage() {
-  const { data: articles } = await getAllArticles()
-
+export default function BlogPage() {
   return (
     <main className="flex-1 pt-1 lg:pt-20">
       {/* Hero Section */}
@@ -12,8 +13,31 @@ export default async function BlogPage() {
         <BlogHero />
       </div>
 
-      {/* Le wrapper gère maintenant toute la logique de filtrage et d'affichage */}
-      <BlogFilterWrapper initialArticles={articles || []} />
+      {/* Static Sticky Header for Mobile - Shows immediately */}
+      <BlogStickyHeaderStatic />
+
+      <Suspense fallback={
+        <div className="container mx-auto px-4 lg:px-8 pt-52 lg:pt-0 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="h-full flex flex-col overflow-hidden rounded-2xl">
+                <Skeleton className="h-40 w-full" />
+                <div className="p-4 flex-1 flex flex-col">
+                  <Skeleton className="h-6 w-2/3 mb-2" />
+                  <Skeleton className="h-4 w-1/2 mb-3" />
+                  <Skeleton className="h-12 w-full mb-4" />
+                  <div className="flex justify-between mt-auto">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      }>
+        <BlogContent />
+      </Suspense>
 
     </main>
   )

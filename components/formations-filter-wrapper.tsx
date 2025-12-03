@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/custom-bottom-sheet"
 import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 import { FormationSidebar } from "./ui/formation-sidebar"
+import { FormationsStickyHeader } from "./formations/FormationsStickyHeader"
 
 const iconMap: { [key: string]: React.ElementType } = {
   BarChartHorizontal,
@@ -289,203 +290,15 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
   return (
     <>
       {/* Mobile-only Filter UI - Fixed at top */}
-      <div className="lg:hidden">
-        <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-          <div className="md:hidden px-4 py-2 border-b flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
-              onClick={() => router.back()}
-            >
-              <ArrowLeft size={16} />
-            </Button>
-            <span className="text-lg font-semibold ml-2">Formations</span>
-          </div>
-          <div className="px-4 py-2 border-b">
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-              <Input
-                placeholder="Rechercher une formation..."
-                className="pl-10 h-10 rounded-xl border-border/50 focus:ring-2 focus:ring-primary"
-                value={filters.search}
-                onChange={e => handleFilterChange("search", e.target.value)}
-              />
-            </form>
-          </div>
-
-          <div className="flex items-center gap-2 px-4 py-2 border-b overflow-x-auto [&::-webkit-scrollbar]:hidden">
-            <CustomBottomSheet>
-              <CustomBottomSheetTrigger asChild>
-                <Button variant="outline" size="sm" className="rounded-xl">
-                  <SlidersHorizontal size={16} />
-                </Button>
-              </CustomBottomSheetTrigger>
-              <CustomBottomSheetContent>
-                <CustomBottomSheetHeader>
-                  <CustomBottomSheetTitle>Tous les filtres</CustomBottomSheetTitle>
-                </CustomBottomSheetHeader>
-                <div className="grid gap-4 py-4">
-                  {[...mainFiltersConfig, ...locationFiltersConfig, ...secondaryFiltersConfig].map(filter => (
-                    <div key={filter.name}>
-                      <h4 className="font-semibold mb-2">{filter.label}</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {filter.options.map(option => (
-                          <CustomBottomSheetClose asChild key={option.label}>
-                            <Button
-                              variant={filters[filter.name] === option.value ? "default" : "outline"}
-                              onClick={() => handleFilterChange(filter.name, option.value)}
-                            >
-                              {option.label}
-                            </Button>
-                          </CustomBottomSheetClose>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CustomBottomSheetContent>
-            </CustomBottomSheet>
-            {mainFiltersConfig.map(filter => {
-              const Icon = iconMap[filter.icon]
-              const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
-              return (
-                <CustomBottomSheet key={filter.name}>
-                  <CustomBottomSheetTrigger asChild>
-                    <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
-                      {Icon && <Icon size={16} className="mr-1.5" />}
-                      {displayValue}
-                    </Button>
-                  </CustomBottomSheetTrigger>
-                  <CustomBottomSheetContent>
-                    <CustomBottomSheetHeader>
-                      <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
-                    </CustomBottomSheetHeader>
-                    <div className="grid grid-cols-2 gap-2">
-                      {filter.options.map(option => (
-                        <CustomBottomSheetClose asChild key={option.label}>
-                          <Button
-                            variant={filters[filter.name] === option.value ? "default" : "outline"}
-                            onClick={() => handleFilterChange(filter.name, option.value)}
-                          >
-                            {option.label}
-                          </Button>
-                        </CustomBottomSheetClose>
-                      ))}
-                    </div>
-                  </CustomBottomSheetContent>
-                </CustomBottomSheet>
-              )
-            })}
-            {/* Location filters in mobile */}
-            {locationFiltersConfig.map(filter => {
-              const Icon = iconMap[filter.icon]
-              const displayValue = filter.options.find(opt => opt.value === filters[filter.name])?.label || filter.label
-              return (
-                <CustomBottomSheet key={filter.name}>
-                  <CustomBottomSheetTrigger asChild>
-                    <Button variant={filters[filter.name] !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
-                      {Icon && <Icon size={16} className="mr-1.5" />}
-                      {displayValue}
-                    </Button>
-                  </CustomBottomSheetTrigger>
-                  <CustomBottomSheetContent>
-                    <CustomBottomSheetHeader>
-                      <CustomBottomSheetTitle>Filtrer par {filter.label}</CustomBottomSheetTitle>
-                    </CustomBottomSheetHeader>
-                    <div className="grid grid-cols-2 gap-2">
-                      {filter.options.map(option => (
-                        <CustomBottomSheetClose asChild key={option.label}>
-                          <Button
-                            variant={filters[filter.name] === option.value ? "default" : "outline"}
-                            onClick={() => handleFilterChange(filter.name, option.value)}
-                          >
-                            {option.label}
-                          </Button>
-                        </CustomBottomSheetClose>
-                      ))}
-                    </div>
-                  </CustomBottomSheetContent>
-                </CustomBottomSheet>
-              )
-            })}
-            {/* Tags filter in mobile */}
-            {availableTags.length > 0 && (
-              <CustomBottomSheet>
-                <CustomBottomSheetTrigger asChild>
-                  <Button variant={filters.tags !== undefined ? "default" : "outline"} size="sm" className="rounded-xl">
-                    <Tag size={16} className="mr-1.5" />
-                    {filters.tags || "Tags"}
-                  </Button>
-                </CustomBottomSheetTrigger>
-                <CustomBottomSheetContent>
-                  <CustomBottomSheetHeader>
-                    <CustomBottomSheetTitle>Filtrer par Tags</CustomBottomSheetTitle>
-                  </CustomBottomSheetHeader>
-                  <div className="grid grid-cols-2 gap-2">
-                    <CustomBottomSheetClose asChild>
-                      <Button
-                        variant={filters.tags === undefined ? "default" : "outline"}
-                        onClick={() => handleFilterChange("tags", undefined)}
-                      >
-                        Tous les tags
-                      </Button>
-                    </CustomBottomSheetClose>
-                    {availableTags.map(tag => (
-                      <CustomBottomSheetClose asChild key={tag}>
-                        <Button
-                          variant={filters.tags === tag ? "default" : "outline"}
-                          onClick={() => handleFilterChange("tags", tag)}
-                        >
-                          {tag}
-                        </Button>
-                      </CustomBottomSheetClose>
-                    ))}
-                  </div>
-                </CustomBottomSheetContent>
-              </CustomBottomSheet>
-            )}
-            {/* Capacity filter in mobile */}
-            <CustomBottomSheet>
-              <CustomBottomSheetTrigger asChild>
-                <Button variant={filters.hasCapacity ? "default" : "outline"} size="sm" className="rounded-xl">
-                  <Users size={16} className="mr-1.5" />
-                  {filters.hasCapacity ? "Places dispo" : "Capacité"}
-                </Button>
-              </CustomBottomSheetTrigger>
-              <CustomBottomSheetContent>
-                <CustomBottomSheetHeader>
-                  <CustomBottomSheetTitle>Filtrer par Capacité</CustomBottomSheetTitle>
-                </CustomBottomSheetHeader>
-                <div className="grid grid-cols-2 gap-2">
-                  <CustomBottomSheetClose asChild>
-                    <Button
-                      variant={filters.hasCapacity === undefined ? "default" : "outline"}
-                      onClick={() => handleFilterChange("hasCapacity", undefined)}
-                    >
-                      Toutes
-                    </Button>
-                  </CustomBottomSheetClose>
-                  <CustomBottomSheetClose asChild>
-                    <Button
-                      variant={filters.hasCapacity === true ? "default" : "outline"}
-                      onClick={() => handleFilterChange("hasCapacity", true)}
-                    >
-                      Places disponibles
-                    </Button>
-                  </CustomBottomSheetClose>
-                </div>
-              </CustomBottomSheetContent>
-            </CustomBottomSheet>
-          </div>
-
-          <HorizontalCategoryNav
-            scope="formation"
-            selectedSlugs={filters.categorySlugs}
-            onCategorySelect={(slugs) => handleFilterChange("categorySlugs", slugs)}
-          />
-        </div>
-      </div>
+      <FormationsStickyHeader
+        filters={filters}
+        handleFilterChange={handleFilterChange}
+        handleSearchSubmit={handleSearchSubmit}
+        mainFiltersConfig={mainFiltersConfig}
+        locationFiltersConfig={locationFiltersConfig}
+        secondaryFiltersConfig={secondaryFiltersConfig}
+        availableTags={availableTags}
+      />
 
       {/* Main Content with proper spacing for fixed header on mobile */}
       <div className="container mx-auto px-4 lg:px-8 pt-48 lg:pt-0">

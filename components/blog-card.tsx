@@ -29,6 +29,7 @@ interface BlogCardProps {
   featured?: boolean
   is_favorited: boolean
   tags?: string[]
+  onToggle?: (newStatus: boolean) => void
 }
 
 export function BlogCard({
@@ -48,6 +49,7 @@ export function BlogCard({
   featured = false,
   is_favorited: initialIsFavorited,
   tags,
+  onToggle,
 }: BlogCardProps) {
   const router = useRouter();
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -57,8 +59,12 @@ export function BlogCard({
   const [isPending, startTransition] = useTransition();
 
   const handleToggleFavorite = () => {
+    const newStatus = !optimisticIsFavorited;
     startTransition(async () => {
       addOptimisticFavorite(null);
+      if (onToggle) {
+        onToggle(newStatus);
+      }
       await toggleFavoriteAction('article', id);
     });
   };

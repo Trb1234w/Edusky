@@ -6,6 +6,7 @@ import { ClubCard } from "@/components/club-card"
 import { BlogCard } from "@/components/blog-card"
 import { ProfesseurCard } from "@/components/professeur-card"
 import { Card } from "@/components/ui/card"
+import { useState, useEffect } from "react"
 
 interface FavoriteItem {
   id: string;
@@ -27,6 +28,19 @@ interface FavoritesListProps {
 }
 
 export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
+  const [localFavorites, setLocalFavorites] = useState<FavoriteItem[]>(favorites);
+
+  useEffect(() => {
+    setLocalFavorites(favorites);
+  }, [favorites]);
+
+  const handleToggle = (id: string, newStatus: boolean) => {
+    if (!newStatus) {
+      // If unliked, remove from list
+      setLocalFavorites(prev => prev.filter(item => item.id !== id));
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -37,32 +51,91 @@ export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
     )
   }
 
-  if (favorites.length === 0) {
+  if (localFavorites.length === 0) {
     return <Card className="p-8 text-center text-muted-foreground">Vous n'avez encore aucun favori.</Card>;
   }
 
   const renderCard = (item: FavoriteItem) => {
-    // We need to map the generic favorite item to specific card props
-    // This is a simplified mapping, it might need adjustments based on card prop requirements
     const commonProps = {
       id: item.id,
       title: item.title || "",
       description: item.description || "",
       image: item.image_url || "/placeholder.png",
-      is_favorited: true, // All items in this list are favorites
+      is_favorited: true,
+      onToggle: (newStatus: boolean) => handleToggle(item.id, newStatus),
     };
 
     switch (item.type) {
       case 'formation':
-        return <CourseCard {...commonProps} instructor={item.author || "N/A"} category={item.category || ""} {...item} />;
+        return (
+          <CourseCard
+            {...commonProps}
+            instructor={item.author || "N/A"}
+            category={item.category || ""}
+            level={item.level || "N/A"}
+            duration={item.duration || "N/A"}
+            students={item.students || 0}
+            rating={item.rating || 0}
+            price={item.price || "Gratuit"}
+            {...item}
+          />
+        );
       case 'evenement':
-        return <EventCard {...commonProps} organizer={item.author || "N/A"} category={item.category || ""} {...item} />;
+        return (
+          <EventCard
+            {...commonProps}
+            organizer={item.author || "N/A"}
+            category={item.category || ""}
+            date={item.date || "Date inconnue"}
+            time={item.time || "Heure inconnue"}
+            location={item.location || "Lieu inconnu"}
+            participants={item.participants || 0}
+            maxParticipants={item.maxParticipants || 0}
+            status={item.status || "upcoming"}
+            {...item}
+          />
+        );
       case 'club':
-        return <ClubCard {...commonProps} name={item.title || ""} president={item.author || "N/A"} category={item.category || ""} {...item} />;
+        return (
+          <ClubCard
+            {...commonProps}
+            name={item.title || ""}
+            president={item.author || "N/A"}
+            category={item.category || ""}
+            members={item.members || 0}
+            activities={item.activities || "Activités diverses"}
+            {...item}
+          />
+        );
       case 'article':
-        return <BlogCard {...commonProps} excerpt={item.description || ""} author={item.author || "N/A"} category={item.category || ""} {...item} />;
+        return (
+          <BlogCard
+            {...commonProps}
+            excerpt={item.description || ""}
+            author={item.author || "N/A"}
+            category={item.category || ""}
+            authorRole={item.authorRole || "Auteur"}
+            authorAvatar={item.authorAvatar || ""}
+            date={item.date || new Date().toISOString()}
+            readTime={item.readTime || "5 min"}
+            views={item.views || 0}
+            likes={item.likes || 0}
+            comments={item.comments || 0}
+            {...item}
+          />
+        );
       case 'professeur':
-        return <ProfesseurCard {...commonProps} name={item.title || ""} title={item.category || ""} avatarUrl={item.image_url || "/placeholder.svg"} {...item} />;
+        return (
+          <ProfesseurCard
+            full_name={item.title || "Professeur"}
+            avatar_url={item.image_url || "/placeholder.svg"}
+            titre={item.category || "Enseignant"}
+            specialites={item.specialites || []}
+            note_moyenne={item.note_moyenne || 0}
+            nb_etudiants_formes={item.nb_etudiants_formes || 0}
+            {...item}
+          />
+        );
       default:
         return (
           <Card className="p-4">
@@ -75,7 +148,7 @@ export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {favorites.map((item) => (
+      {localFavorites.map((item) => (
         <div key={`${item.type}-${item.id}`}>
           {renderCard(item)}
         </div>

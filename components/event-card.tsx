@@ -29,6 +29,7 @@ interface EventCardProps {
     is_favorited: boolean
     price?: number
     isFree?: boolean
+    onToggle?: (newStatus: boolean) => void
 }
 
 export function EventCard({
@@ -47,6 +48,7 @@ export function EventCard({
     is_favorited: initialIsFavorited,
     price,
     isFree,
+    onToggle,
 }: EventCardProps) {
     const router = useRouter();
     const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -56,8 +58,12 @@ export function EventCard({
     const [isPending, startTransition] = useTransition();
 
     const handleToggleFavorite = () => {
+        const newStatus = !optimisticIsFavorited;
         startTransition(async () => {
             addOptimisticFavorite(null);
+            if (onToggle) {
+                onToggle(newStatus);
+            }
             await toggleFavoriteAction('evenement', id);
         });
     };

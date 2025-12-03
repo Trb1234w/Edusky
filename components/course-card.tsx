@@ -25,6 +25,7 @@ interface CourseCardProps {
   is_favorited: boolean
   language?: string
   certificate?: boolean
+  onToggle?: (newStatus: boolean) => void
 }
 
 export function CourseCard({
@@ -42,6 +43,7 @@ export function CourseCard({
   is_favorited: initialIsFavorited,
   language,
   certificate,
+  onToggle,
 }: CourseCardProps) {
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
     initialIsFavorited,
@@ -50,8 +52,12 @@ export function CourseCard({
   const [isPending, startTransition] = useTransition();
 
   const handleToggleFavorite = () => {
+    const newStatus = !optimisticIsFavorited;
     startTransition(async () => {
       addOptimisticFavorite(null);
+      if (onToggle) {
+        onToggle(newStatus);
+      }
       await toggleFavoriteAction('formation', id);
     });
   };

@@ -23,6 +23,7 @@ interface ClubCardProps {
   verified?: boolean
   is_favorited: boolean
   fees?: string | number
+  onToggle?: (newStatus: boolean) => void
 }
 
 export function ClubCard({
@@ -37,6 +38,7 @@ export function ClubCard({
   verified = false,
   is_favorited: initialIsFavorited,
   fees,
+  onToggle,
 }: ClubCardProps) {
   const router = useRouter();
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -46,8 +48,12 @@ export function ClubCard({
   const [isPending, startTransition] = useTransition();
 
   const handleToggleFavorite = () => {
+    const newStatus = !optimisticIsFavorited;
     startTransition(async () => {
       addOptimisticFavorite(null);
+      if (onToggle) {
+        onToggle(newStatus);
+      }
       await toggleFavoriteAction('club', id);
     });
   };

@@ -2,20 +2,20 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { findOrCreateConversationAction } from "@/app/messages/actions";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { followUserAction } from "@/app/users/actions";
 
 interface Profile {
   id: string;
   full_name: string | null;
-  username: string | null; // Added
+  username: string | null;
   avatar_url: string | null;
   bio: string | null;
-  isFollowing?: boolean; // Optionnel, à ajouter plus tard si besoin du bouton Suivre
+  isFollowing?: boolean;
 }
 
 interface FollowersListProps {
@@ -28,9 +28,14 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
   const { toast } = useToast();
   const [creatingConversationForUser, setCreatingConversationForUser] = useState<string | null>(null);
   const [loadingFollow, setLoadingFollow] = useState<string | null>(null);
+  const [localProfiles, setLocalProfiles] = useState<Profile[]>(profiles);
+
+  useEffect(() => {
+    setLocalProfiles(profiles);
+  }, [profiles]);
 
   const handleMessageUser = async (e: React.MouseEvent, otherUserId: string) => {
-    e.stopPropagation(); // Prevent navigation when clicking message button
+    e.stopPropagation();
     if (creatingConversationForUser === otherUserId) return;
     setCreatingConversationForUser(otherUserId);
 
@@ -45,33 +50,37 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
   };
 
   const handleFollowUser = async (e: React.MouseEvent, targetUserId: string, isFollowing: boolean) => {
-    e.stopPropagation(); // Prevent navigation
+    e.stopPropagation();
     if (loadingFollow === targetUserId) return;
+
+    // Optimistic update
+    setLocalProfiles(prev => prev.map(p =>
+      p.id === targetUserId ? { ...p, isFollowing: !isFollowing } : p
+    ));
+
     setLoadingFollow(targetUserId);
 
-    // Optimistic update could be done here if we had state management for the list,
-    // but for now we'll rely on router.refresh() or just wait for the action.
-    // Actually, let's just trigger the action and refresh.
-
-    // Import followUserAction dynamically or assume it's available. 
-    // Since this is a client component, we need to import the server action.
-    // I'll add the import at the top.
-
     try {
-      const { followUserAction } = await import('@/app/users/actions');
       const { error } = await followUserAction(currentUserId, targetUserId);
 
       if (error) {
+        // Revert on error
+        setLocalProfiles(prev => prev.map(p =>
+          p.id === targetUserId ? { ...p, isFollowing: isFollowing } : p
+        ));
         toast({ title: "Erreur", description: error, variant: "destructive" });
       } else {
         toast({
           title: isFollowing ? "Désabonné" : "Abonné",
           description: isFollowing ? "Vous ne suivez plus cet utilisateur." : "Vous suivez maintenant cet utilisateur."
         });
-        router.refresh();
       }
     } catch (err) {
       console.error("Failed to execute follow action", err);
+      // Revert on error
+      setLocalProfiles(prev => prev.map(p =>
+        p.id === targetUserId ? { ...p, isFollowing: isFollowing } : p
+      ));
       toast({ title: "Erreur", description: "Une erreur est survenue.", variant: "destructive" });
     } finally {
       setLoadingFollow(null);
@@ -84,7 +93,7 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
     }
   };
 
-  if (profiles.length === 0) {
+  if (localProfiles.length === 0) {
     return (
       <p className="text-muted-foreground text-center py-8">Aucun utilisateur à afficher.</p>
     );
@@ -92,7 +101,7 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
 
   return (
     <div className="space-y-4">
-      {profiles.map(profile => (
+      {localProfiles.map(profile => (
         <div
           key={profile.id}
           className="flex items-center justify-between px-4 py-3 sm:py-4 border-b border-border last:border-b-0 cursor-pointer hover:bg-muted/50 transition-colors rounded-lg"
