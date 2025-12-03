@@ -74,7 +74,7 @@ export default async function FeedPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left Sidebar - Hidden on mobile */}
             <div className="hidden lg:block">
-              <Card className="sticky top-20 border-border">
+              <Card className="sticky top-22 border-border">
                 <CardContent className="p-4">
                   <h3 className="font-bold text-foreground mb-3">Suggestions</h3>
                   <div className="space-y-3">
@@ -108,17 +108,17 @@ export default async function FeedPage() {
               {/* UNIFIED MOBILE VIEW */}
               <div className="md:hidden">
                 <Tabs defaultValue="all" className="w-full">
-                  <div className="bg-background border-b p-2 space-y-2">
-                    <TabsList className="grid w-full grid-cols-2 bg-background">
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="following">Abonnements</TabsTrigger>
+                  <div className="bg-background border-b pt-20 space-y-2">
+                    <TabsList className="grid w-full grid-cols-2 bg-muted/60 p-1.5 rounded-full">
+                      <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-full">Tous</TabsTrigger>
+                      <TabsTrigger value="following" className="data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-full">Abonnements</TabsTrigger>
                     </TabsList>
                   </div>
                   <TabsContent value="all" className="mt-2 space-y-2 divide-y divide-border">
                     {posts.map(renderPost)}
                   </TabsContent>
                   <TabsContent value="following" className="mt-2 space-y-2 divide-y divide-border">
-                    {posts.slice(0, 3).map(renderPost)}
+                    {posts.filter(post => followingIds.includes(post.authorId)).map(renderPost)}
                   </TabsContent>
                 </Tabs>
               </div>
@@ -130,16 +130,16 @@ export default async function FeedPage() {
                 />
                 <Tabs defaultValue="all" className="w-full">
                   <div className="space-y-2">
-                    <TabsList className="w-full">
-                      <TabsTrigger value="all" className="flex-1">Tous</TabsTrigger>
-                      <TabsTrigger value="following" className="flex-1">Abonnements</TabsTrigger>
+                    <TabsList className="grid w-full grid-cols-2 bg-muted/60 p-1.5 rounded-full">
+                      <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-full">Tous</TabsTrigger>
+                      <TabsTrigger value="following" className="data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-full">Abonnements</TabsTrigger>
                     </TabsList>
                   </div>
                   <TabsContent value="all" className="space-y-4 mt-4 divide-y divide-border">
                     {posts.map(renderPost)}
                   </TabsContent>
                   <TabsContent value="following" className="space-y-4 mt-4 divide-y divide-border">
-                    {posts.slice(0, 3).map(renderPost)}
+                    {posts.filter(post => followingIds.includes(post.authorId)).map(renderPost)}
                   </TabsContent>
                 </Tabs>
               </div>

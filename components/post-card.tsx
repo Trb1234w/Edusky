@@ -333,9 +333,9 @@ export function PostCard(props: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className={`flex-1 h-8 text-xs lg:text-sm rounded-full transition-all ${isLiked
+            className={`flex-1 h-8 text-xs rounded-full transition-all ${isLiked
               ? "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30"
-              : "bg-secondary/30 hover:bg-secondary/50 text-secondary-foreground"}`}
+              : "text-muted-foreground hover:bg-muted/20"}`}
             onClick={handleLikeClick}
             disabled={!currentUserId}
           >
@@ -347,7 +347,7 @@ export function PostCard(props: PostCardProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex-1 h-8 text-xs lg:text-sm rounded-full bg-gradient-to-r from-primary via-secondary to-accent text-white hover:opacity-90 transition-all shadow-sm transition-all"
+                className="flex-1 h-8 text-xs rounded-full text-muted-foreground hover:bg-muted/20 transition-all"
                 onClick={fetchComments}
               >
                 <MessageCircle size={16} className="mr-1.5" />
@@ -434,7 +434,7 @@ export function PostCard(props: PostCardProps) {
           </CustomBottomSheet>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex-1 h-8 text-xs lg:text-sm rounded-full bg-gradient-to-r from-primary via-secondary to-accent text-white hover:opacity-90 transition-all shadow-sm">
+              <Button variant="ghost" size="sm" className="flex-1 h-8 text-xs rounded-full text-muted-foreground hover:bg-muted/20 transition-all">
                 <Share2 size={16} className="mr-1.5" />
                 <span>Partager</span>
               </Button>
