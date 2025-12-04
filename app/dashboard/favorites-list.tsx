@@ -6,7 +6,6 @@ import { ClubCard } from "@/components/club-card"
 import { BlogCard } from "@/components/blog-card"
 import { ProfesseurCard } from "@/components/professeur-card"
 import { Card } from "@/components/ui/card"
-import { useState, useEffect } from "react"
 
 interface FavoriteItem {
   id: string;
@@ -25,19 +24,13 @@ interface FavoriteItem {
 interface FavoritesListProps {
   favorites: FavoriteItem[];
   isLoading: boolean;
+  onFavoriteToggle?: (itemId: string, itemType: string, isFavorited: boolean) => void;
 }
 
-export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
-  const [localFavorites, setLocalFavorites] = useState<FavoriteItem[]>(favorites);
-
-  useEffect(() => {
-    setLocalFavorites(favorites);
-  }, [favorites]);
-
-  const handleToggle = (id: string, newStatus: boolean) => {
-    if (!newStatus) {
-      // If unliked, remove from list
-      setLocalFavorites(prev => prev.filter(item => item.id !== id));
+export function FavoritesList({ favorites, isLoading, onFavoriteToggle }: FavoritesListProps) {
+  const handleToggle = (id: string, type: string, newStatus: boolean) => {
+    if (onFavoriteToggle) {
+      onFavoriteToggle(id, type, newStatus);
     }
   };
 
@@ -51,7 +44,7 @@ export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
     )
   }
 
-  if (localFavorites.length === 0) {
+  if (favorites.length === 0) {
     return <Card className="p-8 text-center text-muted-foreground">Vous n'avez encore aucun favori.</Card>;
   }
 
@@ -62,7 +55,7 @@ export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
       description: item.description || "",
       image: item.image_url || "/placeholder.png",
       is_favorited: true,
-      onToggle: (newStatus: boolean) => handleToggle(item.id, newStatus),
+      onToggle: (newStatus: boolean) => handleToggle(item.id, item.type, newStatus),
     };
 
     switch (item.type) {
@@ -148,7 +141,7 @@ export function FavoritesList({ favorites, isLoading }: FavoritesListProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {localFavorites.map((item) => (
+      {favorites.map((item) => (
         <div key={`${item.type}-${item.id}`}>
           {renderCard(item)}
         </div>

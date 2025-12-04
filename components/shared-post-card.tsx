@@ -35,6 +35,10 @@ export function SharedPostCard(props: SharedPostCardProps) {
     ...sharedPost,
     currentUserId,
     followingIds,
+    // Wrapper callback pour passer le bon ID (celui du sharedPost)
+    onLikeChange: props.onLikeChange ? (newLiked: boolean, newLikesCount: number) => {
+      props.onLikeChange(newLiked, newLikesCount);
+    } : undefined,
   };
 
   return (

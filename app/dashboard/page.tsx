@@ -177,18 +177,23 @@ export default function DashboardPage() {
 
   const handleFavoriteToggle = (itemId: string, itemType: string, isFavorited: boolean) => {
     if (isFavorited) {
-      // We can't easily add to favorites list without full item data, 
-      // but we can remove it if it was there.
+      let itemToAdd = null;
+
+      if (itemType === 'evenement') {
+        itemToAdd = registeredEvents.find(e => e.id === itemId);
+      } else if (itemType === 'formation') {
+        itemToAdd = registeredFormations.find(f => f.id === itemId);
+      } else if (itemType === 'club') {
+        itemToAdd = registeredClubs.find(c => c.id === itemId);
+      }
+
+      if (itemToAdd && !favorites.some(fav => fav.id === itemId && fav.type === itemType)) {
+        setFavorites(prev => [...prev, { ...itemToAdd, id: itemId, type: itemType }]);
+      }
     } else {
       setFavorites(prev => prev.filter(fav => !(fav.id === itemId && fav.type === itemType)));
     }
-
-    // Also update registered lists if applicable
-    if (itemType === 'evenement') {
-      // No specific favorite field in registeredEvents state, but if we added one we would update it here
-    }
   };
-
   const followingIds = useMemo(() => following.map((f: any) => f.id), [following]);
 
   const followersWithStatus = useMemo(() => followers.map(f => ({
@@ -295,7 +300,12 @@ export default function DashboardPage() {
                           };
 
                           if (post.sharedPost) {
-                            return <SharedPostCard key={post.id} {...commonProps} sharedPost={post.sharedPost} />;
+                            return <SharedPostCard
+                              key={post.id}
+                              {...commonProps}
+                              sharedPost={post.sharedPost}
+                              onLikeChange={(newLiked: boolean, newLikesCount: number) => handleLikeToggle(post.sharedPost.id, newLiked, newLikesCount)}
+                            />;
                           }
                           return <PostCard key={post.id} {...commonProps} />;
                         })
@@ -467,7 +477,11 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <FavoritesList favorites={favorites} isLoading={favoritesLoading} />
+                <FavoritesList
+                  favorites={favorites}
+                  isLoading={favoritesLoading}
+                  onFavoriteToggle={handleFavoriteToggle}
+                />
               )}
             </TabsContent>
           </Tabs>
