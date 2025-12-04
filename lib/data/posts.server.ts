@@ -34,96 +34,53 @@ export async function getAllFeedPosts(userId?: string) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Récupérer les IDs des posts likés par l'utilisateur si l'ID est fourni
-  const { data: likedPostIds, error: likedPostsError } = userId
-    ? await getUserLikedPostIds(userId)
-    : { data: [], error: null };
+  // Utiliser la fonction RPC optimisée qui récupère tout en une seule requête
+  const { data, error } = await supabase.rpc('get_feed_posts_optimized', {
+    p_user_id: userId || null
+  });
 
-  if (likedPostsError) {
-    console.error("Error fetching user liked posts:", likedPostsError);
-    // On peut décider de continuer sans les informations de like ou de retourner une erreur
+  if (error) {
+    console.error("Error fetching feed posts:", error);
+    return { data: [], error };
   }
 
-  const { data: postsData, error: postsError } = await supabase
-    .from('postes')
-    .select(`
-      id,
-      contenu,
-      media,
-      created_at,
-      auteur:profiles!auteur_id(id, full_name, username, avatar_url, prenom, nom),
-      shared_post:partage_de(
-        id,
-        contenu,
-        media,
-        created_at,
-        auteur:profiles!auteur_id(id, full_name, username, avatar_url, prenom, nom)
-      )
-    `)
-    .order('created_at', { ascending: false });
-
-  if (postsError) {
-    console.error("Error fetching base posts:", postsError);
-    return { data: [], error: postsError };
-  }
-
-  if (!postsData || postsData.length === 0) {
+  if (!data || data.length === 0) {
     return { data: [], error: null };
   }
 
-  const postsWithAggregates = await Promise.all(
-    postsData.map(async (post) => {
-      const { data: likesCount, error: likesError } = await supabase.rpc('count_likes', { post_id: post.id });
-      const { data: commentsCount, error: commentsError } = await supabase.rpc('count_comments', { post_id: post.id });
-      const { data: sharesCount, error: sharesError } = await supabase.rpc('count_shares', { post_id: post.id });
+  // Transformer les données en format attendu par les composants
+  const posts = data.map((row: any) => ({
+    id: row.id,
+    authorId: row.auteur_id,
+    author: row.auteur_full_name || 'Utilisateur inconnu',
+    authorUsername: row.auteur_username,
+    authorRole: row.auteur_prenom || '',
+    authorAvatar: row.auteur_avatar_url || '/placeholder.svg',
+    content: row.contenu,
+    media: row.media || null,
+    timestamp: row.created_at,
+    likes: row.likes_count,
+    comments: row.comments_count,
+    shares: row.shares_count,
+    liked: row.is_liked,
+    sharedPost: row.shared_post_id ? {
+      id: row.shared_post_id,
+      authorId: row.shared_post_auteur_id,
+      author: row.shared_post_auteur_full_name || 'Utilisateur inconnu',
+      authorUsername: row.shared_post_auteur_username,
+      authorRole: row.shared_post_auteur_prenom || '',
+      authorAvatar: row.shared_post_auteur_avatar_url || '/placeholder.svg',
+      content: row.shared_post_contenu,
+      media: row.shared_post_media || null,
+      timestamp: row.shared_post_created_at,
+      likes: row.shared_post_likes_count,
+      comments: row.shared_post_comments_count,
+      shares: row.shared_post_shares_count,
+      liked: row.shared_post_is_liked,
+    } : null
+  }));
 
-      if (likesError) console.error("Error fetching likes count for post", post.id, likesError);
-      if (commentsError) console.error("Error fetching comments count for post", post.id, commentsError);
-      if (sharesError) console.error("Error fetching shares count for post", post.id, sharesError);
-
-      let sharedPostData = null;
-      if (post.shared_post && post.shared_post.id) {
-        const { data: sharedLikesCount } = await supabase.rpc('count_likes', { post_id: post.shared_post.id });
-        const { data: sharedCommentsCount } = await supabase.rpc('count_comments', { post_id: post.shared_post.id });
-        const { data: sharedSharesCount } = await supabase.rpc('count_shares', { post_id: post.shared_post.id });
-
-        sharedPostData = {
-          id: post.shared_post.id,
-          authorId: post.shared_post.auteur?.id,
-          author: post.shared_post.auteur?.full_name || 'Utilisateur inconnu',
-          authorUsername: post.shared_post.auteur?.username,
-          authorRole: post.shared_post.auteur?.prenom || '',
-          authorAvatar: post.shared_post.auteur?.avatar_url || '/placeholder.svg',
-          content: post.shared_post.contenu,
-          media: post.shared_post.media || null,
-          timestamp: post.shared_post.created_at,
-          likes: sharedLikesCount || 0,
-          comments: sharedCommentsCount || 0,
-          shares: sharedSharesCount || 0,
-          liked: likedPostIds ? likedPostIds.includes(post.shared_post.id) : false,
-        };
-      }
-
-      return {
-        id: post.id,
-        authorId: post.auteur?.id,
-        author: post.auteur?.full_name || 'Utilisateur inconnu',
-        authorUsername: post.auteur?.username,
-        authorRole: post.auteur?.prenom || '',
-        authorAvatar: post.auteur?.avatar_url || '/placeholder.svg',
-        content: post.contenu,
-        media: post.media || null,
-        timestamp: post.created_at,
-        likes: likesCount || 0,
-        comments: commentsCount || 0,
-        shares: sharesCount || 0,
-        liked: likedPostIds ? likedPostIds.includes(post.id) : false,
-        sharedPost: sharedPostData,
-      };
-    })
-  );
-
-  return { data: postsWithAggregates, error: null };
+  return { data: posts, error: null };
 }
 
 /**
@@ -139,103 +96,52 @@ export async function getPostsByAuthorId(authorId: string, currentUserId?: strin
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Récupérer les IDs des posts likés par l'utilisateur consultant la page
-  const { data: likedPostIds, error: likedPostsError } = currentUserId
-    ? await getUserLikedPostIds(currentUserId)
-    : { data: [], error: null };
+  // Utiliser la fonction RPC optimisée
+  const { data, error } = await supabase.rpc('get_posts_by_author_optimized', {
+    p_author_id: authorId,
+    p_user_id: currentUserId || null
+  });
 
-  if (likedPostsError) {
-    console.error("Error fetching user liked posts for profile page:", likedPostsError);
+  if (error) {
+    console.error(`Error fetching posts for author ${authorId}:`, error);
+    return { data: [], error };
   }
 
-  // Récupérer les posts de l'auteur spécifié
-  const { data: postsData, error: postsError } = await supabase
-    .from('postes')
-    .select(`
-      id,
-      contenu,
-      media,
-      created_at,
-      auteur:profiles!auteur_id(id, full_name, username, avatar_url, prenom, nom),
-      shared_post:partage_de(
-        id,
-        contenu,
-        media,
-        created_at,
-        auteur:profiles!auteur_id(id, full_name, username, avatar_url, prenom, nom)
-      )
-    `)
-    .eq('auteur_id', authorId) // Filtre pour ne prendre que les posts de cet auteur
-    .order('created_at', { ascending: false });
-
-  if (postsError) {
-    console.error(`Error fetching posts for author ${authorId}:`, postsError);
-    return { data: [], error: postsError };
-  }
-
-  if (!postsData || postsData.length === 0) {
+  if (!data || data.length === 0) {
     return { data: [], error: null };
   }
 
-  // Enrichir les posts avec les comptes et le statut 'liked'
-  const postsWithAggregates = await Promise.all(
-    postsData.map(async (post) => {
-      const { data: likesCount, error: likesError } = await supabase.rpc('count_likes', { post_id: post.id });
-      const { data: commentsCount, error: commentsError } = await supabase.rpc('count_comments', { post_id: post.id });
-      const { data: sharesCount, error: sharesError } = await supabase.rpc('count_shares', { post_id: post.id });
+  // Transformer les données en format attendu par les composants
+  const posts = data.map((row: any) => ({
+    id: row.id,
+    authorId: row.auteur_id,
+    author: row.auteur_full_name || 'Utilisateur inconnu',
+    authorUsername: row.auteur_username,
+    authorRole: row.auteur_prenom || '',
+    authorAvatar: row.auteur_avatar_url || '/placeholder.svg',
+    content: row.contenu,
+    media: row.media || null,
+    timestamp: row.created_at,
+    likes: row.likes_count,
+    comments: row.comments_count,
+    shares: row.shares_count,
+    liked: row.is_liked,
+    sharedPost: row.shared_post_id ? {
+      id: row.shared_post_id,
+      authorId: row.shared_post_auteur_id,
+      author: row.shared_post_auteur_full_name || 'Utilisateur inconnu',
+      authorUsername: row.shared_post_auteur_username,
+      authorRole: row.shared_post_auteur_prenom || '',
+      authorAvatar: row.shared_post_auteur_avatar_url || '/placeholder.svg',
+      content: row.shared_post_contenu,
+      media: row.shared_post_media || null,
+      timestamp: row.shared_post_created_at,
+      likes: row.shared_post_likes_count,
+      comments: row.shared_post_comments_count,
+      shares: row.shared_post_shares_count,
+      liked: row.shared_post_is_liked,
+    } : null
+  }));
 
-      // Gestion des erreurs de comptage
-      if (likesError) console.error("Error fetching likes count for post", post.id, likesError);
-      if (commentsError) console.error("Error fetching comments count for post", post.id, commentsError);
-      if (sharesError) console.error("Error fetching shares count for post", post.id, sharesError);
-
-      let sharedPostData = null;
-      const sharedPostRaw = Array.isArray(post.shared_post) ? post.shared_post[0] : post.shared_post;
-
-      if (sharedPostRaw) {
-        const { data: sharedLikesCount } = await supabase.rpc('count_likes', { post_id: sharedPostRaw.id });
-        const { data: sharedCommentsCount } = await supabase.rpc('count_comments', { post_id: sharedPostRaw.id });
-        const { data: sharedSharesCount } = await supabase.rpc('count_shares', { post_id: sharedPostRaw.id });
-
-        const sharedPostAuthor = Array.isArray(sharedPostRaw.auteur) ? sharedPostRaw.auteur[0] : sharedPostRaw.auteur;
-
-        sharedPostData = {
-          id: sharedPostRaw.id,
-          authorId: sharedPostAuthor?.id,
-          author: sharedPostAuthor?.full_name || 'Utilisateur inconnu',
-          authorUsername: sharedPostAuthor?.username,
-          authorRole: sharedPostAuthor?.prenom || '',
-          authorAvatar: sharedPostAuthor?.avatar_url || '/placeholder.svg',
-          content: sharedPostRaw.contenu,
-          media: sharedPostRaw.media || null,
-          timestamp: sharedPostRaw.created_at,
-          likes: sharedLikesCount || 0,
-          comments: sharedCommentsCount || 0,
-          shares: sharedSharesCount || 0,
-          liked: likedPostIds ? likedPostIds.includes(sharedPostRaw.id) : false,
-        };
-      }
-
-      const postAuthor = Array.isArray(post.auteur) ? post.auteur[0] : post.auteur;
-
-      return {
-        id: post.id,
-        authorId: postAuthor?.id,
-        author: postAuthor?.full_name || 'Utilisateur inconnu',
-        authorUsername: postAuthor?.username,
-        authorRole: postAuthor?.prenom || '',
-        authorAvatar: postAuthor?.avatar_url || '/placeholder.svg',
-        content: post.contenu,
-        media: post.media || null,
-        timestamp: post.created_at,
-        likes: likesCount || 0,
-        comments: commentsCount || 0,
-        shares: sharesCount || 0,
-        liked: likedPostIds ? likedPostIds.includes(post.id) : false,
-        sharedPost: sharedPostData,
-      };
-    })
-  );
-
-  return { data: postsWithAggregates, error: null };
+  return { data: posts, error: null };
 }
