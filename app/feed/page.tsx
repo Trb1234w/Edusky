@@ -11,29 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export const dynamic = 'force-dynamic'
 
-// Skeleton pour le feed pendant le chargement
-function FeedSkeleton() {
-  return (
-    <div className="space-y-4">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <Card key={i} className="p-6">
-          <div className="flex items-center space-x-4 mb-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          </div>
-          <Skeleton className="h-24 w-full mb-4" />
-          <div className="flex justify-between">
-            <Skeleton className="h-8 w-24" />
-            <Skeleton className="h-8 w-24" />
-          </div>
-        </Card>
-      ))}
-    </div>
-  )
-}
+
 
 export default async function FeedPage() {
   const supabase = await createClient()
@@ -99,13 +77,11 @@ export default async function FeedPage() {
 
             {/* Main Feed avec Suspense */}
             <div className="lg:col-span-2">
-              <Suspense fallback={<FeedSkeleton />}>
-                <FeedContent
-                  userId={user.id}
-                  followingIds={followingIds}
-                  profile={profile}
-                />
-              </Suspense>
+              <FeedContent
+                userId={user.id}
+                followingIds={followingIds}
+                profile={profile}
+              />
             </div>
           </div>
         </section>

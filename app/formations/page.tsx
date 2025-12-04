@@ -34,14 +34,14 @@ export default function FormationsPage() {
                     <Skeleton className="h-8 w-24" />
                   </div>
                 </div>
-              </Card>
+              </Card >
             ))}
-          </div>
-        </div>
+          </div >
+        </div >
       }>
         <FormationsContent />
-      </Suspense>
+      </Suspense >
 
-    </main>
+    </main >
   )
 }
