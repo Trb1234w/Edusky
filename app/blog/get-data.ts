@@ -39,26 +39,32 @@ export async function getDistinctArticleTags(): Promise<{ data: string[] | null;
  */
 export async function getAllArticles(): Promise<{ data: any[] | null; error: string | null }> {
     try {
-        console.log('[getAllArticles] Starting to fetch articles...');
+        // console.log('[getAllArticles] Starting to fetch articles...');
         const supabase = await createClient();
-        console.log('[getAllArticles] Supabase client created');
+        // console.log('[getAllArticles] Supabase client created');
 
-        const { data: articlesData, error } = await supabase.rpc('get_articles', {
-            search_term: null,
-            category_slug: null,
-            min_vues: null,
-            min_likes: null,
-            sort_by: 'publie_at_desc'
-        });
+        // 1. Fetch user and articles in parallel
+        const [userResponse, articlesResponse] = await Promise.all([
+            supabase.auth.getUser(),
+            supabase.rpc('get_articles', {
+                search_term: null,
+                category_slug: null,
+                min_vues: null,
+                min_likes: null,
+                sort_by: 'publie_at_desc'
+            })
+        ]);
+
+        const user = userResponse.data.user;
+        let articles = articlesResponse.data || [];
+        const error = articlesResponse.error;
 
         if (error) {
             console.error("Error fetching articles via RPC:", error);
             return { data: null, error: error.message };
         }
 
-        let articles = articlesData || [];
-        const { data: { user } } = await supabase.auth.getUser();
-
+        // 2. Fetch favorites if user is logged in
         if (user) {
             const { data: favoritesData, error: favoritesError } = await supabase
                 .from('favoris')
@@ -82,7 +88,7 @@ export async function getAllArticles(): Promise<{ data: any[] | null; error: str
             }));
         }
 
-        console.log('[getAllArticles] Returning data successfully');
+        // console.log('[getAllArticles] Returning data successfully');
         return { data: articles, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllArticles:", e);

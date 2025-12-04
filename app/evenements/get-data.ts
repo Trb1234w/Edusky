@@ -71,29 +71,35 @@ export async function getDistinctEventTypes(): Promise<{ data: string[] | null; 
  */
 export async function getAllEvenements(): Promise<{ data: any[] | null; error: string | null }> {
     try {
-        console.log('[getAllEvenements] Starting to fetch events...');
+        // console.log('[getAllEvenements] Starting to fetch events...');
         const supabase = await createClient();
-        console.log('[getAllEvenements] Supabase client created');
+        // console.log('[getAllEvenements] Supabase client created');
 
-        const { data: eventsData, error } = await supabase.rpc('get_evenements', {
-            search_term: null,
-            category_slug: null,
-            mode_filter: null,
-            pays_filter: null,
-            ville_filter: null,
-            quartier_filter: null,
-            type_filter: null,
-            sort_by: 'date_debut_asc'
-        });
+        // 1. Fetch user and events in parallel
+        const [userResponse, eventsResponse] = await Promise.all([
+            supabase.auth.getUser(),
+            supabase.rpc('get_evenements', {
+                search_term: null,
+                category_slug: null,
+                mode_filter: null,
+                pays_filter: null,
+                ville_filter: null,
+                quartier_filter: null,
+                type_filter: null,
+                sort_by: 'date_debut_asc'
+            })
+        ]);
+
+        const user = userResponse.data.user;
+        let events = eventsResponse.data || [];
+        const error = eventsResponse.error;
 
         if (error) {
             console.error("Error fetching events via RPC:", error);
             return { data: null, error: error.message };
         }
 
-        let events = eventsData || [];
-        const { data: { user } } = await supabase.auth.getUser();
-
+        // 2. Fetch favorites if user is logged in
         if (user) {
             const { data: favoritesData, error: favoritesError } = await supabase
                 .from('favoris')
@@ -117,7 +123,7 @@ export async function getAllEvenements(): Promise<{ data: any[] | null; error: s
             }));
         }
 
-        console.log('[getAllEvenements] Returning data successfully');
+        // console.log('[getAllEvenements] Returning data successfully');
         return { data: events, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllEvenements:", e);

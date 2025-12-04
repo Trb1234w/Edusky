@@ -141,26 +141,32 @@ export async function getDistinctClubLocationsData(): Promise<{ data: LocationsD
  */
 export async function getAllClubs(): Promise<{ data: any[] | null; error: string | null }> {
     try {
-        console.log('[getAllClubs] Starting to fetch clubs...');
+        // console.log('[getAllClubs] Starting to fetch clubs...');
         const supabase = await createClient();
-        console.log('[getAllClubs] Supabase client created');
+        // console.log('[getAllClubs] Supabase client created');
 
-        const { data: clubsData, error } = await supabase.rpc('get_clubs', {
-            search_term: null,
-            category_slug: null,
-            statut_filter: null,
-            theme_filter: null,
-            sort_by: 'created_at_desc'
-        });
+        // 1. Fetch user and clubs in parallel
+        const [userResponse, clubsResponse] = await Promise.all([
+            supabase.auth.getUser(),
+            supabase.rpc('get_clubs', {
+                search_term: null,
+                category_slug: null,
+                statut_filter: null,
+                theme_filter: null,
+                sort_by: 'created_at_desc'
+            })
+        ]);
+
+        const user = userResponse.data.user;
+        let clubs = clubsResponse.data || [];
+        const error = clubsResponse.error;
 
         if (error) {
             console.error("Error fetching clubs via RPC:", error);
             return { data: null, error: error.message };
         }
 
-        let clubs = clubsData || [];
-        const { data: { user } } = await supabase.auth.getUser();
-
+        // 2. Fetch favorites if user is logged in
         if (user) {
             const { data: favoritesData, error: favoritesError } = await supabase
                 .from('favoris')
@@ -184,7 +190,7 @@ export async function getAllClubs(): Promise<{ data: any[] | null; error: string
             }));
         }
 
-        console.log('[getAllClubs] Returning data successfully');
+        // console.log('[getAllClubs] Returning data successfully');
         return { data: clubs, error: null };
     } catch (e: any) {
         console.error("Unexpected error in getAllClubs:", e);
