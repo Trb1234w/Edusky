@@ -40,7 +40,7 @@ export default async function FeedPage() {
 
   const followingIds = followingData ? followingData.map(f => f.followed_id) : [];
 
-  const { data: posts, error } = await getAllFeedPosts(user?.id);
+  const { data: posts, error } = await getAllFeedPosts(user?.id, 10);
 
   // Récupérer les profils suggérés
   const { data: suggestedProfiles, error: suggestedProfilesError } = await getSuggestedProfiles(user.id, followingIds);

@@ -1,8 +1,13 @@
 -- ÉTAPE 1 : Supprimer l'ancienne fonction
 DROP FUNCTION IF EXISTS get_feed_posts_optimized(uuid);
+DROP FUNCTION IF EXISTS get_feed_posts_optimized(uuid, integer, timestamptz);
 
--- ÉTAPE 2 : Créer la nouvelle fonction avec les types corrects
-CREATE OR REPLACE FUNCTION get_feed_posts_optimized(p_user_id UUID DEFAULT NULL)
+-- ÉTAPE 2 : Créer la fonction avec pagination (cursor-based)
+CREATE OR REPLACE FUNCTION get_feed_posts_optimized(
+  p_user_id UUID DEFAULT NULL,
+  p_limit INTEGER DEFAULT 10,
+  p_cursor TIMESTAMPTZ DEFAULT NULL
+)
 RETURNS TABLE (
   id UUID,
   contenu TEXT,
@@ -92,8 +97,10 @@ BEGIN
   LEFT JOIN likes sp_user_likes ON sp_user_likes.parent_id = sp.id 
     AND sp_user_likes.parent_type = 'post' 
     AND sp_user_likes.user_id = p_user_id
-  ORDER BY p.created_at DESC;
+  WHERE (p_cursor IS NULL OR p.created_at < p_cursor)
+  ORDER BY p.created_at DESC
+  LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
-COMMENT ON FUNCTION get_feed_posts_optimized IS 'Récupère tous les posts du feed avec leurs statistiques (likes, comments, shares) et le statut liked de l''utilisateur en une seule requête optimisée';
+COMMENT ON FUNCTION get_feed_posts_optimized IS 'Récupère les posts du feed avec pagination cursor-based pour infinite scroll. Paramètres: p_user_id (UUID), p_limit (nombre de posts, défaut 10), p_cursor (timestamp du dernier post vu)';

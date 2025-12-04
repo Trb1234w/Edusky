@@ -27,16 +27,18 @@ export async function getUserLikedPostIds(userId: string) {
   return { data: data.map(like => like.parent_id), error: null };
 }
 
-export async function getAllFeedPosts(userId?: string) {
+export async function getAllFeedPosts(userId?: string, limit: number = 10, cursor?: string) {
   noStore();
   const supabase = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Utiliser la fonction RPC optimisée qui récupère tout en une seule requête
+  // Utiliser la fonction RPC optimisée avec pagination
   const { data, error } = await supabase.rpc('get_feed_posts_optimized', {
-    p_user_id: userId || null
+    p_user_id: userId || null,
+    p_limit: limit,
+    p_cursor: cursor || null
   });
 
   if (error) {

@@ -1,10 +1,13 @@
 -- ÉTAPE 1 : Supprimer l'ancienne fonction
 DROP FUNCTION IF EXISTS get_posts_by_author_optimized(uuid, uuid);
+DROP FUNCTION IF EXISTS get_posts_by_author_optimized(uuid, uuid, integer, timestamptz);
 
--- ÉTAPE 2 : Créer la nouvelle fonction avec les types corrects
+-- ÉTAPE 2 : Créer la fonction avec pagination
 CREATE OR REPLACE FUNCTION get_posts_by_author_optimized(
   p_author_id UUID,
-  p_user_id UUID DEFAULT NULL
+  p_user_id UUID DEFAULT NULL,
+  p_limit INTEGER DEFAULT 10,
+  p_cursor TIMESTAMPTZ DEFAULT NULL
 )
 RETURNS TABLE (
   id UUID,
@@ -96,8 +99,10 @@ BEGIN
     AND sp_user_likes.parent_type = 'post' 
     AND sp_user_likes.user_id = p_user_id
   WHERE p.auteur_id = p_author_id
-  ORDER BY p.created_at DESC;
+    AND (p_cursor IS NULL OR p.created_at < p_cursor)
+  ORDER BY p.created_at DESC
+  LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
-COMMENT ON FUNCTION get_posts_by_author_optimized IS 'Récupère tous les posts d''un auteur spécifique avec leurs statistiques en une seule requête optimisée';
+COMMENT ON FUNCTION get_posts_by_author_optimized IS 'Récupère les posts d''un auteur avec pagination cursor-based';
