@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { findOrCreateConversationAction } from "@/app/messages/actions";
 import { useToast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { followUserAction } from "@/app/users/actions";
 
 interface Profile {
@@ -29,11 +29,6 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
   const { toast } = useToast();
   const [creatingConversationForUser, setCreatingConversationForUser] = useState<string | null>(null);
   const [loadingFollow, setLoadingFollow] = useState<string | null>(null);
-  const [localProfiles, setLocalProfiles] = useState<Profile[]>(profiles);
-
-  useEffect(() => {
-    setLocalProfiles(profiles);
-  }, [profiles]);
 
   const handleMessageUser = async (e: React.MouseEvent, otherUserId: string) => {
     e.stopPropagation();
@@ -54,11 +49,7 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
     e.stopPropagation();
     if (loadingFollow === targetUserId) return;
 
-    // Optimistic update
-    setLocalProfiles(prev => prev.map(p =>
-      p.id === targetUserId ? { ...p, isFollowing: !isFollowing } : p
-    ));
-
+    // Optimistic update via callback
     if (onFollowChange) {
       onFollowChange(targetUserId, !isFollowing);
     }
@@ -70,9 +61,6 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
 
       if (error) {
         // Revert on error
-        setLocalProfiles(prev => prev.map(p =>
-          p.id === targetUserId ? { ...p, isFollowing: isFollowing } : p
-        ));
         if (onFollowChange) {
           onFollowChange(targetUserId, isFollowing);
         }
@@ -86,9 +74,6 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
     } catch (err) {
       console.error("Failed to execute follow action", err);
       // Revert on error
-      setLocalProfiles(prev => prev.map(p =>
-        p.id === targetUserId ? { ...p, isFollowing: isFollowing } : p
-      ));
       if (onFollowChange) {
         onFollowChange(targetUserId, isFollowing);
       }
@@ -104,7 +89,7 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
     }
   };
 
-  if (localProfiles.length === 0) {
+  if (profiles.length === 0) {
     return (
       <p className="text-muted-foreground text-center py-8">Aucun utilisateur à afficher.</p>
     );
@@ -112,7 +97,7 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
 
   return (
     <div className="space-y-4">
-      {localProfiles.map(profile => (
+      {profiles.map(profile => (
         <div
           key={profile.id}
           className="flex items-center justify-between px-4 py-3 sm:py-4 border-b border-border last:border-b-0 cursor-pointer hover:bg-muted/50 transition-colors rounded-lg"
