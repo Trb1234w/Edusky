@@ -111,28 +111,32 @@ export async function getDistinctVenues(): Promise<{ data: string[] | null; erro
  */
 export async function getAllFormations(): Promise<{ data: any[] | null; error: string | null }> {
     try {
-        console.log('[getAllFormations] Starting to fetch formations...');
+        // console.log('[getAllFormations] Starting to fetch formations...');
         const supabase = await createClient();
-        console.log('[getAllFormations] Supabase client created');
+        // console.log('[getAllFormations] Supabase client created');
 
-        const { data: { user } } = await supabase.auth.getUser();
-        const currentUserId = user?.id;
+        // 1. Fetch user and formations in parallel
+        const [userResponse, formationsResponse] = await Promise.all([
+            supabase.auth.getUser(),
+            supabase
+                .from('formations')
+                .select(`
+                    *,
+                    categorie:categorie_id(*),
+                    professeur:professeurs(*),
+                    pays:pays_id(*),
+                    ville:ville_id(*),
+                    quartier:quartier_id(*)
+                `)
+                .eq('statut', 'publie')
+                .order('date_publication', { ascending: false })
+        ]);
 
-        const { data: formations, error } = await supabase
-            .from('formations')
-            .select(`
-                *,
-                categorie:categorie_id(*),
-                professeur:professeurs(*),
-                pays:pays_id(*),
-                ville:ville_id(*),
-                quartier:quartier_id(*)
-            `)
-            .eq('statut', 'publie')
-            .order('date_publication', { ascending: false });
+        const currentUserId = userResponse.data.user?.id;
+        const { data: formations, error } = formationsResponse;
 
-        console.log('[getAllFormations] Query completed');
-        console.log('[getAllFormations] Data received:', formations ? `${formations.length} formations` : 'null');
+        // console.log('[getAllFormations] Query completed');
+        // console.log('[getAllFormations] Data received:', formations ? `${formations.length} formations` : 'null');
 
         if (error) {
             console.error("Error fetching formations:", error);
@@ -141,44 +145,69 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
 
         let formationsWithFavorites = formations || [];
 
-        // Manually fetch profiles for professors to avoid missing FK constraint issues
+        // 2. Prepare promises for additional data (profiles and favorites)
+        const promises = [];
+
+        // Fetch profiles for professors
         if (formationsWithFavorites.length > 0) {
             const professorIds = Array.from(new Set(formationsWithFavorites
                 .map((f: any) => f.professeur?.id)
                 .filter((id: any) => id)));
 
             if (professorIds.length > 0) {
-                const { data: profiles } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, avatar_url')
-                    .in('id', professorIds);
-
-                if (profiles) {
-                    const profilesMap = new Map(profiles.map((p: any) => [p.id, p]));
-
-                    formationsWithFavorites.forEach((f: any) => {
-                        if (f.professeur && f.professeur.id) {
-                            f.professeur.profiles = profilesMap.get(f.professeur.id);
-                        }
-                    });
-                }
+                promises.push(
+                    supabase
+                        .from('profiles')
+                        .select('id, full_name, avatar_url')
+                        .in('id', professorIds)
+                        .then(({ data: profiles }) => ({ type: 'profiles', data: profiles }))
+                );
             }
         }
 
-        // Add is_favorited status
+        // Fetch favorites if user is logged in
         if (currentUserId && formationsWithFavorites.length > 0) {
-            const { data: favoritesData } = await supabase
-                .from('favoris')
-                .select('item_id')
-                .eq('user_id', currentUserId)
-                .eq('type_item', 'formation');
+            promises.push(
+                supabase
+                    .from('favoris')
+                    .select('item_id')
+                    .eq('user_id', currentUserId)
+                    .eq('type_item', 'formation')
+                    .then(({ data: favorites }) => ({ type: 'favorites', data: favorites }))
+            );
+        }
 
-            const favoriteItemIds = new Set(favoritesData?.map(fav => fav.item_id) || []);
-            formationsWithFavorites = formationsWithFavorites.map((formation: any) => ({
-                ...formation,
-                is_favorited: favoriteItemIds.has(formation.id)
-            }));
+        // 3. Await all additional data
+        if (promises.length > 0) {
+            const results = await Promise.all(promises);
+
+            // Process results
+            let profilesMap = new Map();
+            let favoriteItemIds = new Set();
+
+            results.forEach((result: any) => {
+                if (result.type === 'profiles' && result.data) {
+                    profilesMap = new Map(result.data.map((p: any) => [p.id, p]));
+                } else if (result.type === 'favorites' && result.data) {
+                    favoriteItemIds = new Set(result.data.map((fav: any) => fav.item_id));
+                }
+            });
+
+            // Apply data to formations
+            formationsWithFavorites = formationsWithFavorites.map((formation: any) => {
+                // Attach profile
+                if (formation.professeur && formation.professeur.id && profilesMap.has(formation.professeur.id)) {
+                    formation.professeur.profiles = profilesMap.get(formation.professeur.id);
+                }
+
+                // Attach favorite status
+                return {
+                    ...formation,
+                    is_favorited: favoriteItemIds.has(formation.id)
+                };
+            });
         } else {
+            // If no user, ensure is_favorited is false
             formationsWithFavorites = formationsWithFavorites.map((formation: any) => ({
                 ...formation,
                 is_favorited: false
