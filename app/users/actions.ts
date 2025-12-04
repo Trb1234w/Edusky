@@ -82,6 +82,7 @@ export async function followUserAction(followerId: string, followedId: string) {
 
   // On revalide aussi le feed, car les suggestions peuvent changer.
   revalidatePath('/feed');
+  revalidatePath('/dashboard');
 
   return { success: true };
 }

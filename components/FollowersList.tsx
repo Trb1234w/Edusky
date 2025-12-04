@@ -21,9 +21,10 @@ interface Profile {
 interface FollowersListProps {
   profiles: Profile[];
   currentUserId: string;
+  onFollowChange?: (userId: string, isFollowing: boolean) => void;
 }
 
-export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
+export function FollowersList({ profiles, currentUserId, onFollowChange }: FollowersListProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [creatingConversationForUser, setCreatingConversationForUser] = useState<string | null>(null);
@@ -58,6 +59,10 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
       p.id === targetUserId ? { ...p, isFollowing: !isFollowing } : p
     ));
 
+    if (onFollowChange) {
+      onFollowChange(targetUserId, !isFollowing);
+    }
+
     setLoadingFollow(targetUserId);
 
     try {
@@ -68,6 +73,9 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
         setLocalProfiles(prev => prev.map(p =>
           p.id === targetUserId ? { ...p, isFollowing: isFollowing } : p
         ));
+        if (onFollowChange) {
+          onFollowChange(targetUserId, isFollowing);
+        }
         toast({ title: "Erreur", description: error, variant: "destructive" });
       } else {
         toast({
@@ -81,6 +89,9 @@ export function FollowersList({ profiles, currentUserId }: FollowersListProps) {
       setLocalProfiles(prev => prev.map(p =>
         p.id === targetUserId ? { ...p, isFollowing: isFollowing } : p
       ));
+      if (onFollowChange) {
+        onFollowChange(targetUserId, isFollowing);
+      }
       toast({ title: "Erreur", description: "Une erreur est survenue.", variant: "destructive" });
     } finally {
       setLoadingFollow(null);

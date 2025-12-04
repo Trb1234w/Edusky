@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CreatePost } from "@/components/CreatePost";
@@ -143,6 +143,65 @@ export default function DashboardPage() {
     fetchUserAndProfile();
   }, [router]);
 
+  const handleLikeToggle = (postId: string, newLiked: boolean, newLikesCount: number) => {
+    setPosts(currentPosts =>
+      currentPosts.map(post => {
+        if (post.id === postId) {
+          return { ...post, liked: newLiked, likes: newLikesCount };
+        }
+        if (post.sharedPost && post.sharedPost.id === postId) {
+          return { ...post, sharedPost: { ...post.sharedPost, liked: newLiked, likes: newLikesCount } };
+        }
+        return post;
+      })
+    );
+  };
+
+  const handleFollowToggle = (userId: string, isFollowing: boolean) => {
+    // Update following list
+    if (isFollowing) {
+      // Add to following if not present
+      // We need to construct an object that matches the structure of 'following' items (which are profiles)
+      const userInFollowers = followers.find(f => f.id === userId);
+
+      // Check if already following (using 'id' as 'following' contains profiles)
+      if (userInFollowers && !following.some(f => f.id === userId)) {
+        setFollowing(prev => [...prev, userInFollowers]);
+      }
+    } else {
+      // Remove from following
+      // Filter by 'id' because 'following' contains profiles
+      setFollowing(prev => prev.filter(f => f.id !== userId));
+    }
+  };
+
+  const handleFavoriteToggle = (itemId: string, itemType: string, isFavorited: boolean) => {
+    if (isFavorited) {
+      // We can't easily add to favorites list without full item data, 
+      // but we can remove it if it was there.
+    } else {
+      setFavorites(prev => prev.filter(fav => !(fav.id === itemId && fav.type === itemType)));
+    }
+
+    // Also update registered lists if applicable
+    if (itemType === 'evenement') {
+      // No specific favorite field in registeredEvents state, but if we added one we would update it here
+    }
+  };
+
+  const followingIds = useMemo(() => following.map((f: any) => f.id), [following]);
+
+  const followersWithStatus = useMemo(() => followers.map(f => ({
+    ...f,
+    isFollowing: following.some((followed: any) => followed.id === f.id)
+  })), [followers, following]);
+
+  const followingWithStatus = useMemo(() => following.map(f => ({
+    ...f,
+    isFollowing: true // User is following everyone in their following list
+  })), [following]);
+
+
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -231,7 +290,8 @@ export default function DashboardPage() {
                             shares: post.shares || 0,
                             liked: post.liked || false,
                             currentUserId: profile.id,
-                            followingIds: following.map((f: any) => f.followed_id),
+                            followingIds: followingIds,
+                            onLikeChange: (newLiked: boolean, newLikesCount: number) => handleLikeToggle(post.id, newLiked, newLikesCount),
                           };
 
                           if (post.sharedPost) {
@@ -258,11 +318,9 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <FollowersList
-                  profiles={followers.map(f => ({
-                    ...f,
-                    isFollowing: following.some((followed: any) => followed.id === f.id)
-                  }))}
+                  profiles={followersWithStatus}
                   currentUserId={profile.id}
+                  onFollowChange={handleFollowToggle}
                 />
               )}
             </TabsContent>
@@ -275,11 +333,9 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <FollowersList
-                  profiles={following.map(f => ({
-                    ...f,
-                    isFollowing: true // User is following everyone in their following list
-                  }))}
+                  profiles={followingWithStatus}
                   currentUserId={profile.id}
+                  onFollowChange={handleFollowToggle}
                 />
               )}
             </TabsContent>
@@ -314,6 +370,7 @@ export default function DashboardPage() {
                         image={event.image_url || "/placeholder.png"}
                         status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
                         is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
+                        onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
                       />
                     ))}
                   </div>
@@ -353,6 +410,7 @@ export default function DashboardPage() {
                         price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
                         image={formation.image_url || "/placeholder.png"}
                         is_favorited={favorites.some(fav => fav.type === 'formation' && fav.id === formation.id)}
+                        onToggle={(status) => handleFavoriteToggle(formation.id, 'formation', status)}
                       />
                     ))}
                   </div>
@@ -390,6 +448,7 @@ export default function DashboardPage() {
                         image={club.image_url || "/placeholder.png"}
                         verified={false} // Placeholder
                         is_favorited={favorites.some(fav => fav.type === 'club' && fav.id === club.id)}
+                        onToggle={(status) => handleFavoriteToggle(club.id, 'club', status)}
                       />
                     ))}
                   </div>

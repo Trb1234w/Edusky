@@ -48,6 +48,7 @@ interface PostCardProps {
   liked: boolean;
   currentUserId: string;
   followingIds: string[];
+  onLikeChange?: (newLiked: boolean, newLikesCount: number) => void;
 }
 
 interface Comment {
@@ -103,8 +104,8 @@ function MediaGallery({ media }: { media: PostCardProps['media'] }) {
         {images.length > 0 && (
           <div className={`grid ${images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-1 mt-1`}>
             {images.slice(0, 4).map((image, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`relative ${images.length === 3 && index === 0 ? 'row-span-2' : ''} ${images.length >= 4 ? 'h-40' : 'h-64'}`}
                 onClick={() => openLightbox(index)}
               >
@@ -125,21 +126,21 @@ function MediaGallery({ media }: { media: PostCardProps['media'] }) {
           <VisuallyHidden.Root>
             <DialogTitle>Aperçu de l'image du post</DialogTitle>
           </VisuallyHidden.Root>
-            <Image src={images[selectedImageIndex]} alt="Post media" layout="fill" className="object-contain" />
-            
-            {images.length > 1 && (
-              <>
-                <Button onClick={goToPrevious} variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
-                  <ChevronLeft size={24} />
-                </Button>
-                <Button onClick={goToNext} variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
-                  <ChevronRight size={24} />
-                </Button>
-              </>
-            )}
-             <DialogClose className="absolute top-2 right-2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
-                <X size={24} />
-            </DialogClose>
+          <Image src={images[selectedImageIndex]} alt="Post media" layout="fill" className="object-contain" />
+
+          {images.length > 1 && (
+            <>
+              <Button onClick={goToPrevious} variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
+                <ChevronLeft size={24} />
+              </Button>
+              <Button onClick={goToNext} variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
+                <ChevronRight size={24} />
+              </Button>
+            </>
+          )}
+          <DialogClose className="absolute top-2 right-2 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white">
+            <X size={24} />
+          </DialogClose>
         </DialogContent>
       </Dialog>
     </>
@@ -251,12 +252,19 @@ export function PostCard(props: PostCardProps) {
     setIsLiked(!previousIsLiked);
     setCurrentLikes(previousIsLiked ? previousLikes - 1 : previousLikes + 1);
 
+    if (props.onLikeChange) {
+      props.onLikeChange(!previousIsLiked, previousIsLiked ? previousLikes - 1 : previousLikes + 1);
+    }
+
     const { error } = await toggleLike(id, currentUserId);
 
     if (error) {
       console.error("Erreur lors de l'action de like:", error);
       setIsLiked(previousIsLiked);
       setCurrentLikes(previousLikes);
+      if (props.onLikeChange) {
+        props.onLikeChange(previousIsLiked, previousLikes);
+      }
     }
   };
 
