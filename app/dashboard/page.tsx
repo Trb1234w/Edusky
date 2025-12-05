@@ -31,7 +31,7 @@ import {
 
 import { PostCard } from "@/components/post-card";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
-import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction, fetchUserPosts } from "@/app/dashboard/actions";
+import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction, fetchUserPosts, getUserFavorites } from "@/app/dashboard/actions";
 import { EventCard } from "@/components/event-card";
 import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
@@ -133,7 +133,7 @@ export default function DashboardPage() {
       setRegisteredClubsLoading(false);
 
       // Charger les favoris
-      const { data: favoritesData, error: favoritesError } = await supabase.rpc('get_user_favorites', { p_user_id: user.id });
+      const { data: favoritesData, error: favoritesError } = await getUserFavorites();
       if (!favoritesError && favoritesData) {
         setFavorites(favoritesData);
       }
@@ -181,10 +181,51 @@ export default function DashboardPage() {
 
       if (itemType === 'evenement') {
         itemToAdd = registeredEvents.find(e => e.id === itemId);
+        if (itemToAdd) {
+          itemToAdd = {
+            ...itemToAdd,
+            title: itemToAdd.titre,
+            description: itemToAdd.extrait || itemToAdd.description,
+            author: itemToAdd.organisateur?.full_name,
+            category: itemToAdd.categorie?.nom,
+            location: itemToAdd.lieu || itemToAdd.mode,
+            price: itemToAdd.prix,
+            isFree: itemToAdd.est_gratuit,
+            date: itemToAdd.date_debut,
+            maxParticipants: itemToAdd.capacite
+          };
+        }
       } else if (itemType === 'formation') {
         itemToAdd = registeredFormations.find(f => f.id === itemId);
+        if (itemToAdd) {
+          itemToAdd = {
+            ...itemToAdd,
+            title: itemToAdd.titre,
+            description: itemToAdd.extrait,
+            author: itemToAdd.professeur?.full_name,
+            category: itemToAdd.categorie?.nom,
+            price: itemToAdd.prix_indicatif ? `${itemToAdd.prix_indicatif} GNF` : "Gratuit",
+            language: itemToAdd.langue_enseignement,
+            certificate: itemToAdd.certificat,
+            level: itemToAdd.niveau,
+            duration: itemToAdd.duree_texte,
+            rating: itemToAdd.note_moyenne,
+            students: itemToAdd.nb_avis
+          };
+        }
       } else if (itemType === 'club') {
         itemToAdd = registeredClubs.find(c => c.id === itemId);
+        if (itemToAdd) {
+          itemToAdd = {
+            ...itemToAdd,
+            title: itemToAdd.nom,
+            description: itemToAdd.description,
+            author: itemToAdd.leader?.full_name,
+            category: itemToAdd.categorie?.nom,
+            fees: itemToAdd.cotisation_mensuelle || itemToAdd.cotisation_annuelle || itemToAdd.prix_inscription,
+            members: itemToAdd.capacite
+          };
+        }
       }
 
       if (itemToAdd && !favorites.some(fav => fav.id === itemId && fav.type === itemType)) {
@@ -381,6 +422,8 @@ export default function DashboardPage() {
                         status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
                         is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
                         onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
+                        price={event.prix}
+                        isFree={event.est_gratuit}
                       />
                     ))}
                   </div>
@@ -411,7 +454,7 @@ export default function DashboardPage() {
                         id={formation.id}
                         title={formation.titre || ""}
                         description={formation.extrait || ""}
-                        instructor={formation.professeur_full_name || "Inconnu"}
+                        instructor={formation.professeur?.full_name || "Inconnu"}
                         category={formation.categorie?.nom || ""}
                         level={formation.niveau || ""}
                         duration={formation.duree_texte || ""}
@@ -421,6 +464,8 @@ export default function DashboardPage() {
                         image={formation.image_url || "/placeholder.png"}
                         is_favorited={favorites.some(fav => fav.type === 'formation' && fav.id === formation.id)}
                         onToggle={(status) => handleFavoriteToggle(formation.id, 'formation', status)}
+                        language={formation.langue_enseignement}
+                        certificate={formation.certificat}
                       />
                     ))}
                   </div>
@@ -459,6 +504,7 @@ export default function DashboardPage() {
                         verified={false} // Placeholder
                         is_favorited={favorites.some(fav => fav.type === 'club' && fav.id === club.id)}
                         onToggle={(status) => handleFavoriteToggle(club.id, 'club', status)}
+                        fees={club.cotisation_mensuelle || club.cotisation_annuelle || club.prix_inscription}
                       />
                     ))}
                   </div>

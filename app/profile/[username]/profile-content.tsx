@@ -83,7 +83,7 @@ export function ProfileContent({
             shares: post.shares || 0,
             liked: post.liked || false,
             currentUserId: currentUserId,
-            followingIds: followingIds,
+            followingIds: initialFollowingIds,
             onLikeChange: (newLiked: boolean, newLikesCount: number) => handleLikeToggle(post.id, newLiked, newLikesCount),
         };
 
