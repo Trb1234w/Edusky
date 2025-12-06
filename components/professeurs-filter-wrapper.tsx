@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/custom-bottom-sheet"
 import { ProfesseurSidebar } from "@/components/ui/professeur-sidebar"
 import { HorizontalSpecialtyNav } from "./professeurs/HorizontalSpecialtyNav"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 const iconMap: { [key: string]: React.ElementType } = {
     Star,
@@ -93,6 +94,10 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
         genre: undefined,
     })
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 9
+
     useEffect(() => {
         const fetchProfesseursAndData = async () => {
             setIsLoading(true)
@@ -148,6 +153,7 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
 
             return newFilters;
         });
+        setCurrentPage(1); // Reset to first page on filter change
     }
 
     const getFilteredVilles = () => {
@@ -243,6 +249,13 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
             )
         })
     }, [filters, allProfesseurs])
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredProfesseurs.length / itemsPerPage)
+    const paginatedProfesseurs = filteredProfesseurs.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     const mainFiltersConfig = [
         { label: "Note", name: "note", icon: "Star", options: [{ label: "Note", value: undefined }, { label: "4+", value: 4 }, { label: "3+", value: 3 }] },
@@ -583,7 +596,13 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
                             </div>
                         </div>
 
-                        <ProfesseursList professeurs={filteredProfesseurs} isLoading={isLoading} />
+                        <ProfesseursList professeurs={paginatedProfesseurs} isLoading={isLoading} />
+
+                        <PaginationControls
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 </div>
             </div>

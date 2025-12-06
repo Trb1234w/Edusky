@@ -32,6 +32,7 @@ import {
 import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 import { FormationSidebar } from "./ui/formation-sidebar"
 import { FormationsStickyHeader } from "./formations/FormationsStickyHeader"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 const iconMap: { [key: string]: React.ElementType } = {
   BarChartHorizontal,
@@ -106,6 +107,10 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
     placesDisponibles: undefined,
   })
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 9
+
   // Fetch locations and tags on mount
   useEffect(() => {
     const fetchFiltersData = async () => {
@@ -145,6 +150,7 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
 
       return newFilters;
     });
+    setCurrentPage(1); // Reset to first page on filter change
   }
 
   // Helper functions to get filtered locations based on selections
@@ -263,6 +269,13 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
     }))
   }, [filters, allFormations])
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredFormations.length / itemsPerPage)
+  const paginatedFormations = filteredFormations.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
   const mainFiltersConfig = [
     { label: "Niveau", name: "niveau", icon: "BarChartHorizontal", options: [{ label: "Niveau", value: undefined }, { label: "Débutant", value: "Débutant" }, { label: "Intermédiaire", value: "Intermédiaire" }, { label: "Avancé", value: "Avancé" }] },
     { label: "Mode", name: "mode", icon: "Computer", options: [{ label: "Mode", value: undefined }, { label: "En ligne", value: "en_ligne" }, { label: "Présentiel", value: "presentiel" }, { label: "Hybride", value: "hybride" }] },
@@ -328,7 +341,13 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
               </div>
             </div>
 
-            <FormationsList formations={filteredFormations} isLoading={isLoading} />
+            <FormationsList formations={paginatedFormations} isLoading={isLoading} />
+
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>

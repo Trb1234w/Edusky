@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/client"
 import { getDistinctEventTags, getDistinctEventTypes } from "@/app/evenements/get-data"
 import { getDistinctLocations } from "@/app/formations/get-locations"
 import { EvenementsList } from "@/app/evenements/evenements-list"
+import { EvenementsStickyHeader } from "./evenements/EvenementsStickyHeader"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
@@ -89,7 +91,12 @@ export function EvenementsFilterWrapper({ initialEvents }: EvenementsFilterWrapp
         prix: undefined,
         statut_evenement: undefined,
         placesDisponibles: undefined,
+        is_gratuit: undefined,
     })
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 9
 
     // Sync with initialEvents if they change (e.g. after server action revalidation)
     useEffect(() => {
@@ -135,6 +142,7 @@ export function EvenementsFilterWrapper({ initialEvents }: EvenementsFilterWrapp
 
             return newFilters;
         });
+        setCurrentPage(1); // Reset to first page on filter change
     }
 
     // Helper functions to get filtered locations based on selections
@@ -222,6 +230,8 @@ export function EvenementsFilterWrapper({ initialEvents }: EvenementsFilterWrapp
                 evenement.nombre_participants < evenement.capacite
             );
 
+            const isGratuitMatch = !filters.is_gratuit || evenement.est_gratuit === true || evenement.prix === 0 || evenement.prix === null;
+
             return (
                 searchMatch &&
                 categoryMatch &&
@@ -235,10 +245,18 @@ export function EvenementsFilterWrapper({ initialEvents }: EvenementsFilterWrapp
                 dateMatch &&
                 prixMatch &&
                 statutMatch &&
-                placesDisponiblesMatch
+                placesDisponiblesMatch &&
+                isGratuitMatch
             )
         })
     }, [filters, allEvenements])
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredEvenements.length / itemsPerPage)
+    const paginatedEvenements = filteredEvenements.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     const mainFiltersConfig = [
         {
@@ -572,7 +590,13 @@ export function EvenementsFilterWrapper({ initialEvents }: EvenementsFilterWrapp
                         />
                     </div>
                     <div className="flex-1 py-4">
-                        <EvenementsList events={filteredEvenements} isLoading={isLoading} />
+                        <EvenementsList events={paginatedEvenements} isLoading={isLoading} />
+
+                        <PaginationControls
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 </div>
             </div>

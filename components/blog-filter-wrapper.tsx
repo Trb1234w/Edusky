@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/custom-bottom-sheet"
 import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 import { BlogSidebar } from "./ui/blog-sidebar"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 const iconMap: { [key: string]: React.ElementType } = {
   Calendar,
@@ -62,6 +63,10 @@ export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapp
     min_likes: undefined,
   })
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 9
+
   // Sync with initialArticles if they change
   useEffect(() => {
     setAllArticles(initialArticles);
@@ -80,6 +85,7 @@ export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapp
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }))
+    setCurrentPage(1); // Reset to first page on filter change
   }
 
   const filteredArticles = useMemo(() => {
@@ -139,6 +145,13 @@ export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapp
 
     return articles
   }, [filters, allArticles])
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredArticles.length / itemsPerPage)
+  const paginatedArticles = filteredArticles.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   const filtersConfig = [
     {
@@ -396,7 +409,13 @@ export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapp
             />
           </div>
           <div className="flex-1 py-2">
-            <ArticlesList articles={filteredArticles} isLoading={isLoading} />
+            <ArticlesList articles={paginatedArticles} isLoading={isLoading} />
+
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>
