@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Send, Loader2, ArrowLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getMessages, sendMessageAction } from "@/app/messages/actions";
+import { getMessages, sendMessageAction, markMessagesAsRead } from "@/app/messages/actions";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from 'date-fns';
@@ -44,12 +44,18 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         const { data } = await getMessages(conversation.id);
         if (data) {
           setMessages(data);
+          // Mark as read
+          if (currentUserId) {
+            await markMessagesAsRead(conversation.id, currentUserId);
+          }
         }
         setLoading(false);
       };
-      fetchMessages();
+      if (currentUserId) {
+        fetchMessages();
+      }
     }
-  }, [conversation?.id]);
+  }, [conversation?.id, currentUserId]);
 
   // Subscribe to real-time messages
   useEffect(() => {
@@ -115,7 +121,7 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header du Chat */}
-      <div className="p-4 border-b border-border flex items-center gap-3">
+      <div className="p-4 border-b border-border flex items-center gap-3 sticky top-0 z-10 bg-background">
         <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -162,7 +168,7 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
       </div>
 
       {/* Input pour envoyer un message */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t border-border bg-background">
+      <form onSubmit={handleSendMessage} className="p-4 border-t border-border bg-background sticky bottom-0 z-10">
         <div className="relative">
           <Input
             placeholder="Écrivez votre message..."

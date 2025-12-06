@@ -194,3 +194,45 @@ export async function getConversation(conversationId: string, currentUserId: str
         }
     };
 }
+
+export async function markMessagesAsRead(conversationId: string, userId: string) {
+    const supabase = supabaseAdmin;
+
+    const { error } = await supabase
+        .from('messages')
+        .update({ lu: true })
+        .eq('conversation_id', conversationId)
+        .neq('auteur_id', userId)
+        .eq('lu', false);
+
+    if (error) {
+        console.error("Error marking messages as read:", error);
+        return { error };
+    }
+
+    return { success: true };
+}
+
+export async function getGlobalUnreadCount(userId: string) {
+    const supabase = supabaseAdmin;
+
+    // Get user's conversation IDs first
+    const { data: userConvos } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', userId);
+
+    if (!userConvos || userConvos.length === 0) return 0;
+
+    const conversationIds = userConvos.map(c => c.conversation_id);
+
+    const { count, error } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .in('conversation_id', conversationIds)
+        .eq('lu', false)
+        .neq('auteur_id', userId);
+
+    if (error) return 0;
+    return count || 0;
+}

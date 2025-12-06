@@ -29,6 +29,7 @@ export function ModernHeader() {
     const [scrolled, setScrolled] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [isFocused, setIsFocused] = useState(false)
+    const [unreadCount, setUnreadCount] = useState(0)
     const pathname = usePathname()
     const router = useRouter()
     const supabase = createClient()
@@ -43,20 +44,44 @@ export function ModernHeader() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    // Récupération de l'utilisateur
+    // Récupération de l'utilisateur et des messages non lus
     useEffect(() => {
-        const getUser = async () => {
+        const getUserAndMessages = async () => {
             const { data: { user } } = await supabase.auth.getUser()
             setUser(user)
+
+            if (user) {
+                const { getGlobalUnreadCount } = await import('@/app/messages/actions')
+                const count = await getGlobalUnreadCount(user.id)
+                setUnreadCount(count)
+            }
         }
-        getUser()
+        getUserAndMessages()
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null)
+            if (session?.user) {
+                import('@/app/messages/actions').then(async ({ getGlobalUnreadCount }) => {
+                    const count = await getGlobalUnreadCount(session.user.id)
+                    setUnreadCount(count)
+                })
+            } else {
+                setUnreadCount(0)
+            }
         })
 
         return () => subscription.unsubscribe()
     }, [supabase])
+
+    // Refresh count on path change (e.g. leaving messages page)
+    useEffect(() => {
+        if (user) {
+            import('@/app/messages/actions').then(async ({ getGlobalUnreadCount }) => {
+                const count = await getGlobalUnreadCount(user.id)
+                setUnreadCount(count)
+            })
+        }
+    }, [pathname, user])
 
     const navLinks = [
         { href: '/professeurs', label: 'Professeurs' },
@@ -147,6 +172,14 @@ export function ModernHeader() {
                         {user ? (
                             <>
                                 <NotificationsDropdown />
+                                <Link href="/messages" className="relative p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                    <MessageCircle className="w-6 h-6" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+                                </Link>
                                 <Link href="/dashboard">
                                     <GlossyButton variant="outline" size="sm" className="text-sm md:text-base">
                                         Mon Espace
@@ -179,8 +212,13 @@ export function ModernHeader() {
                                 </div>
 
                                 {/* Messages */}
-                                <Link href="/messages" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                <Link href="/messages" className="relative p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
                                     <MessageCircle className="w-6 h-6" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                            {unreadCount}
+                                        </span>
+                                    )}
                                 </Link>
 
                                 {/* Info / About Us */}

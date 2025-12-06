@@ -16,6 +16,7 @@ interface Conversation {
   title: string;
   avatarUrl: string | null;
   participants: Profile[];
+  unreadCount?: number;
 }
 
 interface ConversationListProps {
@@ -49,7 +50,7 @@ export function ConversationList({
             key={item.id}
             onClick={() => handleSelectItem(item)}
             className={cn(
-              "flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted",
+              "flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted relative",
               selectedConversationId === item.id && "bg-muted"
             )}
           >
@@ -59,6 +60,11 @@ export function ConversationList({
             </Avatar>
             <div className="flex-1 flex items-center justify-between">
               <p className="font-semibold">{item.title}</p>
+              {item.unreadCount && item.unreadCount > 0 ? (
+                <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                  {item.unreadCount}
+                </span>
+              ) : null}
             </div>
           </div>
         ))

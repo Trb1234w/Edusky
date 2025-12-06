@@ -56,6 +56,23 @@ export async function getUserConversations(userId: string) {
     return { data: null, error: allParticipantsError };
   }
 
+  // 2.5. Récupérer les messages non lus pour ces conversations
+  const { data: unreadMessages, error: unreadError } = await supabaseAdmin
+    .from('messages')
+    .select('conversation_id')
+    .eq('lu', false)
+    .neq('auteur_id', userId)
+    .in('conversation_id', conversationIds);
+
+  if (unreadError) {
+    console.error("Erreur lors de la récupération des messages non lus:", unreadError);
+  }
+
+  const unreadCounts = (unreadMessages || []).reduce((acc: any, msg: any) => {
+    acc[msg.conversation_id] = (acc[msg.conversation_id] || 0) + 1;
+    return acc;
+  }, {});
+
   // 3. Combiner les données pour former les conversations formatées
   const formattedConversations = userParticipants.map(userPart => {
     const convo = Array.isArray(userPart.conversations) ? userPart.conversations[0] : userPart.conversations;
@@ -78,6 +95,7 @@ export async function getUserConversations(userId: string) {
       title: title,
       avatarUrl: avatarUrl,
       participants: otherParticipants,
+      unreadCount: unreadCounts[convo.id] || 0,
     };
   }).filter(Boolean) // Remove nulls
     .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()); // Sort by updated_at
