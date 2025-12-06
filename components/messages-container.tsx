@@ -55,7 +55,7 @@ export function MessagesContainer({ initialConversations, currentUserId }: Messa
     setConversations(initialConversations);
   }, [initialConversations]);
 
-  // Realtime subscription for new conversations
+  // Realtime subscription for new conversations and updates
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -82,6 +82,27 @@ export function MessagesContainer({ initialConversations, currentUserId }: Messa
           if (newConvo) {
             setConversations(prev => [newConvo as Conversation, ...prev]);
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversations',
+        },
+        (payload) => {
+          const updatedConvoId = payload.new.id;
+          setConversations(prev => {
+            const convoIndex = prev.findIndex(c => c.id === updatedConvoId);
+            if (convoIndex === -1) return prev; // Not in our list
+
+            const updatedConvo = { ...prev[convoIndex], updated_at: payload.new.updated_at };
+            const newList = [...prev];
+            newList.splice(convoIndex, 1); // Remove from current position
+            newList.unshift(updatedConvo); // Add to top
+            return newList;
+          });
         }
       )
       .subscribe();

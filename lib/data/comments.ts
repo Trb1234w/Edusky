@@ -15,7 +15,7 @@ export async function getCommentsByPostId(postId: string) {
       id,
       contenu,
       created_at,
-      auteur:profiles!auteur_id(full_name, avatar_url) // Joindre avec profiles via auteur_id
+      auteur:profiles!auteur_id(full_name, avatar_url, username) // Joindre avec profiles via auteur_id
     `)
     .eq('parent_poste', postId) // Colonne correcte pour l'ID du post
     .order('created_at', { ascending: true });

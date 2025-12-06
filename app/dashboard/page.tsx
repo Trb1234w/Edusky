@@ -541,7 +541,7 @@ function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-muted/30">
 
-      <main className="pt-16 lg:pt-20">
+      <main className="pt-0 lg:pt-20">
         <section className="bg-gray-200 py-12 lg:py-16 animate-pulse">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">

@@ -58,6 +58,7 @@ interface Comment {
   auteur: {
     full_name: string | null;
     avatar_url: string | null;
+    username: string | null;
   } | null;
 }
 
@@ -475,10 +476,12 @@ export function PostCard(props: PostCardProps) {
                           <AvatarImage src={comment.auteur?.avatar_url || "/placeholder.svg"} alt={comment.auteur?.full_name || "User"} />
                           <AvatarFallback>{comment.auteur?.full_name?.charAt(0) || "U"}</AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 bg-muted/30 p-3 rounded-2xl rounded-tl-none hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="font-semibold text-sm">{comment.auteur?.full_name || "Utilisateur inconnu"}</p>
-                            <p className="text-[10px] text-muted-foreground">
+                        <div className="flex-1 bg-muted/30 p-3 rounded-2xl rounded-tl-none hover:bg-muted/50 transition-colors min-w-0">
+                          <div className="flex flex-col mb-1">
+                            <Link href={`/profile/${comment.auteur?.username || '#'}`} className="font-semibold text-sm hover:underline truncate block w-full">
+                              {comment.auteur?.full_name || "Utilisateur inconnu"}
+                            </Link>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
                               {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: fr })}
                             </p>
                           </div>

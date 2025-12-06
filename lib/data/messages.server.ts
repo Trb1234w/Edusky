@@ -1,13 +1,22 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
+
+// Utiliser le client ADMIN pour contourner les RLS lors de la récupération des participants
+// Cela permet de voir les autres participants même si les politiques RLS sont strictes
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 
 /**
  * Récupère toutes les conversations d'un utilisateur, avec les détails des autres participants.
  */
 export async function getUserConversations(userId: string) {
-  const supabase = await createClient();
+  // On utilise supabaseAdmin pour les requêtes de données
 
   // 1. Récupérer toutes les entrées de conversation_participants pour l'utilisateur actuel
-  const { data: userParticipants, error: userParticipantsError } = await supabase
+  const { data: userParticipants, error: userParticipantsError } = await supabaseAdmin
     .from('conversation_participants')
     .select(`
       conversation_id,
@@ -30,7 +39,7 @@ export async function getUserConversations(userId: string) {
   const conversationIds = userParticipants.map(p => p.conversation_id);
 
   // 2. Pour chaque conversation, récupérer tous les participants et leurs profils
-  const { data: allParticipants, error: allParticipantsError } = await supabase
+  const { data: allParticipants, error: allParticipantsError } = await supabaseAdmin
     .from('conversation_participants')
     .select(`
       conversation_id,
