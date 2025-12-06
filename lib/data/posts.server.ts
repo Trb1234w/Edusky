@@ -27,7 +27,7 @@ export async function getUserLikedPostIds(userId: string) {
   return { data: data.map(like => like.parent_id), error: null };
 }
 
-export async function getAllFeedPosts(userId?: string, limit: number = 10, cursor?: string) {
+export async function getAllFeedPosts(userId?: string, limit: number = 10, cursor?: string, filterByFollowing: boolean = false) {
   noStore();
   const supabase = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,7 +38,8 @@ export async function getAllFeedPosts(userId?: string, limit: number = 10, curso
   const { data, error } = await supabase.rpc('get_feed_posts_optimized', {
     p_user_id: userId || null,
     p_limit: limit,
-    p_cursor: cursor || null
+    p_cursor: cursor || null,
+    p_filter_by_following: filterByFollowing
   });
 
   if (error) {

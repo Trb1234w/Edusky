@@ -11,9 +11,10 @@ interface InfiniteFeedProps {
     initialPosts: any[]
     currentUserId: string
     followingIds: string[]
+    filter?: 'following'
 }
 
-export function InfiniteFeed({ initialPosts, currentUserId, followingIds }: InfiniteFeedProps) {
+export function InfiniteFeed({ initialPosts, currentUserId, followingIds, filter }: InfiniteFeedProps) {
     const [posts, setPosts] = useState(initialPosts)
     const [isLoading, setIsLoading] = useState(false)
     const [hasMore, setHasMore] = useState(initialPosts.length >= 10)
@@ -36,7 +37,7 @@ export function InfiniteFeed({ initialPosts, currentUserId, followingIds }: Infi
         }
 
         try {
-            const url = `/api/feed/posts?cursor=${encodeURIComponent(cursor)}&limit=10&userId=${currentUserId}`
+            const url = `/api/feed/posts?cursor=${encodeURIComponent(cursor)}&limit=10&userId=${currentUserId}${filter ? `&filter=${filter}` : ''}`
             console.log('Fetching URL:', url)
             const response = await fetch(url)
 

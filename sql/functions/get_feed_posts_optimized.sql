@@ -1,12 +1,14 @@
 -- ÉTAPE 1 : Supprimer l'ancienne fonction
 DROP FUNCTION IF EXISTS get_feed_posts_optimized(uuid);
 DROP FUNCTION IF EXISTS get_feed_posts_optimized(uuid, integer, timestamptz);
+DROP FUNCTION IF EXISTS get_feed_posts_optimized(uuid, integer, timestamptz, boolean);
 
 -- ÉTAPE 2 : Créer la fonction avec pagination (cursor-based)
 CREATE OR REPLACE FUNCTION get_feed_posts_optimized(
   p_user_id UUID DEFAULT NULL,
   p_limit INTEGER DEFAULT 10,
-  p_cursor TIMESTAMPTZ DEFAULT NULL
+  p_cursor TIMESTAMPTZ DEFAULT NULL,
+  p_filter_by_following BOOLEAN DEFAULT FALSE
 )
 RETURNS TABLE (
   id UUID,
@@ -98,9 +100,14 @@ BEGIN
     AND sp_user_likes.parent_type = 'post' 
     AND sp_user_likes.user_id = p_user_id
   WHERE (p_cursor IS NULL OR p.created_at < p_cursor)
+    AND (
+      p_filter_by_following = FALSE 
+      OR 
+      (p_user_id IS NOT NULL AND p.auteur_id IN (SELECT followed_id FROM suivis WHERE follower_id = p_user_id))
+    )
   ORDER BY p.created_at DESC
   LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
-COMMENT ON FUNCTION get_feed_posts_optimized IS 'Récupère les posts du feed avec pagination cursor-based pour infinite scroll. Paramètres: p_user_id (UUID), p_limit (nombre de posts, défaut 10), p_cursor (timestamp du dernier post vu)';
+COMMENT ON FUNCTION get_feed_posts_optimized IS 'Récupère les posts du feed avec pagination cursor-based pour infinite scroll. Paramètres: p_user_id (UUID), p_limit (nombre de posts, défaut 10), p_cursor (timestamp du dernier post vu), p_filter_by_following (boolean)';

@@ -8,16 +8,18 @@ export async function GET(request: NextRequest) {
     const cursor = searchParams.get('cursor')
     const limit = parseInt(searchParams.get('limit') || '10')
     const userId = searchParams.get('userId')
+    const filter = searchParams.get('filter') // 'following' or undefined
 
     // Sanitize cursor: ensure it's not "undefined", "null", or empty string
     const validCursor = cursor && cursor !== 'undefined' && cursor !== 'null' ? cursor : undefined
 
-    console.log(`[API] Fetching posts with cursor: ${validCursor}, limit: ${limit}, userId: ${userId}`)
+    console.log(`[API] Fetching posts with cursor: ${validCursor}, limit: ${limit}, userId: ${userId}, filter: ${filter}`)
 
     const { data: posts, error } = await getAllFeedPosts(
         userId || undefined,
         limit,
-        validCursor
+        validCursor,
+        filter === 'following'
     )
 
     if (error) {

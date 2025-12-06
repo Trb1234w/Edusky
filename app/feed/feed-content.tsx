@@ -12,28 +12,22 @@ interface FeedContentProps {
 }
 
 export async function FeedContent({ userId, followingIds, profile }: FeedContentProps) {
-    // Cette fonction charge les posts (lent) - Suspense affichera le skeleton pendant ce temps
-    const { data: posts, error } = await getAllFeedPosts(userId, 10)
+    // Charger les posts pour les deux onglets en parallèle
+    const [allPostsResult, followingPostsResult] = await Promise.all([
+        getAllFeedPosts(userId, 10),
+        getAllFeedPosts(userId, 10, undefined, true) // filterByFollowing = true
+    ])
+
+    const posts = allPostsResult.data || []
+    const followingPosts = followingPostsResult.data || []
+    const error = allPostsResult.error || followingPostsResult.error
 
     if (error) {
         return <div className="text-center text-red-500">Erreur lors du chargement des posts.</div>
     }
 
     if (!posts || posts.length === 0) {
-        return <div className="text-center text-muted-foreground">Aucun post trouvé.</div>
-    }
-
-    const renderPost = (post: any) => {
-        const props = {
-            ...post,
-            currentUserId: userId,
-            followingIds: followingIds,
-            authorUsername: post.authorUsername,
-        }
-        if (post.sharedPost) {
-            return <SharedPostCard key={post.id} {...props} />
-        }
-        return <PostCard key={post.id} {...props} />
+        // return <div className="text-center text-muted-foreground">Aucun post trouvé.</div>
     }
 
     return (
@@ -48,10 +42,18 @@ export async function FeedContent({ userId, followingIds, profile }: FeedContent
                         </TabsList>
                     </div>
                     <TabsContent value="all" className="mt-2 space-y-2 divide-y divide-border">
-                        <InfiniteFeed initialPosts={posts} currentUserId={userId} followingIds={followingIds} />
+                        {posts.length > 0 ? (
+                            <InfiniteFeed initialPosts={posts} currentUserId={userId} followingIds={followingIds} />
+                        ) : (
+                            <div className="text-center text-muted-foreground py-8">Aucun post pour le moment.</div>
+                        )}
                     </TabsContent>
                     <TabsContent value="following" className="mt-2 space-y-2 divide-y divide-border">
-                        {posts.filter((post: any) => followingIds.includes(post.authorId)).map(renderPost)}
+                        {followingPosts.length > 0 ? (
+                            <InfiniteFeed initialPosts={followingPosts} currentUserId={userId} followingIds={followingIds} filter="following" />
+                        ) : (
+                            <div className="text-center text-muted-foreground py-8">Aucun post de vos abonnements.</div>
+                        )}
                     </TabsContent>
                 </Tabs>
             </div>
@@ -69,10 +71,18 @@ export async function FeedContent({ userId, followingIds, profile }: FeedContent
                         </TabsList>
                     </div>
                     <TabsContent value="all" className="space-y-4 mt-4 divide-y divide-border">
-                        <InfiniteFeed initialPosts={posts} currentUserId={userId} followingIds={followingIds} />
+                        {posts.length > 0 ? (
+                            <InfiniteFeed initialPosts={posts} currentUserId={userId} followingIds={followingIds} />
+                        ) : (
+                            <div className="text-center text-muted-foreground py-8">Aucun post pour le moment.</div>
+                        )}
                     </TabsContent>
                     <TabsContent value="following" className="space-y-4 mt-4 divide-y divide-border">
-                        {posts.filter((post: any) => followingIds.includes(post.authorId)).map(renderPost)}
+                        {followingPosts.length > 0 ? (
+                            <InfiniteFeed initialPosts={followingPosts} currentUserId={userId} followingIds={followingIds} filter="following" />
+                        ) : (
+                            <div className="text-center text-muted-foreground py-8">Aucun post de vos abonnements.</div>
+                        )}
                     </TabsContent>
                 </Tabs>
             </div>
