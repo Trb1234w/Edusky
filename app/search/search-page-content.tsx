@@ -20,15 +20,15 @@ import {
     searchProfesseurs,
     SearchFilters
 } from '@/app/actions/search'
-import { SearchResultPost } from '@/components/search/search-result-post'
-import { SearchResultUser } from '@/components/search/search-result-user'
-import { SearchResultFormation } from '@/components/search/search-result-formation'
-import { SearchResultEvent } from '@/components/search/search-result-event'
-import { SearchResultClub } from '@/components/search/search-result-club'
-import { SearchResultArticle } from '@/components/search/search-result-article'
-import { SearchResultProfesseur } from '@/components/search/search-result-professeur'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { CourseCard } from '@/components/course-card'
+import { EventCard } from '@/components/event-card'
+import { BlogCard } from '@/components/blog-card'
+import { ProfesseurCard } from '@/components/professeur-card'
+import { PostCard } from '@/components/post-card'
+import { ClubCard } from '@/components/club-card'
+import { SearchResultUser } from '@/components/search/search-result-user'
 
 type TabValue = 'all' | 'posts' | 'users' | 'formations' | 'events' | 'clubs' | 'articles' | 'professeurs'
 
@@ -115,23 +115,6 @@ export default function SearchPageContent() {
             return results.total || 0
         }
         return results.total || 0
-    }
-
-    const getTabCount = (tab: TabValue) => {
-        if (!results || activeTab !== 'all') return null
-
-        const counts: Record<TabValue, number> = {
-            all: results.total || 0,
-            posts: results.posts?.length || 0,
-            users: results.users?.length || 0,
-            formations: results.formations?.length || 0,
-            events: results.events?.length || 0,
-            clubs: results.clubs?.length || 0,
-            articles: results.articles?.length || 0,
-            professeurs: results.professeurs?.length || 0,
-        }
-
-        return counts[tab]
     }
 
     return (
@@ -305,21 +288,27 @@ export default function SearchPageContent() {
                             </div>
                         ) : (
                             <>
-                                <TabsContent value="all" className="space-y-6 mt-0">
+                                <TabsContent value="all" className="space-y-8 mt-0">
                                     {results?.posts?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Postes</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <FileText className="h-5 w-5 text-primary" />
+                                                Postes récents
+                                            </h3>
+                                            <div className="space-y-4 max-w-2xl">
                                                 {results.posts.map((post: any) => (
-                                                    <SearchResultPost key={post.id} {...post} />
+                                                    <PostCard key={post.id} {...post} />
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                     {results?.users?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Personnes</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <Users className="h-5 w-5 text-primary" />
+                                                Personnes
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 {results.users.map((user: any) => (
                                                     <SearchResultUser key={user.id} {...user} />
                                                 ))}
@@ -328,64 +317,84 @@ export default function SearchPageContent() {
                                     )}
                                     {results?.formations?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Formations</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <GraduationCap className="h-5 w-5 text-primary" />
+                                                Formations
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.formations.map((formation: any) => (
-                                                    <SearchResultFormation key={formation.id} {...formation} />
+                                                    <div key={formation.id} className="h-full">
+                                                        <CourseCard {...formation} />
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                     {results?.events?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Événements</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <Calendar className="h-5 w-5 text-primary" />
+                                                Événements
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.events.map((event: any) => (
-                                                    <SearchResultEvent key={event.id} {...event} />
+                                                    <div key={event.id} className="h-full">
+                                                        <EventCard {...event} />
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                     {results?.clubs?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Clubs</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <UsersRound className="h-5 w-5 text-primary" />
+                                                Clubs
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.clubs.map((club: any) => (
-                                                    <SearchResultClub key={club.id} {...club} />
+                                                    <div key={club.id} className="h-full">
+                                                        <ClubCard {...club} />
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                     {results?.articles?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Articles</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <BookmarkIcon className="h-5 w-5 text-primary" />
+                                                Articles
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.articles.map((article: any) => (
-                                                    <SearchResultArticle key={article.id} {...article} />
+                                                    <div key={article.id} className="h-full">
+                                                        <BlogCard {...article} />
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                     {results?.professeurs?.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">Professeurs</h3>
-                                            <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                                <UserCheck className="h-5 w-5 text-primary" />
+                                                Professeurs
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.professeurs.map((prof: any) => (
-                                                    <SearchResultProfesseur key={prof.id} {...prof} />
+                                                    <div key={prof.id} className="h-full">
+                                                        <ProfesseurCard {...prof} />
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
-                                    {results && getTotalResults() === 0 && (
-                                        <Card className="p-12 text-center">
-                                            <p className="text-muted-foreground">Aucun résultat trouvé pour "{query}"</p>
-                                        </Card>
-                                    )}
                                 </TabsContent>
 
-                                <TabsContent value="posts" className="space-y-3 mt-0">
+                                <TabsContent value="posts" className="space-y-4 mt-0 max-w-2xl mx-auto">
                                     {results?.data?.map((post: any) => (
-                                        <SearchResultPost key={post.id} {...post} />
+                                        <PostCard key={post.id} {...post} />
                                     ))}
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
@@ -394,10 +403,12 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="users" className="space-y-3 mt-0">
-                                    {results?.data?.map((user: any) => (
-                                        <SearchResultUser key={user.id} {...user} />
-                                    ))}
+                                <TabsContent value="users" className="space-y-4 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {results?.data?.map((user: any) => (
+                                            <SearchResultUser key={user.id} {...user} />
+                                        ))}
+                                    </div>
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucune personne trouvée</p>
@@ -405,10 +416,14 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="formations" className="space-y-3 mt-0">
-                                    {results?.data?.map((formation: any) => (
-                                        <SearchResultFormation key={formation.id} {...formation} />
-                                    ))}
+                                <TabsContent value="formations" className="space-y-4 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {results?.data?.map((formation: any) => (
+                                            <div key={formation.id} className="h-full">
+                                                <CourseCard {...formation} />
+                                            </div>
+                                        ))}
+                                    </div>
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucune formation trouvée</p>
@@ -416,10 +431,14 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="events" className="space-y-3 mt-0">
-                                    {results?.data?.map((event: any) => (
-                                        <SearchResultEvent key={event.id} {...event} />
-                                    ))}
+                                <TabsContent value="events" className="space-y-4 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {results?.data?.map((event: any) => (
+                                            <div key={event.id} className="h-full">
+                                                <EventCard {...event} />
+                                            </div>
+                                        ))}
+                                    </div>
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun événement trouvé</p>
@@ -427,10 +446,14 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="clubs" className="space-y-3 mt-0">
-                                    {results?.data?.map((club: any) => (
-                                        <SearchResultClub key={club.id} {...club} />
-                                    ))}
+                                <TabsContent value="clubs" className="space-y-4 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {results?.data?.map((club: any) => (
+                                            <div key={club.id} className="h-full">
+                                                <ClubCard {...club} />
+                                            </div>
+                                        ))}
+                                    </div>
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun club trouvé</p>
@@ -438,10 +461,14 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="articles" className="space-y-3 mt-0">
-                                    {results?.data?.map((article: any) => (
-                                        <SearchResultArticle key={article.id} {...article} />
-                                    ))}
+                                <TabsContent value="articles" className="space-y-4 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {results?.data?.map((article: any) => (
+                                            <div key={article.id} className="h-full">
+                                                <BlogCard {...article} />
+                                            </div>
+                                        ))}
+                                    </div>
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun article trouvé</p>
@@ -449,10 +476,14 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="professeurs" className="space-y-3 mt-0">
-                                    {results?.data?.map((prof: any) => (
-                                        <SearchResultProfesseur key={prof.id} {...prof} />
-                                    ))}
+                                <TabsContent value="professeurs" className="space-y-4 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {results?.data?.map((prof: any) => (
+                                            <div key={prof.id} className="h-full">
+                                                <ProfesseurCard {...prof} />
+                                            </div>
+                                        ))}
+                                    </div>
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun professeur trouvé</p>

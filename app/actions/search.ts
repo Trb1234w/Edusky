@@ -18,6 +18,214 @@ export interface SearchResult<T> {
     hasMore: boolean
 }
 
+// Interfaces for enriched data
+export interface SearchPost {
+    id: string
+    contenu: string
+    content?: string // Mapped from contenu
+    media: any
+    created_at: string
+    updated_at: string
+    statut: string
+    visibilite: string
+    auteur_id: string
+    author?: string
+    authorUsername?: string
+    authorAvatar?: string
+    authorRole?: string
+    authorId?: string
+    likes?: number
+    comments?: number
+    shares?: number
+    timestamp?: string
+    liked?: boolean
+    currentUserId?: string
+    followingIds?: string[]
+}
+
+export interface SearchUser {
+    id: string
+    full_name: string
+    username: string
+    avatar_url: string
+    bio: string
+    is_verified: boolean
+    competences: string[]
+    pays_id: string
+    ville_id: string
+    followers: { count: number }[]
+    pays?: { id: string; nom: string }
+    ville?: { id: string; nom: string }
+    isFollowing?: boolean
+}
+
+export interface SearchFormation {
+    id: string
+    titre: string
+    slug: string
+    extrait: string
+    description: string
+    image_url: string
+    tags: string[]
+    mode: string
+    niveau: string
+    duree_texte: string
+    prix_indicatif: number
+    note_moyenne: number
+    nb_avis: number
+    created_at: string
+    professeur_id: string
+    categorie_id: string
+    pays_id: string
+    ville_id: string
+    nombre_inscrits: number
+    langue_enseignement: string
+    certificat: boolean
+    certificate?: boolean // Mapped from certificat
+    category?: string
+    instructor?: string
+    is_favorited?: boolean
+    level?: string
+    duration?: string
+    students?: number
+    rating?: number
+    price?: string
+    image?: string
+    language?: string
+}
+
+export interface SearchEvent {
+    id: string
+    titre: string
+    slug: string
+    extrait: string
+    description: string
+    image_url: string
+    tags: string[]
+    date_debut: string
+    date_fin: string
+    mode: string
+    lieu: string
+    capacite: number
+    type_evenement: string
+    created_at: string
+    organisateur_id: string
+    categorie_id: string
+    pays_id: string
+    ville_id: string
+    prix: number
+    est_gratuit: boolean
+    nombre_participants: number
+    heure_ouverture_portes: string
+    category?: string
+    organizer?: string
+    is_favorited?: boolean
+    date?: string
+    time?: string
+    location?: string
+    participants?: number
+    maxParticipants?: number
+    image?: string
+    status?: string
+    price?: number // Mapped from prix
+    isFree?: boolean
+}
+
+export interface SearchClub {
+    id: string
+    nom: string
+    slug: string
+    description: string
+    image_url: string
+    tags: string[]
+    theme_principal: string
+    capacite: number
+    statut: string
+    created_at: string
+    leader_id: string
+    categorie_id: string
+    pays_id: string
+    ville_id: string
+    nombre_membres: number
+    prix_inscription: number
+    cotisation_mensuelle: number
+    cotisation_annuelle: number
+    category?: string
+    president?: string
+    is_favorited?: boolean
+    members?: number
+    fees?: string
+    image?: string
+}
+
+export interface SearchArticle {
+    id: string
+    titre: string
+    slug: string
+    extrait: string
+    contenu: string
+    image_couverture: string
+    image_url: string
+    tags: string[]
+    vues: number
+    likes_count: number
+    comment_count: number
+    publie_at: string
+    created_at: string
+    auteur_id: string
+    categorie_id: string
+    category?: string
+    author?: string
+    authorAvatar?: string
+    authorRole?: string
+    is_favorited?: boolean
+    date?: string
+    readTime?: string
+    image?: string
+    likes?: number
+    comments?: number
+    views?: number
+}
+
+export interface SearchProfessor {
+    id: string
+    titre: string
+    presentation: string
+    specialites: string[]
+    annees_experience: number
+    tarif_indicatif: number
+    tarif_horaire_min: number
+    tarif_horaire_max: number
+    nb_etudiants_formes: number
+    disponibilite: any
+    portfolio: any
+    is_publie: boolean
+    note_moyenne: number
+    nb_notes: number
+    certifications: any
+    created_at: string
+    updated_at: string
+    pays_id: string
+    ville_id: string
+    quartier_id: string
+    type: string
+    methodes_pedagogiques: string[]
+    modalites_cours: string[]
+    reseaux_sociaux: any
+    site_web: string
+    full_name: string
+    image_url: string
+    linkedin_url: string
+    diplomes: any
+    formations_parcours: any
+    email_contact: string
+    telephone_professionnel: string
+    langues_enseignement: string[]
+    domaines_intervention: string[]
+    pays_nom?: string
+    ville_nom?: string
+}
+
 // Fonction utilitaire pour construire le filtre de date
 function getDateFilter(dateRange?: string) {
     if (!dateRange || dateRange === 'all') return null
@@ -48,7 +256,6 @@ export async function searchAll(query: string, filters: SearchFilters = {}) {
         }
     }
 
-    const supabase = await createClient()
     const limit = filters.limit || 5 // Limite par type pour la recherche globale
 
     try {
@@ -79,7 +286,7 @@ export async function searchAll(query: string, filters: SearchFilters = {}) {
 }
 
 // RECHERCHE DE POSTES
-export async function searchPosts(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchPosts(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchPost>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
@@ -118,38 +325,47 @@ export async function searchPosts(query: string, filters: SearchFilters = {}): P
             throw error
         }
 
+        const posts = (data || []) as unknown as SearchPost[]
+
         // Fetch author data and engagement metrics
-        if (data && data.length > 0) {
-            const authorIds = [...new Set(data.map(post => post.auteur_id).filter(Boolean))]
-            const postIds = data.map(post => post.id)
+        if (posts.length > 0) {
+            const authorIds = [...new Set(posts.map(post => post.auteur_id).filter(Boolean))]
+            const postIds = posts.map(post => post.id)
 
             // Fetch authors
             if (authorIds.length > 0) {
                 const { data: authors } = await supabase
                     .from('profiles')
-                    .select('id, full_name, username, avatar_url, is_verified')
+                    .select('id, full_name, username, avatar_url, is_verified, role')
                     .in('id', authorIds)
 
                 const authorsMap = new Map(authors?.map(a => [a.id, a]) || [])
-                data.forEach(post => {
-                    post.auteur = authorsMap.get(post.auteur_id)
+                posts.forEach(post => {
+                    const author = authorsMap.get(post.auteur_id)
+                    post.author = author?.full_name || 'Utilisateur'
+                    post.authorUsername = author?.username
+                    post.authorAvatar = author?.avatar_url
+                    post.authorRole = author?.role || 'Utilisateur'
+                    post.authorId = post.auteur_id
+                    post.content = post.contenu // Map content
                 })
             }
 
             // Fetch engagement counts
-            const [likesData, commentsData, sharesData] = await Promise.all([
-                supabase.from('likes_postes').select('poste_id', { count: 'exact', head: true }).in('poste_id', postIds),
-                supabase.from('commentaires_postes').select('poste_id', { count: 'exact', head: true }).in('poste_id', postIds),
-                supabase.from('partages_postes').select('poste_id', { count: 'exact', head: true }).in('poste_id', postIds)
-            ])
+            await Promise.all(posts.map(async (post) => {
+                const [l, c, s] = await Promise.all([
+                    supabase.from('likes_postes').select('id', { count: 'exact', head: true }).eq('poste_id', post.id),
+                    supabase.from('commentaires_postes').select('id', { count: 'exact', head: true }).eq('poste_id', post.id),
+                    supabase.from('partages_postes').select('id', { count: 'exact', head: true }).eq('poste_id', post.id)
+                ])
+                post.likes = l.count || 0
+                post.comments = c.count || 0
+                post.shares = s.count || 0
+                post.timestamp = post.created_at
+            }))
 
-            data.forEach(post => {
-                post.likes_count = likesData.count || 0
-                post.comments_count = commentsData.count || 0
-                post.shares_count = sharesData.count || 0
-            })
-
-            // Fetch current user's likes if logged in
+            // Fetch current user's likes and following status if logged in
+            let followingIds: string[] = []
             if (user) {
                 const { data: userLikes } = await supabase
                     .from('likes_postes')
@@ -158,20 +374,32 @@ export async function searchPosts(query: string, filters: SearchFilters = {}): P
                     .in('poste_id', postIds)
 
                 const likedPostIds = new Set(userLikes?.map(l => l.poste_id) || [])
-                data.forEach(post => {
-                    post.isLiked = likedPostIds.has(post.id)
+
+                // Fetch following
+                const { data: following } = await supabase
+                    .from('suivis')
+                    .select('suivi_id')
+                    .eq('suiveur_id', user.id)
+
+                followingIds = following?.map(f => f.suivi_id) || []
+
+                posts.forEach(post => {
+                    post.liked = likedPostIds.has(post.id)
+                    post.currentUserId = user.id
+                    post.followingIds = followingIds
                 })
             } else {
-                data.forEach(post => {
-                    post.isLiked = false
+                posts.forEach(post => {
+                    post.liked = false
+                    post.followingIds = []
                 })
             }
         }
 
-        console.log(`Posts search for "${query}":`, data?.length, 'results found')
+        console.log(`Posts search for "${query}":`, posts.length, 'results found')
 
         return {
-            data: data || [],
+            data: posts,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -182,7 +410,7 @@ export async function searchPosts(query: string, filters: SearchFilters = {}): P
 }
 
 // RECHERCHE D'UTILISATEURS
-export async function searchUsers(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchUsers(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchUser>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
@@ -222,17 +450,19 @@ export async function searchUsers(query: string, filters: SearchFilters = {}): P
 
         if (error) throw error
 
+        const usersList = (data || []) as unknown as SearchUser[]
+
         // Fetch location and follow status
-        if (data && data.length > 0) {
-            const paysIds = [...new Set(data.map(u => u.pays_id).filter(Boolean))]
-            const villeIds = [...new Set(data.map(u => u.ville_id).filter(Boolean))]
-            const userIds = data.map(u => u.id)
+        if (usersList.length > 0) {
+            const paysIds = [...new Set(usersList.map(u => u.pays_id).filter(Boolean))]
+            const villeIds = [...new Set(usersList.map(u => u.ville_id).filter(Boolean))]
+            const userIds = usersList.map(u => u.id)
 
             // Fetch pays
             if (paysIds.length > 0) {
                 const { data: pays } = await supabase.from('pays').select('id, nom').in('id', paysIds)
                 const paysMap = new Map(pays?.map(p => [p.id, p]) || [])
-                data.forEach(searchUser => {
+                usersList.forEach(searchUser => {
                     if (searchUser.pays_id) searchUser.pays = paysMap.get(searchUser.pays_id)
                 })
             }
@@ -241,7 +471,7 @@ export async function searchUsers(query: string, filters: SearchFilters = {}): P
             if (villeIds.length > 0) {
                 const { data: villes } = await supabase.from('villes').select('id, nom').in('id', villeIds)
                 const villesMap = new Map(villes?.map(v => [v.id, v]) || [])
-                data.forEach(searchUser => {
+                usersList.forEach(searchUser => {
                     if (searchUser.ville_id) searchUser.ville = villesMap.get(searchUser.ville_id)
                 })
             }
@@ -255,18 +485,18 @@ export async function searchUsers(query: string, filters: SearchFilters = {}): P
                     .in('suivi_id', userIds)
 
                 const followingIds = new Set(following?.map(f => f.suivi_id) || [])
-                data.forEach(searchUser => {
+                usersList.forEach(searchUser => {
                     searchUser.isFollowing = followingIds.has(searchUser.id)
                 })
             } else {
-                data.forEach(searchUser => {
+                usersList.forEach(searchUser => {
                     searchUser.isFollowing = false
                 })
             }
         }
 
         return {
-            data: data || [],
+            data: usersList,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -277,12 +507,14 @@ export async function searchUsers(query: string, filters: SearchFilters = {}): P
 }
 
 // RECHERCHE DE FORMATIONS
-export async function searchFormations(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchFormations(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchFormation>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
 
     try {
+        const { data: { user } } = await supabase.auth.getUser()
+
         let queryBuilder = supabase
             .from('formations')
             .select(`
@@ -303,7 +535,10 @@ export async function searchFormations(query: string, filters: SearchFilters = {
         professeur_id,
         categorie_id,
         pays_id,
-        ville_id
+        ville_id,
+        nombre_inscrits,
+        langue_enseignement,
+        certificat
       `, { count: 'exact' })
             .eq('statut', 'publie')
             .or(`titre.ilike.%${query}%,description.ilike.%${query}%,extrait.ilike.%${query}%`)
@@ -333,10 +568,59 @@ export async function searchFormations(query: string, filters: SearchFilters = {
             throw error
         }
 
-        console.log(`Formations search for "${query}":`, data?.length, 'results found')
+        const formations = (data || []) as unknown as SearchFormation[]
+
+        if (formations.length > 0) {
+            const categoryIds = [...new Set(formations.map(f => f.categorie_id).filter(Boolean))]
+            const professorIds = [...new Set(formations.map(f => f.professeur_id).filter(Boolean))]
+            const formationIds = formations.map(f => f.id)
+
+            // Fetch categories
+            if (categoryIds.length > 0) {
+                const { data: categories } = await supabase.from('categories').select('id, nom').in('id', categoryIds)
+                const catMap = new Map(categories?.map(c => [c.id, c.nom]) || [])
+                formations.forEach(f => f.category = catMap.get(f.categorie_id) || 'Formation')
+            }
+
+            // Fetch professors
+            if (professorIds.length > 0) {
+                const { data: professors } = await supabase.from('professeurs').select('id, full_name').in('id', professorIds)
+                const profMap = new Map(professors?.map(p => [p.id, p.full_name]) || [])
+                formations.forEach(f => f.instructor = profMap.get(f.professeur_id) || 'Professeur')
+            }
+
+            // Check favorites
+            if (user) {
+                const { data: favorites } = await supabase
+                    .from('favoris')
+                    .select('item_id')
+                    .eq('user_id', user.id)
+                    .eq('type_item', 'formation')
+                    .in('item_id', formationIds)
+
+                const favSet = new Set(favorites?.map(f => f.item_id) || [])
+                formations.forEach(f => f.is_favorited = favSet.has(f.id))
+            } else {
+                formations.forEach(f => f.is_favorited = false)
+            }
+
+            // Map fields for CourseCard
+            formations.forEach(f => {
+                f.level = f.niveau
+                f.duration = f.duree_texte
+                f.students = f.nombre_inscrits || 0
+                f.rating = f.note_moyenne || 0
+                f.price = f.prix_indicatif ? `${f.prix_indicatif.toLocaleString()} GNF` : 'Gratuit'
+                f.image = f.image_url
+                f.language = f.langue_enseignement
+                f.certificate = f.certificat // Map certificate
+            })
+        }
+
+        console.log(`Formations search for "${query}":`, formations.length, 'results found')
 
         return {
-            data: data || [],
+            data: formations,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -347,12 +631,14 @@ export async function searchFormations(query: string, filters: SearchFilters = {
 }
 
 // RECHERCHE D'ÉVÉNEMENTS
-export async function searchEvents(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchEvents(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchEvent>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
 
     try {
+        const { data: { user } } = await supabase.auth.getUser()
+
         let queryBuilder = supabase
             .from('evenements')
             .select(`
@@ -373,7 +659,11 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
         organisateur_id,
         categorie_id,
         pays_id,
-        ville_id
+        ville_id,
+        prix,
+        est_gratuit,
+        nombre_participants,
+        heure_ouverture_portes
       `, { count: 'exact' })
             .eq('statut', 'publie')
             .or(`titre.ilike.%${query}%,description.ilike.%${query}%,extrait.ilike.%${query}%`)
@@ -398,10 +688,60 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
             throw error
         }
 
-        console.log(`Events search for "${query}":`, data?.length, 'results found')
+        const events = (data || []) as unknown as SearchEvent[]
+
+        if (events.length > 0) {
+            const categoryIds = [...new Set(events.map(e => e.categorie_id).filter(Boolean))]
+            const organizerIds = [...new Set(events.map(e => e.organisateur_id).filter(Boolean))]
+            const eventIds = events.map(e => e.id)
+
+            // Fetch categories
+            if (categoryIds.length > 0) {
+                const { data: categories } = await supabase.from('categories').select('id, nom').in('id', categoryIds)
+                const catMap = new Map(categories?.map(c => [c.id, c.nom]) || [])
+                events.forEach(e => e.category = catMap.get(e.categorie_id) || 'Événement')
+            }
+
+            // Fetch organizers
+            if (organizerIds.length > 0) {
+                const { data: organizers } = await supabase.from('profiles').select('id, full_name').in('id', organizerIds)
+                const orgMap = new Map(organizers?.map(o => [o.id, o.full_name]) || [])
+                events.forEach(e => e.organizer = orgMap.get(e.organisateur_id) || 'Organisateur')
+            }
+
+            // Check favorites
+            if (user) {
+                const { data: favorites } = await supabase
+                    .from('favoris')
+                    .select('item_id')
+                    .eq('user_id', user.id)
+                    .eq('type_item', 'evenement')
+                    .in('item_id', eventIds)
+
+                const favSet = new Set(favorites?.map(f => f.item_id) || [])
+                events.forEach(e => e.is_favorited = favSet.has(e.id))
+            } else {
+                events.forEach(e => e.is_favorited = false)
+            }
+
+            // Map fields for EventCard
+            events.forEach(e => {
+                e.date = e.date_debut
+                e.time = e.heure_ouverture_portes ? e.heure_ouverture_portes.substring(0, 5) : (e.date_debut ? new Date(e.date_debut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '')
+                e.location = e.lieu || 'En ligne'
+                e.participants = e.nombre_participants || 0
+                e.maxParticipants = e.capacite || 0
+                e.image = e.image_url
+                e.status = e.type_evenement || 'ouvert'
+                e.price = e.prix // Map price
+                e.isFree = e.est_gratuit
+            })
+        }
+
+        console.log(`Events search for "${query}":`, events.length, 'results found')
 
         return {
-            data: data || [],
+            data: events,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -412,12 +752,14 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
 }
 
 // RECHERCHE DE CLUBS
-export async function searchClubs(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchClubs(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchClub>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
 
     try {
+        const { data: { user } } = await supabase.auth.getUser()
+
         let queryBuilder = supabase
             .from('clubs')
             .select(`
@@ -434,7 +776,11 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
         leader_id,
         categorie_id,
         pays_id,
-        ville_id
+        ville_id,
+        nombre_membres,
+        prix_inscription,
+        cotisation_mensuelle,
+        cotisation_annuelle
       `, { count: 'exact' })
             .or(`nom.ilike.%${query}%,description.ilike.%${query}%,theme_principal.ilike.%${query}%`)
             .order('created_at', { ascending: false })
@@ -463,10 +809,64 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
             throw error
         }
 
-        console.log(`Clubs search for "${query}":`, data?.length, 'results found')
+        const clubs = (data || []) as unknown as SearchClub[]
+
+        if (clubs.length > 0) {
+            const categoryIds = [...new Set(clubs.map(c => c.categorie_id).filter(Boolean))]
+            const leaderIds = [...new Set(clubs.map(c => c.leader_id).filter(Boolean))]
+            const clubIds = clubs.map(c => c.id)
+
+            // Fetch categories
+            if (categoryIds.length > 0) {
+                const { data: categories } = await supabase.from('categories').select('id, nom').in('id', categoryIds)
+                const catMap = new Map(categories?.map(c => [c.id, c.nom]) || [])
+                clubs.forEach(c => c.category = catMap.get(c.categorie_id) || 'Club')
+            }
+
+            // Fetch leaders (presidents)
+            if (leaderIds.length > 0) {
+                const { data: leaders } = await supabase.from('profiles').select('id, full_name').in('id', leaderIds)
+                const leaderMap = new Map(leaders?.map(l => [l.id, l.full_name]) || [])
+                clubs.forEach(c => c.president = leaderMap.get(c.leader_id) || 'Président')
+            }
+
+            // Check favorites
+            if (user) {
+                const { data: favorites } = await supabase
+                    .from('favoris')
+                    .select('item_id')
+                    .eq('user_id', user.id)
+                    .eq('type_item', 'club')
+                    .in('item_id', clubIds)
+
+                const favSet = new Set(favorites?.map(f => f.item_id) || [])
+                clubs.forEach(c => c.is_favorited = favSet.has(c.id))
+            } else {
+                clubs.forEach(c => c.is_favorited = false)
+            }
+
+            // Map fields for ClubCard
+            clubs.forEach(c => {
+                c.members = c.nombre_membres || 0
+                c.image = c.image_url
+
+                // Format fees
+                if (c.prix_inscription && c.prix_inscription > 0) {
+                    c.fees = `${c.prix_inscription.toLocaleString()} GNF (Inscription)`
+                } else if (c.cotisation_mensuelle && c.cotisation_mensuelle > 0) {
+                    c.fees = `${c.cotisation_mensuelle.toLocaleString()} GNF / mois`
+                } else if (c.cotisation_annuelle && c.cotisation_annuelle > 0) {
+                    c.fees = `${c.cotisation_annuelle.toLocaleString()} GNF / an`
+                } else {
+                    c.fees = 'Gratuit'
+                }
+            })
+        }
+
+        console.log(`Clubs search for "${query}":`, clubs.length, 'results found')
 
         return {
-            data: data || [],
+            data: clubs,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -477,12 +877,14 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
 }
 
 // RECHERCHE D'ARTICLES BLOG
-export async function searchBlogArticles(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchBlogArticles(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchArticle>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
 
     try {
+        const { data: { user } } = await supabase.auth.getUser()
+
         let queryBuilder = supabase
             .from('articles_blog')
             .select(`
@@ -524,10 +926,62 @@ export async function searchBlogArticles(query: string, filters: SearchFilters =
             throw error
         }
 
-        console.log(`Blog articles search for "${query}":`, data?.length, 'results found')
+        const articles = (data || []) as unknown as SearchArticle[]
+
+        if (articles.length > 0) {
+            const categoryIds = [...new Set(articles.map(a => a.categorie_id).filter(Boolean))]
+            const authorIds = [...new Set(articles.map(a => a.auteur_id).filter(Boolean))]
+            const articleIds = articles.map(a => a.id)
+
+            // Fetch categories
+            if (categoryIds.length > 0) {
+                const { data: categories } = await supabase.from('categories').select('id, nom').in('id', categoryIds)
+                const catMap = new Map(categories?.map(c => [c.id, c.nom]) || [])
+                articles.forEach(a => a.category = catMap.get(a.categorie_id) || 'Article')
+            }
+
+            // Fetch authors
+            if (authorIds.length > 0) {
+                const { data: authors } = await supabase.from('profiles').select('id, full_name, avatar_url, role').in('id', authorIds)
+                const authMap = new Map(authors?.map(a => [a.id, a]) || [])
+                articles.forEach(a => {
+                    const author = authMap.get(a.auteur_id)
+                    a.author = author?.full_name || 'Auteur'
+                    a.authorAvatar = author?.avatar_url
+                    a.authorRole = author?.role || 'Rédacteur'
+                })
+            }
+
+            // Check favorites
+            if (user) {
+                const { data: favorites } = await supabase
+                    .from('favoris')
+                    .select('item_id')
+                    .eq('user_id', user.id)
+                    .eq('type_item', 'article')
+                    .in('item_id', articleIds)
+
+                const favSet = new Set(favorites?.map(f => f.item_id) || [])
+                articles.forEach(a => a.is_favorited = favSet.has(a.id))
+            } else {
+                articles.forEach(a => a.is_favorited = false)
+            }
+
+            // Map fields for BlogCard
+            articles.forEach(a => {
+                a.date = a.publie_at
+                a.readTime = '5 min' // Placeholder
+                a.image = a.image_couverture || a.image_url
+                a.views = a.vues || 0
+                a.likes = a.likes_count || 0
+                a.comments = a.comment_count || 0
+            })
+        }
+
+        console.log(`Blog articles search for "${query}":`, articles.length, 'results found')
 
         return {
-            data: data || [],
+            data: articles,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -538,7 +992,7 @@ export async function searchBlogArticles(query: string, filters: SearchFilters =
 }
 
 // RECHERCHE DE PROFESSEURS
-export async function searchProfesseurs(query: string, filters: SearchFilters = {}): Promise<SearchResult<any>> {
+export async function searchProfesseurs(query: string, filters: SearchFilters = {}): Promise<SearchResult<SearchProfessor>> {
     const supabase = await createClient()
     const limit = filters.limit || 20
     const offset = filters.offset || 0
@@ -568,10 +1022,31 @@ export async function searchProfesseurs(query: string, filters: SearchFilters = 
             throw error
         }
 
-        console.log(`Professeurs search for "${query}":`, data?.length, 'results found')
+        const professors = (data || []) as unknown as SearchProfessor[]
+
+        if (professors.length > 0) {
+            const paysIds = [...new Set(professors.map(p => p.pays_id).filter(Boolean))]
+            const villeIds = [...new Set(professors.map(p => p.ville_id).filter(Boolean))]
+
+            // Fetch pays
+            if (paysIds.length > 0) {
+                const { data: pays } = await supabase.from('pays').select('id, nom').in('id', paysIds)
+                const paysMap = new Map(pays?.map(p => [p.id, p.nom]) || [])
+                professors.forEach(p => p.pays_nom = paysMap.get(p.pays_id))
+            }
+
+            // Fetch villes
+            if (villeIds.length > 0) {
+                const { data: villes } = await supabase.from('villes').select('id, nom').in('id', villeIds)
+                const villesMap = new Map(villes?.map(v => [v.id, v.nom]) || [])
+                professors.forEach(p => p.ville_nom = villesMap.get(p.ville_id))
+            }
+        }
+
+        console.log(`Professeurs search for "${query}":`, professors.length, 'results found')
 
         return {
-            data: data || [],
+            data: professors,
             total: count || 0,
             hasMore: (count || 0) > offset + limit
         }
@@ -580,4 +1055,3 @@ export async function searchProfesseurs(query: string, filters: SearchFilters = 
         return { data: [], total: 0, hasMore: false }
     }
 }
-

@@ -1,12 +1,12 @@
 'use client'
 
 import { Suspense } from 'react'
-import { SearchContent } from './search-content'
+import SearchPageContent from './search-page-content'
 
 export default function SearchPage() {
     return (
         <Suspense fallback={<div className="min-h-screen bg-background" />}>
-            <SearchContent />
+            <SearchPageContent />
         </Suspense>
     )
 }
