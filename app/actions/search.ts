@@ -606,6 +606,8 @@ export async function searchFormations(query: string, filters: SearchFilters = {
 
             // Map fields for CourseCard
             formations.forEach(f => {
+                // @ts-ignore
+                f.title = f.titre // Map title
                 f.level = f.niveau
                 f.duration = f.duree_texte
                 f.students = f.nombre_inscrits || 0
@@ -726,6 +728,8 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
 
             // Map fields for EventCard
             events.forEach(e => {
+                // @ts-ignore
+                e.title = e.titre // Map title
                 e.date = e.date_debut
                 e.time = e.heure_ouverture_portes ? e.heure_ouverture_portes.substring(0, 5) : (e.date_debut ? new Date(e.date_debut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '')
                 e.location = e.lieu || 'En ligne'
@@ -847,6 +851,10 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
 
             // Map fields for ClubCard
             clubs.forEach(c => {
+                // @ts-ignore
+                c.name = c.nom // Map name
+                // @ts-ignore
+                c.activities = c.theme_principal // Map activities
                 c.members = c.nombre_membres || 0
                 c.image = c.image_url
 
@@ -969,6 +977,10 @@ export async function searchBlogArticles(query: string, filters: SearchFilters =
 
             // Map fields for BlogCard
             articles.forEach(a => {
+                // @ts-ignore
+                a.title = a.titre // Map title
+                // @ts-ignore
+                a.excerpt = a.extrait // Map excerpt
                 a.date = a.publie_at
                 a.readTime = '5 min' // Placeholder
                 a.image = a.image_couverture || a.image_url
