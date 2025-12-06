@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getCommentsByPostId } from "@/lib/data/comments";
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { toggleLike, addComment, sharePostAction } from "@/app/actions";
+import { toggleLike, addComment, sharePostAction, reportContent } from "@/app/actions";
 import { deletePostAction, updatePostStatusAction, updatePostVisibilityAction } from "@/app/dashboard/actions";
 import { Trash2, Eye, EyeOff, Archive, Globe, Lock } from "lucide-react";
 import { followUserAction } from "@/app/users/actions";
@@ -62,7 +62,9 @@ interface Comment {
   } | null;
 }
 
-import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose, DialogTitle, DialogHeader, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -180,6 +182,9 @@ export function PostCard(props: PostCardProps) {
   const [addingComment, setAddingComment] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportReason, setReportReason] = useState("spam");
+  const [isReporting, setIsReporting] = useState(false);
   const { toast } = useToast();
 
   const handleDeletePost = async () => {
@@ -331,6 +336,19 @@ export function PostCard(props: PostCardProps) {
     setIsCreatingConversation(false);
   };
 
+  const handleReport = async () => {
+    if (!currentUserId) return;
+    setIsReporting(true);
+    const { error } = await reportContent('post', id, reportReason, currentUserId);
+    if (error) {
+      toast({ title: "Erreur", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "Signalé", description: "Le contenu a été signalé à l'équipe de modération." });
+      setShowReportDialog(false);
+    }
+    setIsReporting(false);
+  };
+
   return (
     <Card className="rounded-none md:rounded-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden group">
       <CardContent className="p-2 lg:p-6">
@@ -396,7 +414,7 @@ export function PostCard(props: PostCardProps) {
                     </DropdownMenuItem>
                   </>
                 ) : (
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setShowReportDialog(true)}>
                     <span>Signaler</span>
                   </DropdownMenuItem>
                 )}
@@ -548,6 +566,44 @@ export function PostCard(props: PostCardProps) {
           </DropdownMenu>
         </div>
       </CardContent>
+
+      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Signaler ce contenu</DialogTitle>
+            <DialogDescription>
+              Aidez-nous à comprendre le problème.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <RadioGroup value={reportReason} onValueChange={setReportReason}>
+              <div className="flex items-center space-x-2 mb-2">
+                <RadioGroupItem value="spam" id="r-spam" />
+                <Label htmlFor="r-spam">Spam ou contenu indésirable</Label>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <RadioGroupItem value="inappropriate" id="r-inappropriate" />
+                <Label htmlFor="r-inappropriate">Contenu inapproprié ou offensant</Label>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <RadioGroupItem value="harassment" id="r-harassment" />
+                <Label htmlFor="r-harassment">Harcèlement ou intimidation</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="misinformation" id="r-misinformation" />
+                <Label htmlFor="r-misinformation">Fausse information</Label>
+              </div>
+            </RadioGroup>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReportDialog(false)}>Annuler</Button>
+            <Button onClick={handleReport} disabled={isReporting}>
+              {isReporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Envoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

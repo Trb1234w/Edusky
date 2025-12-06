@@ -213,8 +213,32 @@ export async function sharePostAction(originalPostId: string, authorId: string) 
   }
   // --- NOTIFICATION END ---
 
-  revalidatePath("/feed");
   revalidatePath("/dashboard");
+  revalidatePath("/feed");
+
+  return { success: true };
+}
+
+export async function reportContent(type: 'post' | 'comment' | 'user', targetId: string, reason: string, userId: string) {
+  if (!targetId || !reason || !userId) {
+    return { error: "Informations manquantes pour le signalement." };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('signalements')
+    .insert({
+      user_id: userId,
+      type: type,
+      target_id: targetId,
+      raison: reason,
+    });
+
+  if (error) {
+    console.error("Erreur lors du signalement:", error);
+    return { error: "Une erreur est survenue lors de l'envoi du signalement." };
+  }
 
   return { success: true };
 }

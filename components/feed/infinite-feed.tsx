@@ -26,7 +26,7 @@ export function InfiniteFeed({ initialPosts, currentUserId, followingIds }: Infi
         const cursor = lastPost?.timestamp
 
         try {
-            const response = await fetch(`/api/feed/posts?cursor=${cursor}&limit=10&userId=${currentUserId}`)
+            const response = await fetch(`/api/feed/posts?cursor=${encodeURIComponent(cursor)}&limit=10&userId=${currentUserId}`)
             const { data: newPosts } = await response.json()
 
             if (newPosts && newPosts.length > 0) {
