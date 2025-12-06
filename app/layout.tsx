@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
@@ -14,6 +14,14 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"]
 })
 
+export const viewport: Viewport = {
+  themeColor: "#3B82F6",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+}
+
 export const metadata: Metadata = {
   title: "EduSky - Plateforme Éducative Sociale",
   description: "Découvrez des professeurs, formations, événements et clubs éducatifs en Guinée",
@@ -21,13 +29,6 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   keywords: ["éducation", "formation", "événements", "clubs", "professeurs", "Guinée", "apprentissage"],
   authors: [{ name: "Edusky" }],
-  themeColor: "#3B82F6",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -9,10 +9,15 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const userId = searchParams.get('userId')
 
+    // Sanitize cursor: ensure it's not "undefined", "null", or empty string
+    const validCursor = cursor && cursor !== 'undefined' && cursor !== 'null' ? cursor : undefined
+
+    console.log(`[API] Fetching posts with cursor: ${validCursor}, limit: ${limit}, userId: ${userId}`)
+
     const { data: posts, error } = await getAllFeedPosts(
         userId || undefined,
         limit,
-        cursor || undefined
+        validCursor
     )
 
     if (error) {

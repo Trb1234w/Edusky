@@ -3,6 +3,7 @@ import { PostCard } from "@/components/post-card"
 import { SharedPostCard } from "@/components/shared-post-card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedHeader } from "@/components/feed-header"
+import { InfiniteFeed } from "@/components/feed/infinite-feed"
 
 interface FeedContentProps {
     userId: string
@@ -47,7 +48,7 @@ export async function FeedContent({ userId, followingIds, profile }: FeedContent
                         </TabsList>
                     </div>
                     <TabsContent value="all" className="mt-2 space-y-2 divide-y divide-border">
-                        {posts.map(renderPost)}
+                        <InfiniteFeed initialPosts={posts} currentUserId={userId} followingIds={followingIds} />
                     </TabsContent>
                     <TabsContent value="following" className="mt-2 space-y-2 divide-y divide-border">
                         {posts.filter((post: any) => followingIds.includes(post.authorId)).map(renderPost)}
@@ -68,7 +69,7 @@ export async function FeedContent({ userId, followingIds, profile }: FeedContent
                         </TabsList>
                     </div>
                     <TabsContent value="all" className="space-y-4 mt-4 divide-y divide-border">
-                        {posts.map(renderPost)}
+                        <InfiniteFeed initialPosts={posts} currentUserId={userId} followingIds={followingIds} />
                     </TabsContent>
                     <TabsContent value="following" className="space-y-4 mt-4 divide-y divide-border">
                         {posts.filter((post: any) => followingIds.includes(post.authorId)).map(renderPost)}

@@ -5,6 +5,7 @@ import { PostCard } from '@/components/post-card'
 import { SharedPostCard } from '@/components/shared-post-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 interface InfiniteFeedProps {
     initialPosts: any[]
@@ -25,12 +26,45 @@ export function InfiniteFeed({ initialPosts, currentUserId, followingIds }: Infi
         const lastPost = posts[posts.length - 1]
         const cursor = lastPost?.timestamp
 
+        console.log('Loading more posts...', { lastPostId: lastPost?.id, cursor })
+
+        if (!cursor) {
+            console.warn('No cursor found, stopping infinite scroll')
+            setHasMore(false)
+            setIsLoading(false)
+            return
+        }
+
         try {
-            const response = await fetch(`/api/feed/posts?cursor=${encodeURIComponent(cursor)}&limit=10&userId=${currentUserId}`)
-            const { data: newPosts } = await response.json()
+            const url = `/api/feed/posts?cursor=${encodeURIComponent(cursor)}&limit=10&userId=${currentUserId}`
+            console.log('Fetching URL:', url)
+            const response = await fetch(url)
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const { data: newPosts, error } = await response.json()
+
+            if (error) {
+                console.error('API Error:', error)
+                return
+            }
+
+            console.log('New posts received:', newPosts?.length)
 
             if (newPosts && newPosts.length > 0) {
-                setPosts(prev => [...prev, ...newPosts])
+                // Filter out duplicates just in case
+                setPosts(prev => {
+                    const existingIds = new Set(prev.map(p => p.id))
+                    const uniqueNewPosts = newPosts.filter((p: any) => !existingIds.has(p.id))
+                    if (uniqueNewPosts.length === 0) {
+                        console.log('All received posts are duplicates')
+                        setHasMore(false)
+                        return prev
+                    }
+                    return [...prev, ...uniqueNewPosts]
+                })
                 setHasMore(newPosts.length >= 10)
             } else {
                 setHasMore(false)
@@ -111,6 +145,15 @@ export function InfiniteFeed({ initialPosts, currentUserId, followingIds }: Infi
                     </p>
                 )}
             </div>
+
+            {/* Debug Manual Load Button */}
+            {hasMore && !isLoading && (
+                <div className="flex justify-center pb-8">
+                    <Button variant="outline" onClick={loadMorePosts}>
+                        Charger plus de posts (Debug)
+                    </Button>
+                </div>
+            )}
         </>
     )
 }
