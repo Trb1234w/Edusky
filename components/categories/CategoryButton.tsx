@@ -2,16 +2,10 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { HorizontalCategoryMenuItem } from "./HorizontalCategoryMenuItem";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { CategoryNode } from "./HorizontalCategoryNav";
+import { CategoryModal } from "./CategoryModal";
 
 type CategoryButtonProps = {
   node: CategoryNode;
@@ -26,22 +20,22 @@ const getDescendantSlugs = (node: CategoryNode): string[] => {
   return [node.slug, ...node.children.flatMap(getDescendantSlugs)];
 };
 
-export function CategoryButton({ 
-  node, 
-  selectedSlugs, 
+export function CategoryButton({
+  node,
+  selectedSlugs,
   onCategorySelect,
   onLabelSelect,
   activeLabel
 }: CategoryButtonProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const hasChildren = node.children.length > 0;
   const isSelected = selectedSlugs?.includes(node.slug);
 
-  const handleSelect = (slugs: string[], name: string) => {
+  const handleCategorySelect = (slugs: string[]) => {
     onCategorySelect(slugs);
-    onLabelSelect(name);
   };
 
+  // Si pas d'enfants, bouton simple
   if (!hasChildren) {
     return (
       <Button
@@ -56,31 +50,27 @@ export function CategoryButton({
     );
   }
 
+  // Si a des enfants, bouton qui ouvre le modal
   return (
-    <DropdownMenu onOpenChange={setIsDropdownOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant={isSelected ? "default" : "outline"}
-          size="sm"
-          className="rounded-full whitespace-nowrap pr-2"
-        >
-          {activeLabel || node.nom}
-          <ChevronDown className={cn("ml-1 h-4 w-4 transition-transform duration-200", isDropdownOpen && "rotate-180")} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => handleSelect(getDescendantSlugs(node), node.nom)}>
-          Tous les articles de "{node.nom}"
-        </DropdownMenuItem>
-        <div className="my-1 border-t border-muted" />
-        {node.children.map(child => (
-          <HorizontalCategoryMenuItem
-            key={child.id}
-            node={child}
-            onSelect={handleSelect}
-          />
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <Button
+        variant={isSelected ? "default" : "outline"}
+        size="sm"
+        className="rounded-full whitespace-nowrap pr-2"
+        onClick={() => setIsModalOpen(true)}
+      >
+        {activeLabel || node.nom}
+        <ChevronDown className={cn("ml-1 h-4 w-4 transition-transform duration-200", isModalOpen && "rotate-180")} />
+      </Button>
+
+      <CategoryModal
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        category={node}
+        selectedSlugs={selectedSlugs}
+        onCategorySelect={handleCategorySelect}
+        onLabelSelect={onLabelSelect}
+      />
+    </>
   );
 }
