@@ -99,63 +99,48 @@ export async function getPaginatedFormationsAction(params: {
   }
 }
 
-export async function createFormationInscription(formData: FormData) {
-  const supabase = await createClient();
+export async function createFormationInscription(formData: {
+  nom: string
+  prenom: string
+  email: string
+  telephone: string
+  whatsapp: string
+  age: number
+  statut_professionnel: string
+  motivation: string
+  niveau_etudes?: string
+  objectifs_formation?: string
+  comment_connu?: string
+  message?: string
+  formation_id: string
+}) {
+  const supabase = await createClient()
 
-  const userResponse = await supabase.auth.getUser();
-  if (userResponse.error || !userResponse.data.user) {
-    return { error: "User not authenticated." };
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const dataToInsert = {
+    ...formData,
+    user_id: user?.id || null,
   }
-  const buyer_id = userResponse.data.user.id;
-
-  // Extract data from formData
-  const product_id = formData.get('product_id') as string; // Assuming formation_id is passed as product_id
-  const price = parseFloat(formData.get('price') as string);
-  const payment_method = formData.get('payment_method') as string;
-  // seller_id would need to be fetched based on product_id or passed as hidden field
-
-  if (!product_id || isNaN(price) || !payment_method) {
-    return { error: "Missing required form fields." };
-  }
-
-  // TODO: Fetch seller_id based on product_id (formation_id)
-  // For now, let's assume product_id directly maps to a product entry with an owner_id
-  const { data: productData, error: productError } = await supabase
-    .from('products') // Assuming formations are stored in the 'products' table
-    .select('owner_id')
-    .eq('product_id', product_id)
-    .single();
-
-  if (productError || !productData) {
-    console.error("Error fetching product owner:", productError);
-    return { error: "Failed to find product owner." };
-  }
-  const seller_id = productData.owner_id;
-
 
   const { data, error } = await supabase
-    .from('orders') // Assuming 'orders' table for inscriptions
-    .insert([
-      {
-        buyer_id: buyer_id,
-        product_id: product_id,
-        seller_id: seller_id, // Replace with actual seller ID
-        price: price,
-        status: 'pending', // Default status
-        payment_method: payment_method,
-        payment_status: 'pending',
-        // delivery_address, tracking_number, delivery_status might not apply to formations
-      },
-    ])
-    .select();
+    .from('inscriptions_formation')
+    .insert([dataToInsert])
+    .select()
 
   if (error) {
-    console.error("Error creating formation inscription:", error);
-    return { error: error.message };
+    console.error("Erreur lors de l'inscription à la formation:", error)
+    return {
+      success: false,
+      message: "Une erreur est survenue. Veuillez réessayer.",
+    }
   }
 
-  revalidatePath('/formations'); // Revalidate the formations page or related paths
-  revalidatePath(`/formations/${product_id}`); // Revalidate the specific formation page
+  revalidatePath(`/formations/${formData.formation_id}`)
 
-  return { data: data[0], error: null };
+  return {
+    success: true,
+    message: "Inscription réussie ! Nous vous recontacterons très prochainement.",
+    data: data[0],
+  }
 }

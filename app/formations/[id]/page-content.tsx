@@ -10,7 +10,6 @@ import {
     Calendar,
     Users,
     Award,
-    CheckCircle2,
     Globe,
     Share2,
     Heart,
@@ -20,12 +19,8 @@ import {
     Computer,
     GraduationCap,
     Info,
-    Accessibility,
     Book,
-    Briefcase,
     Building2,
-    FileText,
-    List,
     ListVideo,
     Star,
 } from 'lucide-react';
@@ -238,94 +233,95 @@ export async function FormationDetailsPageContent({ params }: { params: { id: st
                                 </div>
                             </Card>
 
-                            {/* Contenu principal avec onglets */}
-                            <Tabs defaultValue="about" className="w-full">
+                            {/* Contenu principal avec onglets regroupés */}
+                            <Tabs defaultValue="presentation" className="w-full">
                                 <TabsList className="flex w-full overflow-x-auto justify-start md:flex md:flex-wrap gap-2 bg-transparent md:bg-muted/50 p-0 md:p-1 mb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                    <TabsTrigger value="about" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">À propos</span></TabsTrigger>
-                                    <TabsTrigger value="infos" className="lg:hidden flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Info className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Infos</span></TabsTrigger>
-                                    {curriculum.length > 0 && <TabsTrigger value="curriculum" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Book className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Curriculum</span></TabsTrigger>}
-                                    {formation.programme && <TabsTrigger value="programme" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><List className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Programme</span></TabsTrigger>}
-                                    {(formation.horaires || formation.jours_formation) && <TabsTrigger value="horaires" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Calendar className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Horaires</span></TabsTrigger>}
-                                    {sessions.length > 0 && <TabsTrigger value="sessions" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Calendar className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Sessions</span></TabsTrigger>}
-                                    {formation.ressources && <TabsTrigger value="ressources" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><FileText className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Ressources</span></TabsTrigger>}
-                                    {formation.prerequis && <TabsTrigger value="prerequis" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><CheckCircle2 className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Prérequis</span></TabsTrigger>}
-                                    {formation.public_cible && <TabsTrigger value="public_cible" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Users className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Public</span></TabsTrigger>}
-                                    {formation.jobs_relies && <TabsTrigger value="jobs" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Briefcase className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Débouchés</span></TabsTrigger>}
-                                    {formation.modalites_evaluation && <TabsTrigger value="modalites" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Award className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Modalités</span></TabsTrigger>}
-                                    {formation.accessibilite && <TabsTrigger value="accessibilite" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap"><Accessibility className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Accessibilité</span></TabsTrigger>}
+                                    <TabsTrigger value="presentation" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap">
+                                        <Info className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Présentation</span>
+                                        <span className="md:hidden">Présentation</span>
+                                    </TabsTrigger>
+                                    <TabsTrigger value="programme" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap">
+                                        <Book className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Programme</span>
+                                        <span className="md:hidden">Programme</span>
+                                    </TabsTrigger>
+                                    <TabsTrigger value="organisation" className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full md:rounded-sm px-4 py-2 border md:border-none whitespace-nowrap">
+                                        <Calendar className="h-4 w-4 mr-0 md:mr-2" /><span className="hidden md:inline">Organisation</span>
+                                        <span className="md:hidden">Organisation</span>
+                                    </TabsTrigger>
                                 </TabsList>
 
-                                <TabsContent value="infos">
-                                    <InfosTab formation={formation} formatPrice={formatPrice} formatDate={formatDate} />
-                                </TabsContent>
-
-                                <TabsContent value="about" className="p-6 bg-background rounded-2xl shadow-lg">
-                                    <h3 className="text-xl font-bold mb-4">Description de la formation</h3>
-                                    <div className="prose dark:prose-invert max-w-none text-foreground/90 mb-6">
-                                        {formation.description || "Aucune description disponible."}
+                                {/* Onglet 1 : Présentation */}
+                                <TabsContent value="presentation" className="space-y-6">
+                                    {/* Infos Clés (Mobile uniquement) */}
+                                    <div className="lg:hidden">
+                                        <InfosTab formation={formation} formatPrice={formatPrice} formatDate={formatDate} />
                                     </div>
 
-                                    {/* Infos supplémentaires non couvertes par les autres onglets */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4 mt-6">
-                                        {formation.date_publication && (
-                                            <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(String(formation.date_publication))}</div>
-                                        )}
-                                        {formation.updated_at && (
-                                            <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(String(formation.updated_at))}</div>
-                                        )}
-                                        {formation.ville && (
-                                            <div className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Ville : {formation.ville.nom}</div>
-                                        )}
-                                        {formation.pays && (
-                                            <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Pays : {formation.pays.nom}</div>
-                                        )}
-                                        {formation.capacite && (
-                                            <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {formation.capacite} places</div>
-                                        )}
-                                        {formation.langue_enseignement && (
-                                            <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Langue : <span className="capitalize">{formation.langue_enseignement}</span></div>
-                                        )}
+                                    {/* Description */}
+                                    <div className="p-6 bg-background rounded-2xl shadow-lg">
+                                        <h3 className="text-xl font-bold mb-4">À propos de la formation</h3>
+                                        <div className="prose dark:prose-invert max-w-none text-foreground/90 mb-6">
+                                            {formation.description || "Aucune description disponible."}
+                                        </div>
+
+                                        {/* Infos supplémentaires */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4 mt-6">
+                                            {formation.date_publication && (
+                                                <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(String(formation.date_publication))}</div>
+                                            )}
+                                            {formation.updated_at && (
+                                                <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(String(formation.updated_at))}</div>
+                                            )}
+                                            {formation.ville && (
+                                                <div className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Ville : {formation.ville.nom}</div>
+                                            )}
+                                            {formation.pays && (
+                                                <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Pays : {formation.pays.nom}</div>
+                                            )}
+                                            {formation.capacite && (
+                                                <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {formation.capacite} places</div>
+                                            )}
+                                            {formation.langue_enseignement && (
+                                                <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Langue : <span className="capitalize">{formation.langue_enseignement}</span></div>
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {/* Public Cible */}
+                                    {formation.public_cible && <PublicCibleTab publicCible={formation.public_cible} />}
+
+                                    {/* Débouchés */}
+                                    {formation.jobs_relies && <JobsTab jobs={formation.jobs_relies} />}
+
+                                    {/* Accessibilité */}
+                                    {formation.accessibilite && <AccessibiliteTab accessibilite={formation.accessibilite} />}
                                 </TabsContent>
 
-                                <TabsContent value="curriculum">
-                                    <CurriculumTab curriculum={curriculum} />
+                                {/* Onglet 2 : Programme */}
+                                <TabsContent value="programme" className="space-y-6">
+                                    {/* Curriculum (Modules/Leçons) */}
+                                    {curriculum.length > 0 && <CurriculumTab curriculum={curriculum} />}
+
+                                    {/* Programme détaillé (Texte/Liste) */}
+                                    {formation.programme && <ProgrammeTab programme={formation.programme} />}
+
+                                    {/* Modalités d'évaluation */}
+                                    {formation.modalites_evaluation && <ModalitesTab modalites={formation.modalites_evaluation} />}
+
+                                    {/* Ressources */}
+                                    {formation.ressources && <RessourcesTab ressources={formation.ressources} />}
                                 </TabsContent>
 
-                                <TabsContent value="programme">
-                                    <ProgrammeTab programme={formation.programme} />
-                                </TabsContent>
+                                {/* Onglet 3 : Organisation */}
+                                <TabsContent value="organisation" className="space-y-6">
+                                    {/* Prérequis */}
+                                    {formation.prerequis && <PrerequisTab prerequis={formation.prerequis} />}
 
-                                <TabsContent value="horaires">
-                                    <HorairesTab horaires={formation.horaires} joursFormation={formation.jours_formation} />
-                                </TabsContent>
+                                    {/* Horaires */}
+                                    {(formation.horaires || formation.jours_formation) && <HorairesTab horaires={formation.horaires} joursFormation={formation.jours_formation} />}
 
-                                <TabsContent value="sessions">
-                                    <SessionsTab sessions={sessions} formatDate={formatDate} />
-                                </TabsContent>
-
-                                <TabsContent value="ressources">
-                                    <RessourcesTab ressources={formation.ressources} />
-                                </TabsContent>
-
-                                <TabsContent value="prerequis">
-                                    <PrerequisTab prerequis={formation.prerequis} />
-                                </TabsContent>
-
-                                <TabsContent value="public_cible">
-                                    <PublicCibleTab publicCible={formation.public_cible} />
-                                </TabsContent>
-
-                                <TabsContent value="jobs">
-                                    <JobsTab jobs={formation.jobs_relies} />
-                                </TabsContent>
-
-                                <TabsContent value="modalites">
-                                    <ModalitesTab modalites={formation.modalites_evaluation} />
-                                </TabsContent>
-
-                                <TabsContent value="accessibilite">
-                                    <AccessibiliteTab accessibilite={formation.accessibilite} />
+                                    {/* Sessions */}
+                                    {sessions.length > 0 && <SessionsTab sessions={sessions} formatDate={formatDate} />}
                                 </TabsContent>
                             </Tabs>
                         </div>

@@ -8,6 +8,18 @@ export async function createClubInscription(formData: {
   prenom: string
   email: string
   telephone: string
+  whatsapp: string
+  age: number
+  date_naissance?: string
+  profession?: string
+  niveau_experience: string
+  centres_interet?: string[]
+  motivation_adhesion: string
+  disponibilite_semaine?: string[]
+  comment_connu?: string
+  parraine_par?: string
+  accepte_reglement: boolean
+  accepte_communication?: boolean
   message?: string
   club_id: string
 }) {
@@ -37,7 +49,7 @@ export async function createClubInscription(formData: {
 
   return {
     success: true,
-    message: "Inscription au club réussie !",
+    message: "Inscription au club réussie ! Nous vous recontacterons très prochainement.",
     data: data[0],
   }
 }

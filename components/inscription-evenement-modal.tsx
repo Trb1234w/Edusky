@@ -27,12 +27,22 @@ import { Loader2 } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { createEvenementInscription } from '@/app/evenements/actions'
 
-// Le schéma de validation est le même que pour les formations
 const formSchema = z.object({
   prenom: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères." }),
   nom: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   email: z.string().email({ message: "Veuillez saisir une adresse e-mail valide." }),
   telephone: z.string().min(8, { message: "Le numéro de téléphone semble incorrect." }),
+  whatsapp: z.string().min(8, { message: "Le numéro WhatsApp semble incorrect." }),
+  age: z.coerce.number().min(16, { message: "Vous devez avoir au moins 16 ans." }).max(120),
+  profession: z.string().optional(),
+  entreprise: z.string().optional(),
+  secteur_activite: z.string().optional(),
+  motivation_participation: z.string().optional(),
+  attentes_evenement: z.string().optional(),
+  comment_connu: z.string().optional(),
+  besoins_specifiques: z.string().optional(),
+  regime_alimentaire: z.string().optional(),
+  accompagnants: z.coerce.number().min(0).max(10).optional(),
   message: z.string().optional(),
 })
 
@@ -55,6 +65,17 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
       nom: "",
       email: "",
       telephone: "",
+      whatsapp: "",
+      age: "" as any,
+      profession: "",
+      entreprise: "",
+      secteur_activite: "",
+      motivation_participation: "",
+      attentes_evenement: "",
+      comment_connu: "",
+      besoins_specifiques: "",
+      regime_alimentaire: "",
+      accompagnants: 0,
       message: "",
     },
   })
@@ -70,7 +91,7 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
     if (result.success) {
       toast({
         title: "Inscription réussie !",
-        description: "Votre place est réservée.",
+        description: "Nous vous recontacterons très prochainement.",
       })
       setIsOpen(false)
       form.reset()
@@ -90,7 +111,7 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
           {buttonText || "S'inscrire"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>S'inscrire à l'événement</DialogTitle>
           <DialogDescription>
@@ -99,13 +120,14 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Informations personnelles */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="prenom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Prénom</FormLabel>
+                    <FormLabel>Prénom *</FormLabel>
                     <FormControl>
                       <Input placeholder="Votre prénom" {...field} />
                     </FormControl>
@@ -118,7 +140,7 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
                 name="nom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nom</FormLabel>
+                    <FormLabel>Nom *</FormLabel>
                     <FormControl>
                       <Input placeholder="Votre nom" {...field} />
                     </FormControl>
@@ -127,12 +149,13 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
                 )}
               />
             </div>
+
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email *</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="votre@email.com" {...field} />
                   </FormControl>
@@ -140,35 +163,189 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="telephone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Téléphone *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+224 6..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="whatsapp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>WhatsApp *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+224 6..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="telephone"
+              name="age"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Téléphone</FormLabel>
+                  <FormLabel>Âge *</FormLabel>
                   <FormControl>
-                    <Input placeholder="+224 6..." {...field} />
+                    <Input type="number" placeholder="25" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Message (optionnel)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Avez-vous une question ?"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            {/* Champs optionnels */}
+            <div className="border-t pt-4">
+              <p className="text-sm text-muted-foreground mb-3">Informations complémentaires (optionnel)</p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="profession"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profession</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Votre profession" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="entreprise"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Entreprise</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Votre entreprise" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <FormField
+                  control={form.control}
+                  name="secteur_activite"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Secteur d'activité</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Tech, Finance..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="regime_alimentaire"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Régime alimentaire</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Végétarien, halal..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="motivation_participation"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Motivation / Attentes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Qu'attendez-vous de cet événement ?"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="besoins_specifiques"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Besoins spécifiques</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Accessibilité, allergies..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="accompagnants"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Accompagnants</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="0" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="comment_connu"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Comment avez-vous connu cet événement ?</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Réseaux sociaux, bouche à oreille..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Message</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Avez-vous une question ?"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirmer l'inscription

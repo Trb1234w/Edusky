@@ -62,21 +62,20 @@ export default async function HomePage() {
       {/* 3. Discover Section (Sliders) */}
       {/* 3. Discover Section (Sliders) */}
       <DiscoverSection>
-        {/* Posts Slider */}
-        {postes.length > 0 && (
+        {/* Professeurs Slider */}
+        {professeurs.length > 0 && (
           <SectionSlider
-            title="Publications"
-            icon={<Sparkles className="w-5 h-5 text-primary" />}
-            href="/feed"
+            title="Professeurs"
+            icon={<Users className="w-5 h-5 text-primary" />}
+            href="/professeurs"
           >
-            {postes.map((post: any) => (
-              <div key={post.id} className="w-[280px] md:w-[300px] h-full snap-start">
-                <HomePostCard {...post} />
+            {professeurs.map((prof: any) => (
+              <div key={prof.id} className="w-[280px] md:w-[300px] h-full snap-start">
+                <ProfesseurCard {...prof} />
               </div>
             ))}
           </SectionSlider>
         )}
-
         {/* Formations Slider */}
         {formations.length > 0 && (
           <SectionSlider
@@ -102,21 +101,6 @@ export default async function HomePage() {
             {evenements.map((event: any) => (
               <div key={event.id} className="w-[280px] md:w-[320px] h-full snap-start">
                 <EventCard {...event} />
-              </div>
-            ))}
-          </SectionSlider>
-        )}
-
-        {/* Professeurs Slider */}
-        {professeurs.length > 0 && (
-          <SectionSlider
-            title="Professeurs"
-            icon={<Users className="w-5 h-5 text-primary" />}
-            href="/professeurs"
-          >
-            {professeurs.map((prof: any) => (
-              <div key={prof.id} className="w-[280px] md:w-[300px] h-full snap-start">
-                <ProfesseurCard {...prof} />
               </div>
             ))}
           </SectionSlider>

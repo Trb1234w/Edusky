@@ -8,6 +8,17 @@ export async function createEvenementInscription(formData: {
   prenom: string
   email: string
   telephone: string
+  whatsapp: string
+  age: number
+  profession?: string
+  entreprise?: string
+  secteur_activite?: string
+  motivation_participation?: string
+  attentes_evenement?: string
+  comment_connu?: string
+  besoins_specifiques?: string
+  regime_alimentaire?: string
+  accompagnants?: number
   message?: string
   evenement_id: string
 }) {
@@ -37,7 +48,7 @@ export async function createEvenementInscription(formData: {
 
   return {
     success: true,
-    message: "Inscription réussie !",
+    message: "Inscription réussie ! Nous vous recontacterons très prochainement.",
     data: data[0],
   }
 }

@@ -23,16 +23,26 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { createFormationInscription } from '@/app/formations/actions'
 
-// Schéma de validation avec Zod, basé sur la table
+// Schéma de validation avec Zod, basé sur la table enrichie
 const formSchema = z.object({
   prenom: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères." }),
   nom: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   email: z.string().email({ message: "Veuillez saisir une adresse e-mail valide." }),
   telephone: z.string().min(8, { message: "Le numéro de téléphone semble incorrect." }),
+  whatsapp: z.string().min(8, { message: "Le numéro WhatsApp semble incorrect." }),
+  age: z.coerce.number().min(16, { message: "Vous devez avoir au moins 16 ans." }).max(120),
+  statut_professionnel: z.enum(['etudiant', 'salarie', 'independant', 'chercheur_emploi', 'autre'], {
+    required_error: "Veuillez sélectionner votre statut professionnel.",
+  }),
+  motivation: z.string().min(20, { message: "Veuillez décrire votre motivation (minimum 20 caractères)." }),
+  niveau_etudes: z.enum(['lycee', 'bac', 'licence', 'master', 'doctorat', 'autre']).optional(),
+  objectifs_formation: z.string().optional(),
+  comment_connu: z.string().optional(),
   message: z.string().optional(),
 })
 
@@ -55,6 +65,13 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
       nom: "",
       email: "",
       telephone: "",
+      whatsapp: "",
+      age: "" as any,
+      statut_professionnel: undefined,
+      motivation: "",
+      niveau_etudes: undefined,
+      objectifs_formation: "",
+      comment_connu: "",
       message: "",
     },
   })
@@ -70,7 +87,7 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
     if (result.success) {
       toast({
         title: "Inscription réussie !",
-        description: "Votre demande a bien été prise en compte.",
+        description: "Nous vous recontacterons très prochainement.",
       })
       setIsOpen(false)
       form.reset()
@@ -90,7 +107,7 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
           {buttonText || "S'inscrire"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>S'inscrire à la formation</DialogTitle>
           <DialogDescription>
@@ -99,13 +116,14 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Informations personnelles */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="prenom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Prénom</FormLabel>
+                    <FormLabel>Prénom *</FormLabel>
                     <FormControl>
                       <Input placeholder="Votre prénom" {...field} />
                     </FormControl>
@@ -118,7 +136,7 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
                 name="nom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nom</FormLabel>
+                    <FormLabel>Nom *</FormLabel>
                     <FormControl>
                       <Input placeholder="Votre nom" {...field} />
                     </FormControl>
@@ -127,12 +145,13 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
                 )}
               />
             </div>
+
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email *</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="votre@email.com" {...field} />
                   </FormControl>
@@ -140,28 +159,86 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="telephone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Téléphone *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+224 6..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="whatsapp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>WhatsApp *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+224 6..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Âge *</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="25" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="statut_professionnel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Statut professionnel *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="etudiant">Étudiant</SelectItem>
+                        <SelectItem value="salarie">Salarié</SelectItem>
+                        <SelectItem value="independant">Indépendant</SelectItem>
+                        <SelectItem value="chercheur_emploi">Chercheur d'emploi</SelectItem>
+                        <SelectItem value="autre">Autre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="telephone"
+              name="motivation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Téléphone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+224 6..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Message (optionnel)</FormLabel>
+                  <FormLabel>Motivation *</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Avez-vous une question ou un message à nous laisser ?"
+                      placeholder="Pourquoi souhaitez-vous suivre cette formation ?"
+                      className="min-h-[80px]"
                       {...field}
                     />
                   </FormControl>
@@ -169,6 +246,86 @@ export function InscriptionModal({ formationId, formationTitle, buttonClass, but
                 </FormItem>
               )}
             />
+
+            {/* Champs optionnels */}
+            <div className="border-t pt-4">
+              <p className="text-sm text-muted-foreground mb-3">Informations complémentaires (optionnel)</p>
+
+              <FormField
+                control={form.control}
+                name="niveau_etudes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Niveau d'études</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="lycee">Lycée</SelectItem>
+                        <SelectItem value="bac">Bac</SelectItem>
+                        <SelectItem value="licence">Licence</SelectItem>
+                        <SelectItem value="master">Master</SelectItem>
+                        <SelectItem value="doctorat">Doctorat</SelectItem>
+                        <SelectItem value="autre">Autre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="objectifs_formation"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Vos objectifs</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Quels sont vos objectifs avec cette formation ?"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="comment_connu"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Comment avez-vous connu cette formation ?</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Réseaux sociaux, bouche à oreille..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Message</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Avez-vous une question ou un message à nous laisser ?"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirmer l'inscription
