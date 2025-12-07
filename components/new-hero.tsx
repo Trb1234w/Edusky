@@ -148,7 +148,7 @@ export function NewHero() {
     }, [text, isDeleting, phraseIndex, typingSpeed])
 
     return (
-        <section className="relative pt-32 pb-6 md:pt-28 md:pb-12 lg:py-20 overflow-hidden">
+        <section className="relative pt-30 pb-4 md:pt-28 md:pb-12 lg:py-20 overflow-hidden w-full">
             {/* Advanced Background Elements */}
             <div className="absolute inset-0 -z-10">
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
@@ -159,11 +159,11 @@ export function NewHero() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 h-1/3 bg-accent/5 blur-[100px] rounded-full animate-pulse animation-delay-1000" />
             </div>
 
-            <div className="container mx-auto px-4 md:px-8 lg:px-12">
-                <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
+            <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-full overflow-hidden">
+                <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 md:gap-6 lg:gap-16 items-center">
 
                     {/* Left Column: Text Content */}
-                    <div className={`space-y-5 md:space-y-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+                    <div className={`space-y-3 md:space-y-5 lg:space-y-6 transition-all duration-1000 w-full max-w-full overflow-hidden ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
                         {/* Redesigned Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border border-primary/20 text-primary text-sm font-semibold animate-fade-in-up shadow-sm backdrop-blur-sm">
                             <Sparkles className="w-4 h-4 fill-primary" />
@@ -173,7 +173,7 @@ export function NewHero() {
                         </div>
 
                         {/* Main Title with Typing Effect */}
-                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[100px] md:min-h-[140px] lg:min-h-[160px]">
+                        <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[80px] md:min-h-[140px] lg:min-h-[160px] break-words">
                             Votre avenir <br />
                             <span className="relative inline-block mt-1 md:mt-2">
                                 <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">
@@ -188,7 +188,7 @@ export function NewHero() {
 
                         {/* Description */}
                         {/* Description */}
-                        <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                        <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed max-w-full md:max-w-xl break-words">
                             Edusky révolutionne l'apprentissage en connectant étudiants, mentors et entreprises.
                             Profitez d'un suivi personnalisé par IA, de formations certifiantes et d'un réseau professionnel actif.
                         </p>
@@ -251,18 +251,18 @@ export function NewHero() {
                         <div className="mt-4 md:mt-0">
                             {/* Mobile Marquee View */}
                             <div className="md:hidden overflow-hidden -mx-4 px-4">
-                                <div className="animate-marquee flex gap-3">
+                                <div className="animate-marquee flex gap-4">
                                     {[...heroSlides, ...heroSlides].map((slide, index) => (
                                         <div
                                             key={`mobile-feature-${index}`}
                                             className={cn(
-                                                "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 min-w-[240px] border bg-card/50 border-border/50 opacity-90"
+                                                "flex items-center gap-3 p-4 rounded-lg transition-all duration-300 min-w-[240px] border bg-card/50 border-border/50 opacity-90"
                                             )}
                                         >
                                             <div className="w-10 h-10 rounded-full flex items-center justify-center bg-muted text-muted-foreground shrink-0">
                                                 <slide.icon className="w-5 h-5" />
                                             </div>
-                                            <span className="text-lg font-medium text-muted-foreground whitespace-nowrap">
+                                            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                                                 {slide.title}
                                             </span>
                                         </div>
@@ -305,7 +305,7 @@ export function NewHero() {
                     </div>
 
                     {/* Right Column: Coursera-style Slider */}
-                    <div className={`relative h-[350px] md:h-[450px] lg:h-[550px] w-full md:w-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+                    <div className={`relative h-[280px] md:h-[450px] lg:h-[550px] w-full max-w-[90%] mx-auto md:max-w-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
                         {/* Main Image Container */}
                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
                             {heroSlides.map((slide, index) => (
@@ -354,7 +354,7 @@ export function NewHero() {
                         </div>
 
                         {/* Floating Stats Cards - Decorative (Visible on mobile now) */}
-                        <div className="absolute -top-4 -right-4 md:-top-4 md:-right-4 bg-card/90 backdrop-blur-md border border-border/50 p-2 md:p-3 rounded-xl shadow-xl animate-float z-20 scale-90 md:scale-100">
+                        <div className="absolute -top-2 -right-2 md:-top-4 md:-right-4 bg-card/90 backdrop-blur-md border border-border/50 p-2 md:p-3 rounded-xl shadow-xl animate-float z-20 scale-75 md:scale-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
                                     <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -366,7 +366,7 @@ export function NewHero() {
                             </div>
                         </div>
 
-                        <div className="absolute -bottom-4 -left-4 md:-bottom-4 md:-left-4 bg-card/90 backdrop-blur-md border border-border/50 p-2 md:p-3 rounded-xl shadow-xl animate-float animation-delay-2000 z-20 scale-90 md:scale-100">
+                        <div className="absolute -bottom-2 -left-2 md:-bottom-4 md:-left-4 bg-card/90 backdrop-blur-md border border-border/50 p-2 md:p-3 rounded-xl shadow-xl animate-float animation-delay-2000 z-20 scale-75 md:scale-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                                     <Users className="w-4 h-4 text-blue-500" />
