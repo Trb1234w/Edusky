@@ -27,6 +27,9 @@ RETURNS TABLE (
     pays_id uuid,
     ville_id uuid,
     quartier_id uuid,
+    pays_nom text,
+    ville_nom text,
+    quartier_nom text,
     prix_inscription numeric,
     cotisation_mensuelle numeric,
     cotisation_annuelle numeric,
@@ -76,6 +79,9 @@ BEGIN
         cl.pays_id,
         cl.ville_id,
         cl.quartier_id,
+        p.nom as pays_nom,
+        v.nom as ville_nom,
+        q.nom as quartier_nom,
         cl.prix_inscription,
         cl.cotisation_mensuelle,
         cl.cotisation_annuelle,
@@ -107,6 +113,12 @@ BEGIN
         public.profiles AS pr ON cl.leader_id = pr.id
     LEFT JOIN
         public.categories AS c ON cl.categorie_id = c.id
+    LEFT JOIN
+        public.pays as p ON cl.pays_id = p.id
+    LEFT JOIN
+        public.villes as v ON cl.ville_id = v.id
+    LEFT JOIN
+        public.quartiers as q ON cl.quartier_id = q.id
     WHERE
         (statut_filter IS NULL OR cl.statut::text = statut_filter)
         AND (search_term IS NULL OR cl.nom ILIKE '%' || search_term || '%' OR cl.description ILIKE '%' || search_term || '%')

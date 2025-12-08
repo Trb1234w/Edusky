@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Star, Users, Clock, Heart, ArrowRight, BookOpen } from "lucide-react"
+import { Star, Users, Clock, Heart, ArrowRight, BookOpen, MapPin } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
@@ -21,10 +21,15 @@ interface CourseCardProps {
   students: number
   rating: number
   price: string
+  inscriptionPrice?: string
   image: string
   is_favorited: boolean
   language?: string
   certificate?: boolean
+  lieu?: string
+  pays_nom?: string
+  ville_nom?: string
+  quartier_nom?: string
   onToggle?: (newStatus: boolean) => void
 }
 
@@ -39,10 +44,15 @@ export function CourseCard({
   students,
   rating,
   price,
+  inscriptionPrice,
   image,
   is_favorited: initialIsFavorited,
   language,
   certificate,
+  lieu,
+  pays_nom,
+  ville_nom,
+  quartier_nom,
   onToggle,
 }: CourseCardProps) {
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
@@ -74,6 +84,8 @@ export function CourseCard({
         return "bg-muted text-muted-foreground border-border"
     }
   }
+
+  const fullLocation = [lieu, quartier_nom, ville_nom, pays_nom].filter(Boolean).join(', ');
 
   return (
     <Link href={`/formations/${id}`} className="group block h-full">
@@ -117,12 +129,12 @@ export function CourseCard({
           </Button>
         </div>
 
-        <div className="p-2 flex flex-col flex-1">
+        <div className="p-3 flex flex-col flex-1">
           <div className="flex justify-between items-start mb-1.5">
             <div className="flex gap-1">
               {language && (
                 <Badge variant="outline" className="text-[10px] px-1.5 h-5 border-primary/20 bg-primary/5 text-primary">
-                  {language.substring(0, 2).toUpperCase()}
+                  {language.toUpperCase()}
                 </Badge>
               )}
               {certificate && (
@@ -144,26 +156,39 @@ export function CourseCard({
           <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
             Par <span className="font-medium text-foreground">{instructor}</span>
           </p>
-
-          <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Users size={14} className="text-primary" />
-                <span>{students}</span>
+          
+          <div className="space-y-2 mt-auto">
+            {fullLocation && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <MapPin size={14} className="text-primary shrink-0"/>
+                  <span className="truncate">{fullLocation}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Clock size={14} className="text-primary" />
-                <span>{duration}</span>
-              </div>
+            )}
+            
+            <div className="pt-2 border-t border-border/50">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <Users size={14} className="text-primary" />
+                      <span>{students}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock size={14} className="text-primary" />
+                      <span>{duration}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-bold text-primary">{price}</span>
+                  {inscriptionPrice && <span className="text-sm text-primary/80">Insc: {inscriptionPrice}</span>}
+                </div>
             </div>
-            <span className="text-base font-bold text-primary">{price}</span>
           </div>
         </div>
       </Card>
     </Link>
   )
 }
-
 CourseCard.Skeleton = function CourseCardSkeleton() {
   return (
     <Card className="h-full flex flex-col overflow-hidden rounded-2xl">

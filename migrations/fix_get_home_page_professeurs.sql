@@ -1,4 +1,4 @@
--- Correction de la fonction get_home_page_professeurs pour correspondre aux props du composant ProfesseurCard
+-- Correction de la fonction get_home_page_professeurs pour utiliser uniquement la table professeurs
 -- Date: 2025-12-08
 
 DROP FUNCTION IF EXISTS get_home_page_professeurs(uuid);
@@ -15,10 +15,8 @@ RETURNS TABLE (
     "annees_experience" integer,
     "tarif_indicatif" numeric,
     "avatar_url" text,
-    "is_verified" boolean,
-    "pays_nom" text,
-    "ville_nom" text,
-    "is_favorited" boolean
+    "pays_id" uuid,
+    "ville_id" uuid
 )
 LANGUAGE plpgsql
 AS $$
@@ -26,7 +24,7 @@ BEGIN
     RETURN QUERY
     SELECT
         prof.id,
-        p.full_name,
+        prof.full_name,
         prof.titre,
         prof.type,
         prof.specialites,
@@ -34,17 +32,11 @@ BEGIN
         prof.nb_etudiants_formes,
         prof.annees_experience,
         prof.tarif_indicatif,
-        p.avatar_url,
-        p.is_verified,
-        pays.nom as pays_nom,
-        v.nom as ville_nom,
-        (fav.id IS NOT NULL)
+        prof.image_url, -- Utilisation de image_url de la table professeurs comme avatar_url
+        prof.pays_id,
+        prof.ville_id
     FROM
         public.professeurs prof
-    JOIN public.profiles p ON prof.id = p.id
-    LEFT JOIN public.pays pays ON prof.pays_id = pays.id
-    LEFT JOIN public.villes v ON prof.ville_id = v.id
-    LEFT JOIN public.favoris fav ON fav.item_id = prof.id AND fav.user_id = p_user_id AND fav.type_item = 'professeur'
     WHERE prof.is_publie = true
     ORDER BY prof.note_moyenne DESC NULLS LAST
     LIMIT 4;

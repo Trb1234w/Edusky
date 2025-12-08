@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Users, CheckCircle, ArrowRight, Heart } from "lucide-react"
+import { Users, CheckCircle, ArrowRight, Heart, MapPin, Calendar, Wallet } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useOptimistic, useTransition } from "react"
@@ -22,7 +22,14 @@ interface ClubCardProps {
   image: string
   verified?: boolean
   is_favorited: boolean
-  fees?: string | number
+  prix_inscription?: number
+  cotisation_mensuelle?: number
+  lieu?: string
+  pays_nom?: string
+  ville_nom?: string
+  quartier_nom?: string
+  age_min?: number
+  age_max?: number
   onToggle?: (newStatus: boolean) => void
 }
 
@@ -37,7 +44,14 @@ export function ClubCard({
   image,
   verified = false,
   is_favorited: initialIsFavorited,
-  fees,
+  prix_inscription,
+  cotisation_mensuelle,
+  lieu,
+  pays_nom,
+  ville_nom,
+  quartier_nom,
+  age_min,
+  age_max,
   onToggle,
 }: ClubCardProps) {
   const router = useRouter();
@@ -58,6 +72,19 @@ export function ClubCard({
     });
   };
 
+  const ageRange = age_min && age_max ? `${age_min}-${age_max} ans` : age_min ? `+${age_min} ans` : age_max ? `-${age_max} ans` : null;
+  const fullLocation = [lieu, quartier_nom, ville_nom, pays_nom].filter(Boolean).join(', ');
+
+  const formatPrice = (price: number | undefined, label: string) => {
+    if (price == null) return null;
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Wallet size={14} className="text-primary shrink-0" />
+        <span>{label}: <span className="font-semibold text-foreground">{price.toLocaleString()} GNF</span></span>
+      </div>
+    )
+  }
+
   return (
     <Link href={`/clubs/${id}`} className="group block h-full">
       <Card className="relative overflow-hidden h-full flex flex-col bg-card border-border/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 rounded-2xl mb-2 lg:mb-3">
@@ -70,20 +97,10 @@ export function ClubCard({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-          {/* Category Badge */}
           <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur-md text-foreground border-0 shadow-sm">
             {category}
           </Badge>
 
-          {/* Verified Badge */}
-          {verified && (
-            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-green-500/90 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
-              <CheckCircle className="w-3 h-3" />
-              Vérifié
-            </div>
-          )}
-
-          {/* Favorite Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -102,33 +119,34 @@ export function ClubCard({
           </Button>
         </div>
 
-        <div className="flex-1 p-2 flex flex-col">
-          <div className="flex justify-between items-start mb-1.5">
-            <div className="flex-1 mr-2">
-              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                {name}
-              </h3>
-              <p className="text-sm text-muted-foreground line-clamp-1">{category}</p>
-            </div>
-            <div className="flex flex-col items-end gap-1">
-              {verified && (
-                <div className="bg-blue-500/10 p-1.5 rounded-full" title="Club vérifié">
-                  <CheckCircle size={16} className="text-blue-500" />
-                </div>
-              )}
-              {fees && (
-                <Badge variant="outline" className="text-[10px] px-1.5 h-5 border-primary/20 bg-primary/5 text-primary whitespace-nowrap">
-                  {typeof fees === 'number' ? `${fees.toLocaleString()} GNF` : fees}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <p className="text-sm text-muted-foreground line-clamp-1">
+        <div className="flex-1 p-3 flex flex-col">
+          <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1 mb-1">
+            {name}
+          </h3>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {description}
           </p>
 
-          <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
+          <div className="flex flex-col gap-2 text-sm text-muted-foreground mb-3">
+            {fullLocation && (
+              <div className="flex items-center gap-1.5">
+                <MapPin size={14} className="text-primary shrink-0" />
+                <span className="truncate">{fullLocation}</span>
+              </div>
+            )}
+            {ageRange && (
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} className="text-primary shrink-0" />
+                <span>{ageRange}</span>
+              </div>
+            )}
+            <div className="flex flex-col gap-1">
+              {formatPrice(prix_inscription, "Inscription")}
+              {formatPrice(cotisation_mensuelle, "Prix mensuel")}
+            </div>
+          </div>
+
+          <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users size={16} className="text-primary" />
               <span className="font-medium">{members} membres</span>
@@ -141,22 +159,5 @@ export function ClubCard({
         </div>
       </Card >
     </Link >
-  )
-}
-
-ClubCard.Skeleton = function ClubCardSkeleton() {
-  return (
-    <Card className="h-full flex flex-col overflow-hidden rounded-2xl">
-      <Skeleton className="h-36 w-full" />
-      <div className="p-4 flex-1 flex flex-col">
-        <Skeleton className="h-6 w-3/4 mb-2" />
-        <Skeleton className="h-4 w-1/2 mb-3" />
-        <Skeleton className="h-16 w-full mb-4" />
-        <div className="flex justify-between mt-auto pt-3 border-t border-border/50">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-16" />
-        </div>
-      </div>
-    </Card>
   )
 }

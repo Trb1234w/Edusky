@@ -10,9 +10,15 @@ interface FormationListItem {
   category_nom?: string;
   niveau?: string;
   duree_texte?: string;
+  nombre_jours?: number;
   nb_avis?: number;
   note_moyenne?: number;
   prix_indicatif?: number;
+  prix_inscription?: number;
+  lieu?: string;
+  pays_nom?: string;
+  ville_nom?: string;
+  quartier_nom?: string;
   image_url?: string;
   is_favorited?: boolean;
   langue_enseignement?: string;
@@ -51,14 +57,19 @@ export function FormationsList({ formations, isLoading }: FormationsListProps) {
           instructor={course.professeur_full_name || "Inconnu"}
           category={course.category_nom || ""}
           level={course.niveau || ""}
-          duration={course.duree_texte || ""}
+          duration={course.nombre_jours ? `${course.nombre_jours} jours` : course.duree_texte || ""}
           students={course.nb_avis || 0}
           rating={course.note_moyenne || 0}
-          price={course.prix_indicatif ? `${course.prix_indicatif} GNF` : "Gratuit"}
+          price={course.prix_indicatif ? `${course.prix_indicatif.toLocaleString()} GNF` : "N/A"}
+          inscriptionPrice={course.prix_inscription ? `${course.prix_inscription.toLocaleString()} GNF` : "Gratuit"}
           image={course.image_url || "/placeholder.png"}
           is_favorited={course.is_favorited || false}
           language={course.langue_enseignement}
           certificate={course.certificat}
+          lieu={course.lieu}
+          pays_nom={course.pays_nom}
+          ville_nom={course.ville_nom}
+          quartier_nom={course.quartier_nom}
         />
       ))}
     </div>

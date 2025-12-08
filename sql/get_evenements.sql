@@ -24,9 +24,14 @@ RETURNS TABLE (
     capacite integer,
     type_evenement text,
     tags text[],
+    prix numeric,
+    est_gratuit boolean,
     pays_id uuid,
     ville_id uuid,
     quartier_id uuid,
+    pays_nom text,
+    ville_nom text,
+    quartier_nom text,
     organisateur_id uuid,
     organisateur_full_name text,
     organisateur_avatar_url text,
@@ -51,9 +56,14 @@ BEGIN
         e.capacite,
         e.type_evenement,
         e.tags::text[],
+        e.prix,
+        e.est_gratuit,
         e.pays_id,
         e.ville_id,
         e.quartier_id,
+        p.nom as pays_nom,
+        v.nom as ville_nom,
+        q.nom as quartier_nom,
         pr.id AS organisateur_id,
         pr.full_name AS organisateur_full_name,
         pr.avatar_url AS organisateur_avatar_url,
@@ -66,6 +76,12 @@ BEGIN
         public.profiles AS pr ON e.organisateur_id = pr.id
     LEFT JOIN
         public.categories AS c ON e.categorie_id = c.id
+    LEFT JOIN
+        public.pays as p ON e.pays_id = p.id
+    LEFT JOIN
+        public.villes as v ON e.ville_id = v.id
+    LEFT JOIN
+        public.quartiers as q ON e.quartier_id = q.id
     WHERE
         e.statut = 'publie'
         AND (search_term IS NULL OR e.titre ILIKE '%' || search_term || '%' OR e.description ILIKE '%' || search_term || '%')

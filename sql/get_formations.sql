@@ -15,6 +15,10 @@ returns table (
     image_url text,
     mode mode_cours,
     prix_indicatif numeric,
+    prix_inscription numeric,
+    nombre_jours integer,
+    lieu text,
+    langue_enseignement text,
     note_moyenne numeric,
     nb_avis integer,
     professeur_id uuid,
@@ -32,7 +36,10 @@ returns table (
     tags text[],
     pays_id uuid,
     ville_id uuid,
-    quartier_id uuid
+    quartier_id uuid,
+    pays_nom text,
+    ville_nom text,
+    quartier_nom text
 )
 language plpgsql
 as $$
@@ -46,6 +53,10 @@ begin
         f.image_url,
         f.mode,
         f.prix_indicatif,
+        f.prix_inscription,
+        f.nombre_jours,
+        f.lieu,
+        f.langue_enseignement,
         f.note_moyenne,
         f.nb_avis,
         p.id as professeur_id,
@@ -63,7 +74,10 @@ begin
         f.tags::text[],
         f.pays_id,
         f.ville_id,
-        f.quartier_id
+        f.quartier_id,
+        pa.nom as pays_nom,
+        v.nom as ville_nom,
+        q.nom as quartier_nom
     from
         public.formations as f
     left join
@@ -72,6 +86,12 @@ begin
         public.profiles as pr on p.id = pr.id
     left join
         public.categories as c on f.categorie_id = c.id
+    left join
+        public.pays as pa on f.pays_id = pa.id
+    left join
+        public.villes as v on f.ville_id = v.id
+    left join
+        public.quartiers as q on f.quartier_id = q.id
     where
         f.statut = 'publie'
         and (search_term is null or f.titre ilike '%' || search_term || '%' or f.description ilike '%' || search_term || '%')

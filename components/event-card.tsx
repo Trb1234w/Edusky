@@ -29,6 +29,7 @@ interface EventCardProps {
     is_favorited: boolean
     price?: number
     isFree?: boolean
+    mode?: string
     onToggle?: (newStatus: boolean) => void
 }
 
@@ -48,6 +49,7 @@ export function EventCard({
     is_favorited: initialIsFavorited,
     price,
     isFree,
+    mode,
     onToggle,
 }: EventCardProps) {
     const router = useRouter();
@@ -134,7 +136,7 @@ export function EventCard({
                             {title}
                         </h3>
                         <Badge variant={isFree ? "secondary" : "default"} className="shrink-0 text-[10px] px-1.5 h-5">
-                            {isFree ? "Gratuit" : (price ? `${price.toLocaleString()} GNF` : "Payant")}
+                            {formatPrice(price, isFree)}
                         </Badge>
                     </div>
 
@@ -156,10 +158,13 @@ export function EventCard({
 
                     {/* Footer */}
                     <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                            <Users size={16} className="text-primary" />
-                            <span>{participants} participants</span>
-                        </div>
+                        {mode && (
+                            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <CalendarDays size={16} className="text-primary" />
+                                <span>{mode}</span>
+                            </div>
+                        )}
+
 
                         <Button size="sm" className="h-9 text-sm rounded-full px-5 group/btn">
                             Réserver

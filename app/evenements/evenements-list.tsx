@@ -9,6 +9,9 @@ interface EventListItem {
   description?: string;
   date_debut?: string;
   lieu?: string;
+  pays_nom?: string;
+  ville_nom?: string;
+  quartier_nom?: string;
   mode?: string;
   category_nom?: string;
   capacite?: number;
@@ -43,26 +46,30 @@ export function EvenementsList({ events, isLoading }: EvenementsListProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
-      {events.map((event) => (
-        <EventCard
-          key={event.id}
-          id={event.id}
-          title={event.titre || ""}
-          description={event.extrait || event.description || ""}
-          date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-          time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-          location={event.lieu || event.mode || ""}
-          category={event.category_nom || ""}
-          participants={0} // Placeholder
-          maxParticipants={event.capacite || 0}
-          organizer={event.organisateur_full_name || "Inconnu"}
-          image={event.image_url || "/placeholder.png"}
-          status={new Date(event.date_debut || "") > new Date() ? "upcoming" : "past"}
-          is_favorited={event.is_favorited || false}
-          price={event.prix}
-          isFree={event.est_gratuit}
-        />
-      ))}
+      {events.map((event) => {
+        const fullLocation = [event.lieu, event.quartier_nom, event.ville_nom, event.pays_nom].filter(Boolean).join(', ');
+        return (
+          <EventCard
+            key={event.id}
+            id={event.id}
+            title={event.titre || ""}
+            description={event.extrait || event.description || ""}
+            date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+            time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            location={fullLocation}
+            category={event.category_nom || ""}
+            participants={0} // Placeholder
+            maxParticipants={event.capacite || 0}
+            organizer={event.organisateur_full_name || "Inconnu"}
+            image={event.image_url || "/placeholder.png"}
+            status={new Date(event.date_debut || "") > new Date() ? "upcoming" : "past"}
+            is_favorited={event.is_favorited || false}
+            price={event.prix}
+            isFree={event.est_gratuit}
+            mode={event.mode}
+          />
+        )
+      })}
     </div>
   );
 }
