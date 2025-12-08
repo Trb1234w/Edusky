@@ -35,7 +35,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Veuillez saisir une adresse e-mail valide." }),
   telephone: z.string().min(8, { message: "Le numéro de téléphone semble incorrect." }),
   whatsapp: z.string().min(8, { message: "Le numéro WhatsApp semble incorrect." }),
-  age: z.coerce.number().min(16, { message: "Vous devez avoir au moins 16 ans." }).max(120),
+  age: z.coerce.number().min(5, { message: "Vous devez avoir au moins 5 ans." }).max(120),
   niveau_experience: z.enum(['debutant', 'intermediaire', 'avance', 'expert'], {
     required_error: "Veuillez sélectionner votre niveau d'expérience.",
   }),

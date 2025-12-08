@@ -33,15 +33,11 @@ const formSchema = z.object({
   email: z.string().email({ message: "Veuillez saisir une adresse e-mail valide." }),
   telephone: z.string().min(8, { message: "Le numéro de téléphone semble incorrect." }),
   whatsapp: z.string().min(8, { message: "Le numéro WhatsApp semble incorrect." }),
-  age: z.coerce.number().min(16, { message: "Vous devez avoir au moins 16 ans." }).max(120),
-  profession: z.string().optional(),
-  entreprise: z.string().optional(),
-  secteur_activite: z.string().optional(),
+  age: z.coerce.number().min(5, { message: "Vous devez avoir au moins 5 ans." }).max(120),
   motivation_participation: z.string().optional(),
   attentes_evenement: z.string().optional(),
   comment_connu: z.string().optional(),
   besoins_specifiques: z.string().optional(),
-  regime_alimentaire: z.string().optional(),
   accompagnants: z.coerce.number().min(0).max(10).optional(),
   message: z.string().optional(),
 })
@@ -67,14 +63,10 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
       telephone: "",
       whatsapp: "",
       age: "" as any,
-      profession: "",
-      entreprise: "",
-      secteur_activite: "",
       motivation_participation: "",
       attentes_evenement: "",
       comment_connu: "",
       besoins_specifiques: "",
-      regime_alimentaire: "",
       accompagnants: 0,
       message: "",
     },
@@ -211,63 +203,7 @@ export function InscriptionEvenementModal({ evenementId, evenementTitle, buttonC
             <div className="border-t pt-4">
               <p className="text-sm text-muted-foreground mb-3">Informations complémentaires (optionnel)</p>
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="profession"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Profession</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Votre profession" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="entreprise"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Entreprise</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Votre entreprise" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <FormField
-                  control={form.control}
-                  name="secteur_activite"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Secteur d'activité</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Tech, Finance..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="regime_alimentaire"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Régime alimentaire</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Végétarien, halal..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
 
               <FormField
                 control={form.control}

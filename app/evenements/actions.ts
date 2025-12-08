@@ -10,14 +10,10 @@ export async function createEvenementInscription(formData: {
   telephone: string
   whatsapp: string
   age: number
-  profession?: string
-  entreprise?: string
-  secteur_activite?: string
   motivation_participation?: string
   attentes_evenement?: string
   comment_connu?: string
   besoins_specifiques?: string
-  regime_alimentaire?: string
   accompagnants?: number
   message?: string
   evenement_id: string
