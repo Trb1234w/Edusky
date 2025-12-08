@@ -50,8 +50,9 @@ export async function toggleArticleLike(articleId: string) {
                 .eq('id', existingLike.id)
 
             // Décrémenter likes_count
-            await supabase.rpc('sql', {
-                query: `UPDATE articles_blog SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = '${articleId}'`
+            // Décrémenter likes_count
+            await supabase.rpc('decrement_article_likes', {
+                article_id_param: articleId
             })
 
             revalidatePath(`/blog/${articleId}`)
@@ -67,8 +68,9 @@ export async function toggleArticleLike(articleId: string) {
                 })
 
             // Incrémenter likes_count
-            await supabase.rpc('sql', {
-                query: `UPDATE articles_blog SET likes_count = likes_count + 1 WHERE id = '${articleId}'`
+            // Incrémenter likes_count
+            await supabase.rpc('increment_article_likes', {
+                article_id_param: articleId
             })
 
             revalidatePath(`/blog/${articleId}`)

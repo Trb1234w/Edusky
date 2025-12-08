@@ -16,6 +16,7 @@ export function MobileNav() {
     /^\/clubs\/[^/]+$/.test(pathname) ||
     /^\/blog\/[^/]+$/.test(pathname)
 
+
   // Don't render if on detail page
   if (isDetailPage) {
     return null
@@ -23,11 +24,11 @@ export function MobileNav() {
 
   const navItems = [
     { href: "/", icon: Home, label: "Accueil", color: "from-blue-500 to-cyan-500" },
-    { href: "/professeurs", icon: GraduationCap, label: "Profs", color: "from-green-500 to-emerald-500" },
+    { href: "/professeurs", icon: GraduationCap, label: "Experts", color: "from-green-500 to-emerald-500" },
     { href: "/formations", icon: BookOpen, label: "Cours", color: "from-purple-500 to-pink-500" },
     { href: "/evenements", icon: Calendar, label: "Events", color: "from-orange-500 to-red-500" },
     { href: "/clubs", icon: Users, label: "Clubs", color: "from-blue-500 to-indigo-500" },
-    { href: "/blog", icon: Newspaper, label: "Blog", color: "from-violet-500 to-purple-500" },
+    { href: "/blog", icon: Newspaper, label: "Découvrir", color: "from-violet-500 to-purple-500" },
   ]
 
   return (
