@@ -316,7 +316,7 @@ export default function DashboardPage() {
                   <CreatePost profile={profile} />
 
                   {/* Section des posts de l'utilisateur */}
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <h2 className="text-2xl font-bold">Mes publications</h2>
                     {postsLoading ? (
                       <div className="space-y-4">

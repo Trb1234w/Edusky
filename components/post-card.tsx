@@ -42,9 +42,9 @@ interface PostCardProps {
     video?: string;
   } | null;
   timestamp: string;
-  likes: number;
-  comments: number;
-  shares: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
   liked: boolean;
   currentUserId: string;
   followingIds: string[];
@@ -161,9 +161,9 @@ export function PostCard(props: PostCardProps) {
     content,
     media,
     timestamp,
-    likes,
-    comments,
-    shares,
+    likes = 0,
+    comments = 0,
+    shares = 0,
     liked,
     currentUserId,
     followingIds,

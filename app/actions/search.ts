@@ -353,14 +353,13 @@ export async function searchPosts(query: string, filters: SearchFilters = {}): P
 
             // Fetch engagement counts
             await Promise.all(posts.map(async (post) => {
-                const [l, c, s] = await Promise.all([
-                    supabase.from('likes_postes').select('id', { count: 'exact', head: true }).eq('poste_id', post.id),
-                    supabase.from('commentaires_postes').select('id', { count: 'exact', head: true }).eq('poste_id', post.id),
-                    supabase.from('partages_postes').select('id', { count: 'exact', head: true }).eq('poste_id', post.id)
+                const [l, c] = await Promise.all([
+                    supabase.from('likes').select('id', { count: 'exact', head: true }).eq('parent_id', post.id),
+                    supabase.from('commentaires').select('id', { count: 'exact', head: true }).eq('parent_poste', post.id)
                 ])
                 post.likes = l.count || 0
                 post.comments = c.count || 0
-                post.shares = s.count || 0
+                post.shares = 0 // Shares not implemented yet
                 post.timestamp = post.created_at
             }))
 
@@ -368,20 +367,21 @@ export async function searchPosts(query: string, filters: SearchFilters = {}): P
             let followingIds: string[] = []
             if (user) {
                 const { data: userLikes } = await supabase
-                    .from('likes_postes')
-                    .select('poste_id')
-                    .eq('utilisateur_id', user.id)
-                    .in('poste_id', postIds)
+                    .from('likes')
+                    .select('parent_id')
+                    .eq('user_id', user.id)
+                    .eq('parent_type', 'post')
+                    .in('parent_id', postIds)
 
-                const likedPostIds = new Set(userLikes?.map(l => l.poste_id) || [])
+                const likedPostIds = new Set(userLikes?.map(l => l.parent_id) || [])
 
                 // Fetch following
                 const { data: following } = await supabase
                     .from('suivis')
-                    .select('suivi_id')
-                    .eq('suiveur_id', user.id)
+                    .select('followed_id')
+                    .eq('follower_id', user.id)
 
-                followingIds = following?.map(f => f.suivi_id) || []
+                followingIds = following?.map(f => f.followed_id) || []
 
                 posts.forEach(post => {
                     post.liked = likedPostIds.has(post.id)

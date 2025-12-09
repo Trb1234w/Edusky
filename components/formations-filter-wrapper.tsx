@@ -265,7 +265,10 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
     }).map(formation => ({
       ...formation,
       professeur_full_name: formation.professeur?.full_name || formation.professeur?.profiles?.full_name || "Inconnu",
-      category_nom: formation.categorie?.nom || ""
+      category_nom: formation.categorie?.nom || "",
+      pays_nom: formation.pays?.nom,
+      ville_nom: formation.ville?.nom,
+      quartier_nom: formation.quartier?.nom,
     }))
   }, [filters, allFormations])
 
