@@ -16,7 +16,7 @@ export function AccessibiliteTab({ accessibilite }: AccessibiliteTabProps) {
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Accessibility className="h-6 w-6 text-primary" /> Accessibilité
             </h3>
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <ul className="space-y-2">
                     {items.map((item: any, index: number) => (
                         <li key={index} className="flex items-center gap-2 text-foreground/90">

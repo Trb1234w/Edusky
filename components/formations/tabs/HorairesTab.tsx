@@ -41,7 +41,7 @@ export function HorairesTab({ horaires, joursFormation }: HorairesTabProps) {
             {hasHoraires && (
                 <Card className="p-6 bg-background rounded-2xl shadow-lg">
                     <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                        <Clock className="h-6 w-6 text-primary" /> Emploi du Temps Hebdomadaire
+                        <Clock className="h-6 w-6 text-primary" /> Emploi du Temps
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {Object.entries(horaires).map(([jour, horaire]: [string, any]) => {
@@ -56,7 +56,7 @@ export function HorairesTab({ horaires, joursFormation }: HorairesTabProps) {
                                         <div className="bg-primary/10 p-2 rounded-full">
                                             <Calendar className="h-4 w-4 text-primary" />
                                         </div>
-                                        <span className="font-bold capitalize">{dayMap[jour.toLowerCase()] || jour}</span>
+                                        <span className="font-bold text-sm block mb-1">{dayMap[jour.toLowerCase()] || jour}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm font-mono bg-background px-3 py-1 rounded border">
                                         <Clock className="h-3 w-3 text-muted-foreground" />

@@ -147,7 +147,7 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
                                 {/* Onglet 1 : Présentation */}
                                 <TabsContent value="presentation" className="space-y-6">
                                     <div className="lg:hidden p-6 bg-background rounded-2xl shadow-lg">
-                                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Info className="h-6 w-6 text-primary" /> Informations de l'événement</h3>
+                                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Info className="h-6 w-6 text-primary" /> Informations Clées</h3>
                                         <div className="space-y-4">
                                             {/* Date et heure */}
                                             <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
@@ -234,73 +234,6 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
                                         </div>
                                     </div>
 
-                                    {/* Liens utiles (Mis en avant) */}
-                                    {hasLinks && (
-                                        <div className="p-6 bg-background rounded-2xl shadow-lg border-l-4 border-primary">
-                                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><LinkIcon className="h-6 w-6 text-primary" /> Accès & Billetterie</h3>
-                                            <div className="space-y-4">
-                                                {/* Lien billetterie (En premier pour visibilité) */}
-                                                {evenement.lien_billetterie && (
-                                                    <Card className="p-4 bg-green-50 border-green-200 dark:border-green-800">
-                                                        <div className="flex items-start gap-4">
-                                                            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                                <Ticket className="h-6 w-6 text-white" />
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <h4 className="font-bold text-base mb-1">Billetterie</h4>
-                                                                <p className="text-sm text-muted-foreground mb-3">Réservez vos billets en ligne</p>
-                                                                <Button asChild size="sm" variant="default" className="w-full sm:w-auto">
-                                                                    <a href={evenement.lien_billetterie} target="_blank" rel="noopener noreferrer">
-                                                                        <ExternalLink className="h-4 w-4 mr-2" />
-                                                                        Acheter un billet
-                                                                    </a>
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </Card>
-                                                )}
-
-                                                {/* Lien de streaming */}
-                                                {evenement.lien_streaming && (
-                                                    <Card className="p-4 bg-blue-50 border-blue-200 dark:border-blue-800">
-                                                        <div className="flex items-start gap-4">
-                                                            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                                <Video className="h-6 w-6 text-white" />
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <h4 className="font-bold text-base mb-1">Lien de streaming</h4>
-                                                                <p className="text-sm text-muted-foreground mb-3">Rejoignez l'événement en ligne</p>
-                                                                <Button asChild size="sm" className="w-full sm:w-auto">
-                                                                    <a href={evenement.lien_streaming} target="_blank" rel="noopener noreferrer">
-                                                                        <ExternalLink className="h-4 w-4 mr-2" />
-                                                                        Accéder au streaming
-                                                                    </a>
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </Card>
-                                                )}
-
-                                                {/* Code d'accès streaming */}
-                                                {evenement.code_acces_streaming && (
-                                                    <Card className="p-4 bg-purple-50 border-purple-200 dark:border-purple-800">
-                                                        <div className="flex items-start gap-4">
-                                                            <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                                <Tag className="h-6 w-6 text-white" />
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <h4 className="font-bold text-base mb-1">Code d'accès</h4>
-                                                                <p className="text-sm text-muted-foreground mb-2">Utilisez ce code pour rejoindre</p>
-                                                                <code className="bg-white px-4 py-2 rounded-lg text-lg font-mono font-bold block text-center">
-                                                                    {evenement.code_acces_streaming}
-                                                                </code>
-                                                            </div>
-                                                        </div>
-                                                    </Card>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
 
                                     {/* À propos */}
                                     <div className="p-6 bg-background rounded-2xl shadow-lg">
@@ -397,21 +330,80 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
 
                                             {/* Event Details Grid */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4">
-                                                {evenement.created_at && (
-                                                    <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Créé le : {formatDate(evenement.created_at)}</div>
-                                                )}
-                                                {evenement.updated_at && (
-                                                    <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(evenement.updated_at)}</div>
-                                                )}
-                                                {evenement.mode && (
-                                                    <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Mode : {evenement.mode === 'en_ligne' ? 'En ligne' : evenement.mode === 'presentiel' ? 'Présentiel' : 'Hybride'}</div>
-                                                )}
                                                 {evenement.capacite && (
                                                     <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {evenement.capacite} places</div>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
+                                    {/* Liens utiles (Mis en avant) */}
+                                    {hasLinks && (
+                                        <div className="p-6 bg-background rounded-2xl shadow-lg border-l-4 border-primary">
+                                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><LinkIcon className="h-6 w-6 text-primary" /> Accès & Billetterie</h3>
+                                            <div className="space-y-4">
+                                                {/* Lien billetterie (En premier pour visibilité) */}
+                                                {evenement.lien_billetterie && (
+                                                    <Card className="p-4 bg-green-50 border-green-200 dark:border-green-800">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                                <Ticket className="h-6 w-6 text-white" />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="font-bold text-base mb-1">Billetterie</h4>
+                                                                <p className="text-sm text-muted-foreground mb-3">Réservez vos billets en ligne</p>
+                                                                <Button asChild size="sm" variant="default" className="w-full sm:w-auto">
+                                                                    <a href={evenement.lien_billetterie} target="_blank" rel="noopener noreferrer">
+                                                                        <ExternalLink className="h-4 w-4 mr-2" />
+                                                                        Acheter un billet
+                                                                    </a>
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+                                                )}
+
+                                                {/* Lien de streaming */}
+                                                {evenement.lien_streaming && (
+                                                    <Card className="p-4 bg-blue-50 border-blue-200 dark:border-blue-800">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                                <Video className="h-6 w-6 text-white" />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="font-bold text-base mb-1">Lien de streaming</h4>
+                                                                <p className="text-sm text-muted-foreground mb-3">Rejoignez l'événement en ligne</p>
+                                                                <Button asChild size="sm" className="w-full sm:w-auto">
+                                                                    <a href={evenement.lien_streaming} target="_blank" rel="noopener noreferrer">
+                                                                        <ExternalLink className="h-4 w-4 mr-2" />
+                                                                        Accéder au streaming
+                                                                    </a>
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+                                                )}
+
+                                                {/* Code d'accès streaming */}
+                                                {evenement.code_acces_streaming && (
+                                                    <Card className="p-4 bg-purple-50 border-purple-200 dark:border-purple-800">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                                <Tag className="h-6 w-6 text-white" />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="font-bold text-base mb-1">Code d'accès</h4>
+                                                                <p className="text-sm text-muted-foreground mb-2">Utilisez ce code pour rejoindre</p>
+                                                                <code className="bg-white px-4 py-2 rounded-lg text-lg font-mono font-bold block text-center">
+                                                                    {evenement.code_acces_streaming}
+                                                                </code>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
 
                                     {/* Intervenants */}
                                     {intervenants.length > 0 && (
@@ -477,7 +469,7 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
                                     {/* Sponsors */}
                                     {sponsors.length > 0 && (
                                         <div className="p-6 bg-background rounded-2xl shadow-lg">
-                                            <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Handshake className="h-6 w-6 text-primary" /> Nos Partenaires et Sponsors</h3>
+                                            <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Handshake className="h-6 w-6 text-primary" />Nos Partenaires</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {sponsors.map((sponsor: any, index: number) => {
                                                     const isString = typeof sponsor === 'string';

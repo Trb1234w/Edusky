@@ -266,26 +266,15 @@ export async function FormationDetailsPageContent({ params }: { params: { id: st
 
                                         {/* Infos supplémentaires */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground border-t pt-4 mt-6">
-                                            {formation.date_publication && (
-                                                <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Publié le : {formatDate(String(formation.date_publication))}</div>
-                                            )}
-                                            {formation.updated_at && (
-                                                <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> Mis à jour le : {formatDate(String(formation.updated_at))}</div>
-                                            )}
-                                            {formation.ville && (
-                                                <div className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Ville : {formation.ville.nom}</div>
-                                            )}
-                                            {formation.pays && (
-                                                <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Pays : {formation.pays.nom}</div>
-                                            )}
-                                            {formation.capacite && (
-                                                <div className="flex items-center gap-2"><Users className="h-4 w-4" /> Capacité totale : {formation.capacite} places</div>
-                                            )}
                                             {formation.langue_enseignement && (
                                                 <div className="flex items-center gap-2"><Globe className="h-4 w-4" /> Langue : <span className="capitalize">{formation.langue_enseignement}</span></div>
                                             )}
                                         </div>
                                     </div>
+
+                                    {/* Prérequis */}
+                                    {formation.prerequis && <PrerequisTab prerequis={formation.prerequis} />}
+
 
                                     {/* Public Cible */}
                                     {formation.public_cible && <PublicCibleTab publicCible={formation.public_cible} />}
@@ -314,9 +303,6 @@ export async function FormationDetailsPageContent({ params }: { params: { id: st
 
                                 {/* Onglet 3 : Organisation */}
                                 <TabsContent value="organisation" className="space-y-6">
-                                    {/* Prérequis */}
-                                    {formation.prerequis && <PrerequisTab prerequis={formation.prerequis} />}
-
                                     {/* Horaires */}
                                     {(formation.horaires || formation.jours_formation) && <HorairesTab horaires={formation.horaires} joursFormation={formation.jours_formation} />}
 

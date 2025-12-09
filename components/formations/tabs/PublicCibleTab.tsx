@@ -22,7 +22,7 @@ export function PublicCibleTab({ publicCible }: PublicCibleTabProps) {
                     <Badge
                         key={index}
                         variant="outline"
-                        className="text-base px-4 py-2 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+                        className="text-base px-4 py-2 bg-blue-50 border-blue-200"
                     >
                         {typeof item === 'string' ? item : JSON.stringify(item)}
                     </Badge>

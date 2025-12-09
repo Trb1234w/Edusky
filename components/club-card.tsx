@@ -161,3 +161,22 @@ export function ClubCard({
     </Link >
   )
 }
+ClubCard.Skeleton = function ClubCardSkeleton() {
+  return (
+    <Card className="h-full flex flex-col overflow-hidden rounded-2xl">
+      <Skeleton className="h-40 w-full" />
+      <div className="p-4 flex-1 flex flex-col">
+        <div className="flex justify-between mb-2">
+          <Skeleton className="h-6 w-2/3" />
+          <Skeleton className="h-5 w-10" />
+        </div>
+        <Skeleton className="h-4 w-1/2 mb-3" />
+        <Skeleton className="h-12 w-full mb-4" />
+        <div className="flex justify-between mt-auto pt-3 border-t border-border/50">
+          <Skeleton className="h-8 w-16" />
+          <Skeleton className="h-8 w-24" />
+        </div>
+      </div>
+    </Card>
+  )
+}

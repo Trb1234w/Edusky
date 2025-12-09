@@ -426,7 +426,7 @@ export async function ClubDetailsPageContent({ params }: { params: { id: string 
                                 {/* Onglet 3 : Informations & Adhésion */}
                                 <TabsContent value="infos" className="space-y-6">
                                     <div className="p-6 bg-background rounded-2xl shadow-lg">
-                                        <h3 className="text-xl font-bold mb-6">Détails de l'adhésion & Contact</h3>
+                                        <h3 className="text-xl font-bold mb-6">Détails de l'adhésion</h3>
                                         <div className="space-y-6">
                                             {/* Tarifs */}
                                             {(club.prix_inscription !== null && club.prix_inscription !== undefined) || club.cotisation_mensuelle || club.cotisation_annuelle ? (

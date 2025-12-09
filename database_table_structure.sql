@@ -249,6 +249,18 @@ CREATE TABLE public.inscriptions_club (
   message text,
   statut text DEFAULT 'en_attente'::text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
+  whatsapp text,
+  age integer CHECK (age >= 0 AND age <= 120),
+  date_naissance date,
+  profession text,
+  niveau_experience text CHECK (niveau_experience = ANY (ARRAY['debutant'::text, 'intermediaire'::text, 'avance'::text, 'expert'::text])),
+  centres_interet ARRAY,
+  motivation_adhesion text,
+  disponibilite_semaine ARRAY,
+  comment_connu text,
+  parraine_par text,
+  accepte_reglement boolean DEFAULT false,
+  accepte_communication boolean DEFAULT true,
   CONSTRAINT inscriptions_club_pkey PRIMARY KEY (id),
   CONSTRAINT inscriptions_club_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
   CONSTRAINT inscriptions_club_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
@@ -265,6 +277,18 @@ CREATE TABLE public.inscriptions_evenement (
   ville_id uuid,
   message text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
+  whatsapp text,
+  age integer CHECK (age >= 0 AND age <= 120),
+  profession text,
+  entreprise text,
+  secteur_activite text,
+  motivation_participation text,
+  attentes_evenement text,
+  comment_connu text,
+  besoins_specifiques text,
+  regime_alimentaire text,
+  accompagnants integer DEFAULT 0,
+  statut_participation text DEFAULT 'confirme'::text CHECK (statut_participation = ANY (ARRAY['confirme'::text, 'liste_attente'::text, 'annule'::text])),
   CONSTRAINT inscriptions_evenement_pkey PRIMARY KEY (id),
   CONSTRAINT inscriptions_evenement_evenement_id_fkey FOREIGN KEY (evenement_id) REFERENCES public.evenements(id),
   CONSTRAINT inscriptions_evenement_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
@@ -287,6 +311,13 @@ CREATE TABLE public.inscriptions_formation (
   statut text DEFAULT 'en_attente'::text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  whatsapp text,
+  age integer CHECK (age >= 0 AND age <= 120),
+  statut_professionnel text CHECK (statut_professionnel = ANY (ARRAY['etudiant'::text, 'salarie'::text, 'independant'::text, 'chercheur_emploi'::text, 'autre'::text])),
+  niveau_etudes text CHECK (niveau_etudes = ANY (ARRAY['lycee'::text, 'bac'::text, 'licence'::text, 'master'::text, 'doctorat'::text, 'autre'::text])),
+  motivation text,
+  objectifs_formation text,
+  comment_connu text,
   CONSTRAINT inscriptions_formation_pkey PRIMARY KEY (id),
   CONSTRAINT inscriptions_formation_formation_id_fkey FOREIGN KEY (formation_id) REFERENCES public.formations(id),
   CONSTRAINT inscriptions_formation_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.sessions_formation(id),
@@ -441,6 +472,20 @@ CREATE TABLE public.quartiers (
   CONSTRAINT quartiers_pkey PRIMARY KEY (id),
   CONSTRAINT quartiers_ville_id_fkey FOREIGN KEY (ville_id) REFERENCES public.villes(id)
 );
+CREATE TABLE public.reservations_professeur (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  professeur_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  date_heure_debut timestamp with time zone NOT NULL,
+  date_heure_fin timestamp with time zone NOT NULL,
+  statut text NOT NULL DEFAULT 'en_attente'::text CHECK (statut = ANY (ARRAY['en_attente'::text, 'confirme'::text, 'annule'::text, 'terminee'::text])),
+  message_utilisateur text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT reservations_professeur_pkey PRIMARY KEY (id),
+  CONSTRAINT reservations_professeur_professeur_id_fkey FOREIGN KEY (professeur_id) REFERENCES public.professeurs(id),
+  CONSTRAINT reservations_professeur_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
 CREATE TABLE public.sessions_formation (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   formation_id uuid,
@@ -454,6 +499,17 @@ CREATE TABLE public.sessions_formation (
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT sessions_formation_pkey PRIMARY KEY (id),
   CONSTRAINT sessions_formation_formation_id_fkey FOREIGN KEY (formation_id) REFERENCES public.formations(id)
+);
+CREATE TABLE public.signalements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  type text NOT NULL CHECK (type = ANY (ARRAY['post'::text, 'comment'::text, 'user'::text])),
+  target_id uuid NOT NULL,
+  raison text NOT NULL,
+  statut text NOT NULL DEFAULT 'pending'::text CHECK (statut = ANY (ARRAY['pending'::text, 'resolved'::text, 'dismissed'::text])),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT signalements_pkey PRIMARY KEY (id),
+  CONSTRAINT signalements_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.stats_globales (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
