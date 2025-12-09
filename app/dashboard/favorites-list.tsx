@@ -79,13 +79,18 @@ export function FavoritesList({ favorites, isLoading, onFavoriteToggle }: Favori
             {...commonProps}
             organizer={item.author || "N/A"}
             category={item.category || ""}
-            date={item.date || "Date inconnue"}
-            time={item.time || "Heure inconnue"}
+            date={new Date(item.date || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+            time={new Date(item.date || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
             location={item.location || "Lieu inconnu"}
             participants={item.participants || 0}
             maxParticipants={item.maxParticipants || 0}
             status={item.status || "upcoming"}
-            {...item}
+            price={item.price}
+            isFree={item.isFree}
+            mode={item.mode}
+            pays_nom={item.pays?.nom}
+            ville_nom={item.ville?.nom}
+            quartier_nom={item.quartier?.nom}
           />
         );
       case 'club':
@@ -96,8 +101,16 @@ export function FavoritesList({ favorites, isLoading, onFavoriteToggle }: Favori
             president={item.author || "N/A"}
             category={item.category || ""}
             members={item.members || 0}
-            activities={item.activities || "Activités diverses"}
-            {...item}
+            activities={item.activities ? JSON.stringify(item.activities) : "Activités diverses"}
+            prix_inscription={item.prix_inscription}
+            cotisation_mensuelle={item.cotisation_mensuelle}
+            lieu={item.lieu}
+            pays_nom={item.pays?.nom}
+            ville_nom={item.ville?.nom}
+            quartier_nom={item.quartier?.nom}
+            age_min={item.age_minimum}
+            age_max={item.age_maximum}
+            verified={item.is_verified}
           />
         );
       case 'article':

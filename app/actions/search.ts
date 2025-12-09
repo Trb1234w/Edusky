@@ -536,11 +536,16 @@ export async function searchFormations(query: string, filters: SearchFilters = {
         categorie_id,
         pays_id,
         ville_id,
+        quartier_id,
         nombre_inscrits,
         langue_enseignement,
-        certificat
+        certificat,
+        pays:pays_id(nom),
+        ville:ville_id(nom),
+        quartier:quartier_id(nom)
       `, { count: 'exact' })
             .eq('statut', 'publie')
+            .eq('est_visible', true)
             .or(`titre.ilike.%${query}%,description.ilike.%${query}%,extrait.ilike.%${query}%`)
             .order('created_at', { ascending: false })
             .range(offset, offset + limit - 1)
@@ -605,17 +610,21 @@ export async function searchFormations(query: string, filters: SearchFilters = {
             }
 
             // Map fields for CourseCard
-            formations.forEach(f => {
-                // @ts-ignore
+            formations.forEach((f: any) => {
                 f.title = f.titre // Map title
                 f.level = f.niveau
                 f.duration = f.duree_texte
                 f.students = f.nombre_inscrits || 0
                 f.rating = f.note_moyenne || 0
                 f.price = f.prix_indicatif ? `${f.prix_indicatif.toLocaleString()} GNF` : 'Gratuit'
+                f.inscriptionPrice = f.prix_inscription ? `${f.prix_inscription.toLocaleString()} GNF` : undefined
                 f.image = f.image_url
                 f.language = f.langue_enseignement
                 f.certificate = f.certificat // Map certificate
+                f.lieu = f.lieu
+                f.pays_nom = f.pays?.nom
+                f.ville_nom = f.ville?.nom
+                f.quartier_nom = f.quartier?.nom
             })
         }
 
@@ -662,12 +671,17 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
         categorie_id,
         pays_id,
         ville_id,
+        quartier_id,
         prix,
         est_gratuit,
         nombre_participants,
-        heure_ouverture_portes
+        heure_ouverture_portes,
+        pays:pays_id(nom),
+        ville:ville_id(nom),
+        quartier:quartier_id(nom)
       `, { count: 'exact' })
             .eq('statut', 'publie')
+            .eq('est_visible', true)
             .or(`titre.ilike.%${query}%,description.ilike.%${query}%,extrait.ilike.%${query}%`)
             .order('date_debut', { ascending: true })
             .range(offset, offset + limit - 1)
@@ -727,8 +741,7 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
             }
 
             // Map fields for EventCard
-            events.forEach(e => {
-                // @ts-ignore
+            events.forEach((e: any) => {
                 e.title = e.titre // Map title
                 e.date = e.date_debut
                 e.time = e.heure_ouverture_portes ? e.heure_ouverture_portes.substring(0, 5) : (e.date_debut ? new Date(e.date_debut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '')
@@ -739,6 +752,9 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
                 e.status = e.type_evenement || 'ouvert'
                 e.price = e.prix // Map price
                 e.isFree = e.est_gratuit
+                e.pays_nom = e.pays?.nom
+                e.ville_nom = e.ville?.nom
+                e.quartier_nom = e.quartier?.nom
             })
         }
 
@@ -781,11 +797,19 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
         categorie_id,
         pays_id,
         ville_id,
+        quartier_id,
         nombre_membres,
         prix_inscription,
         cotisation_mensuelle,
-        cotisation_annuelle
+        cotisation_annuelle,
+        age_minimum,
+        age_maximum,
+        is_verified,
+        pays:pays_id(nom),
+        ville:ville_id(nom),
+        quartier:quartier_id(nom)
       `, { count: 'exact' })
+            .eq('est_visible', true)
             .or(`nom.ilike.%${query}%,description.ilike.%${query}%,theme_principal.ilike.%${query}%`)
             .order('created_at', { ascending: false })
             .range(offset, offset + limit - 1)
@@ -850,13 +874,18 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
             }
 
             // Map fields for ClubCard
-            clubs.forEach(c => {
-                // @ts-ignore
+            clubs.forEach((c: any) => {
                 c.name = c.nom // Map name
-                // @ts-ignore
-                c.activities = c.theme_principal // Map activities
+                c.activities = c.activites // Map activities (already JSONB)
                 c.members = c.nombre_membres || 0
                 c.image = c.image_url
+                c.verified = c.is_verified || false
+                c.lieu = c.lieu
+                c.pays_nom = c.pays?.nom
+                c.ville_nom = c.ville?.nom
+                c.quartier_nom = c.quartier?.nom
+                c.age_min = c.age_minimum
+                c.age_max = c.age_maximum
 
                 // Format fees
                 if (c.prix_inscription && c.prix_inscription > 0) {

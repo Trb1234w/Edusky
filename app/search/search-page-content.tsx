@@ -369,7 +369,23 @@ export default function SearchPageContent() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.articles.map((article: any) => (
                                                     <div key={article.id} className="h-full">
-                                                        <BlogCard {...article} />
+                                                        <BlogCard
+                                                            id={article.id}
+                                                            title={article.title || ""}
+                                                            description={article.description || ""}
+                                                            image={article.image || "/placeholder.png"}
+                                                            author={article.author || "N/A"}
+                                                            category={article.category || ""}
+                                                            slug={article.slug || ""}
+                                                            excerpt={article.excerpt || ""}
+                                                            authorRole={article.authorRole || "Auteur"}
+                                                            authorAvatar={article.authorAvatar || ""}
+                                                            date={article.date || new Date().toISOString()}
+                                                            readTime={article.readTime || "5 min"}
+                                                            views={article.views || 0}
+                                                            likes={article.likes || 0}
+                                                            comments={article.comments || 0}
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>

@@ -26,7 +26,10 @@ export async function getRegisteredEvents() {
       `
         evenement:evenement_id(*,
           categorie:categorie_id(*),
-          organisateur:profiles!organisateur_id(*)
+          organisateur:profiles!organisateur_id(*),
+          pays:pays_id(*),
+          ville:ville_id(*),
+          quartier:quartier_id(*)
         )
       `
     )
@@ -58,7 +61,10 @@ export async function getRegisteredFormations() {
       `
         formation:formation_id(*,
           categorie:categorie_id(*),
-          professeur:professeurs!professeur_id(*)
+          professeur:professeurs!professeur_id(*),
+          pays:pays_id(*),
+          ville:ville_id(*),
+          quartier:quartier_id(*)
         )
       `
     )
@@ -89,7 +95,10 @@ export async function getRegisteredClubs() {
       `
         club:club_id(*,
           categorie:categorie_id(*),
-          leader:profiles!leader_id(*)
+          leader:profiles!leader_id(*),
+          pays:pays_id(*),
+          ville:ville_id(*),
+          quartier:quartier_id(*)
         )
       `
     )
@@ -279,6 +288,8 @@ export async function getUserFavorites() {
   const formationIds = favorites.filter(f => f.type_item === 'formation').map(f => f.item_id)
   const eventIds = favorites.filter(f => f.type_item === 'evenement').map(f => f.item_id)
   const clubIds = favorites.filter(f => f.type_item === 'club').map(f => f.item_id)
+  const blogIds = favorites.filter(f => f.type_item === 'article_blog').map(f => f.item_id)
+
 
   let normalizedFavorites: any[] = []
 
@@ -291,7 +302,10 @@ export async function getUserFavorites() {
       .select(`
         *,
         categorie:categorie_id(*),
-        professeur:professeurs!professeur_id(*)
+        professeur:professeurs!professeur_id(*),
+        pays:pays_id(*),
+        ville:ville_id(*),
+        quartier:quartier_id(*)
       `)
       .in('id', formationIds)
 
@@ -308,9 +322,14 @@ export async function getUserFavorites() {
         duration: f.duree_texte,
         rating: f.note_moyenne,
         students: f.nb_avis,
-        price: f.prix_indicatif ? `${f.prix_indicatif} GNF` : "Gratuit",
+        price: f.prix_indicatif,
         language: f.langue_enseignement,
         certificate: f.certificat,
+        lieu: f.lieu,
+        pays_nom: f.pays?.nom,
+        ville_nom: f.ville?.nom,
+        quartier_nom: f.quartier?.nom,
+        inscriptionPrice: f.prix_inscription,
         // Preserve original data
         ...f
       }))
@@ -325,7 +344,10 @@ export async function getUserFavorites() {
       .select(`
         *,
         categorie:categorie_id(*),
-        organisateur:profiles!organisateur_id(*)
+        organisateur:profiles!organisateur_id(*),
+        pays:pays_id(*),
+        ville:ville_id(*),
+        quartier:quartier_id(*)
       `)
       .in('id', eventIds)
 
@@ -343,6 +365,11 @@ export async function getUserFavorites() {
         maxParticipants: e.capacite,
         price: e.prix,
         isFree: e.est_gratuit,
+        mode: e.mode,
+        pays_nom: e.pays?.nom,
+        ville_nom: e.ville?.nom,
+        quartier_nom: e.quartier?.nom,
+        participants: e.nombre_participants,
         // Preserve original data
         ...e
       }))
@@ -357,7 +384,10 @@ export async function getUserFavorites() {
       .select(`
         *,
         categorie:categorie_id(*),
-        leader:profiles!leader_id(*)
+        leader:profiles!leader_id(*),
+        pays:pays_id(*),
+        ville:ville_id(*),
+        quartier:quartier_id(*)
       `)
       .in('id', clubIds)
 
@@ -370,12 +400,50 @@ export async function getUserFavorites() {
         image_url: c.image_url,
         author: c.leader?.full_name,
         category: c.categorie?.nom,
-        members: c.capacite,
+        members: c.nombre_membres,
         fees: c.cotisation_mensuelle || c.cotisation_annuelle || c.prix_inscription,
+        prix_inscription: c.prix_inscription,
+        cotisation_mensuelle: c.cotisation_mensuelle,
+        lieu: c.lieu,
+        pays_nom: c.pays?.nom,
+        ville_nom: c.ville?.nom,
+        quartier_nom: c.quartier?.nom,
+        age_min: c.age_minimum,
+        age_max: c.age_maximum,
+        activities: c.activites,
+        verified: c.is_verified,
         // Preserve original data
         ...c
       }))
       normalizedFavorites = [...normalizedFavorites, ...formattedClubs]
+    }
+  }
+
+  // --- ARTICLES DE BLOG ---
+  if (blogIds.length > 0) {
+    const { data: articles, error: articlesError } = await supabase
+      .from('articles_blog')
+      .select(`
+        *,
+        auteur:profiles!auteur_id(full_name),
+        categorie:categorie_id(nom)
+      `)
+      .in('id', blogIds)
+
+    if (!articlesError && articles) {
+      const formattedArticles = articles.map(a => ({
+        id: a.id,
+        type: 'article_blog',
+        title: a.titre,
+        description: a.extrait || a.contenu,
+        image_url: a.image_url || a.image_couverture,
+        author: a.auteur?.full_name,
+        category: a.categorie?.nom,
+        slug: a.slug,
+        // Preserve original data
+        ...a
+      }))
+      normalizedFavorites = [...normalizedFavorites, ...formattedArticles]
     }
   }
 

@@ -226,14 +226,14 @@ export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapp
             >
               <ArrowLeft size={16} />
             </Button>
-            <span className="text-lg font-semibold ml-2">Blogs</span>
+            <span className="text-lg font-semibold ml-2">Découvrir</span>
           </div>
 
           <div className="px-4 py-2 border-b">
             <form onSubmit={e => e.preventDefault()} className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
-                placeholder="Rechercher un article..."
+                placeholder="Rechercher un emploi, un article, une agence..."
                 className="pl-10 h-10 rounded-xl border-border/50"
                 value={filters.search}
                 onChange={e => handleFilterChange("search", e.target.value)}
@@ -390,8 +390,8 @@ export function BlogFilterWrapper({ gradient, initialArticles }: BlogFilterWrapp
         {/* Desktop Layout */}
         <div className="hidden lg:flex items-center justify-between mb-6 mt-8">
           <div>
-            <h2 className="text-2xl font-bold">Tous les articles</h2>
-            <p className="text-muted-foreground">Explorez nos conseils, actualités et ressources</p>
+            <h2 className="text-2xl font-bold">Découvrir</h2>
+            <p className="text-muted-foreground">Explorez nos conseils,nos offres d'emploi, nos recommendations, nos actualités et nosressources</p>
           </div>
           <div className="px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
             {filteredArticles.length} article{filteredArticles.length > 1 ? 's' : ''}

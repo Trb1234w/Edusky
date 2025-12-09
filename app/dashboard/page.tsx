@@ -121,14 +121,18 @@ export default function DashboardPage() {
       // Charger les formations inscrites
       const { data: registeredFormationsData, error: registeredFormationsError } = await getRegisteredFormations();
       if (!registeredFormationsError && registeredFormationsData) {
-        setRegisteredFormations(registeredFormationsData);
+        // Dédupliquer les formations basées sur leur 'id'
+        const uniqueFormations = Array.from(new Map((registeredFormationsData as any[]).map((formation: any) => [formation.id, formation])).values());
+        setRegisteredFormations(uniqueFormations);
       }
       setRegisteredFormationsLoading(false);
 
       // Charger les clubs inscrits
       const { data: registeredClubsData, error: registeredClubsError } = await getRegisteredClubs();
       if (!registeredClubsError && registeredClubsData) {
-        setRegisteredClubs(registeredClubsData);
+        // Dédupliquer les clubs basés sur leur 'id'
+        const uniqueClubs = Array.from(new Map((registeredClubsData as any[]).map((club: any) => [club.id, club])).values());
+        setRegisteredClubs(uniqueClubs);
       }
       setRegisteredClubsLoading(false);
 
@@ -414,8 +418,8 @@ export default function DashboardPage() {
                         date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                         time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                         location={event.lieu || event.mode || ""}
-                        category={event.categories?.nom || ""}
-                        participants={0} // Placeholder
+                        category={event.categorie?.nom || ""}
+                        participants={event.nombre_participants || 0}
                         maxParticipants={event.capacite || 0}
                         organizer={event.organisateur?.full_name || "Inconnu"}
                         image={event.image_url || "/placeholder.png"}
@@ -424,6 +428,10 @@ export default function DashboardPage() {
                         onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
                         price={event.prix}
                         isFree={event.est_gratuit}
+                        mode={event.mode}
+                        pays_nom={event.pays?.nom}
+                        ville_nom={event.ville?.nom}
+                        quartier_nom={event.quartier?.nom}
                       />
                     ))}
                   </div>
@@ -466,6 +474,10 @@ export default function DashboardPage() {
                         onToggle={(status) => handleFavoriteToggle(formation.id, 'formation', status)}
                         language={formation.langue_enseignement}
                         certificate={formation.certificat}
+                        lieu={formation.lieu}
+                        pays_nom={formation.pays?.nom}
+                        ville_nom={formation.ville?.nom}
+                        quartier_nom={formation.quartier?.nom}
                       />
                     ))}
                   </div>
@@ -497,14 +509,21 @@ export default function DashboardPage() {
                         name={club.nom || ""}
                         description={club.description || ""}
                         category={club.categorie?.nom || ""}
-                        members={club.capacite || 0} // Using capacite as a proxy for members
-                        activities="Activités non spécifiées" // Placeholder
+                        members={club.nombre_membres || 0}
+                        activities={club.activites ? JSON.stringify(club.activites) : ""}
                         president={club.leader?.full_name || "Inconnu"}
                         image={club.image_url || "/placeholder.png"}
-                        verified={false} // Placeholder
+                        verified={club.is_verified || false}
                         is_favorited={favorites.some(fav => fav.type === 'club' && fav.id === club.id)}
                         onToggle={(status) => handleFavoriteToggle(club.id, 'club', status)}
-                        fees={club.cotisation_mensuelle || club.cotisation_annuelle || club.prix_inscription}
+                        prix_inscription={club.prix_inscription}
+                        cotisation_mensuelle={club.cotisation_mensuelle}
+                        lieu={club.lieu}
+                        pays_nom={club.pays?.nom}
+                        ville_nom={club.ville?.nom}
+                        quartier_nom={club.quartier?.nom}
+                        age_min={club.age_minimum}
+                        age_max={club.age_maximum}
                       />
                     ))}
                   </div>

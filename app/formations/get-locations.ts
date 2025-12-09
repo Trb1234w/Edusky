@@ -129,6 +129,7 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
                     quartier:quartier_id(*)
                 `)
                 .eq('statut', 'publie')
+                .eq('est_visible', true)
                 .order('date_publication', { ascending: false })
         ]);
 

@@ -25,7 +25,7 @@ export function BlogStickyHeaderStatic() {
                     >
                         <ArrowLeft size={16} />
                     </Button>
-                    <span className="text-lg font-semibold ml-2">Blogs</span>
+                    <span className="text-lg font-semibold ml-2">Découvrir</span>
                 </div>
                 <div className="px-4 py-2 border-b">
                     <div className="relative">

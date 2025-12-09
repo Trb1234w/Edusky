@@ -26,6 +26,7 @@ RETURNS TABLE (
     tags text[],
     prix numeric,
     est_gratuit boolean,
+    est_visible boolean,
     pays_id uuid,
     ville_id uuid,
     quartier_id uuid,
@@ -58,6 +59,7 @@ BEGIN
         e.tags::text[],
         e.prix,
         e.est_gratuit,
+        e.est_visible,
         e.pays_id,
         e.ville_id,
         e.quartier_id,
@@ -84,6 +86,7 @@ BEGIN
         public.quartiers as q ON e.quartier_id = q.id
     WHERE
         e.statut = 'publie'
+        AND e.est_visible = true
         AND (search_term IS NULL OR e.titre ILIKE '%' || search_term || '%' OR e.description ILIKE '%' || search_term || '%')
         AND (category_slug IS NULL OR c.slug = category_slug)
         AND (mode_filter IS NULL OR e.mode::text = mode_filter)

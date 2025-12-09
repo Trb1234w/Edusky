@@ -55,7 +55,7 @@ export function ProfesseursList({ professeurs, isLoading }: ProfesseursListProps
           id={professeur.id}
           full_name={professeur.full_name || "Inconnu"}
           avatar_url={professeur.image_url || "/placeholder.svg"}
-          titre={professeur.titre || "Professeur"}
+          titre={professeur.titre || "Expert"}
           type={professeur.type}
           specialites={professeur.specialites || []}
           note_moyenne={professeur.note_moyenne || 0}

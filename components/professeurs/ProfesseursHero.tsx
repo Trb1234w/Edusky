@@ -46,10 +46,10 @@ export function ProfesseursHero() {
 
                         {/* Title */}
                         <h1 className="text-3xl lg:text-5xl font-bold text-white leading-tight">
-                            Trouvez le{" "}
+                            Trouvez l'{" "}
                             <span className="relative inline-block">
                                 <span className="relative z-10 bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
-                                    professeur idéal
+                                    expert idéal
                                 </span>
                                 <span className="absolute bottom-2 left-0 w-full h-3 bg-yellow-300/30 blur-sm" />
                             </span>
@@ -68,7 +68,7 @@ export function ProfesseursHero() {
                                     <Users className="text-yellow-300" size={18} />
                                     <div className="text-2xl lg:text-3xl font-bold text-white">500+</div>
                                 </div>
-                                <div className="text-xs lg:text-sm text-white/80 text-center">Professeurs</div>
+                                <div className="text-xs lg:text-sm text-white/80 text-center">Experts</div>
                             </div>
 
                             <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 lg:p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
@@ -94,14 +94,14 @@ export function ProfesseursHero() {
                                 size="lg"
                                 className="bg-white text-purple-600 hover:bg-white/90 font-semibold px-6 shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
                             >
-                                Explorer les professeurs
+                                Explorer les experts
                             </Button>
                             <Button
                                 size="lg"
                                 variant="outline"
                                 className="border-2 border-white text-white hover:bg-white/10 font-semibold px-6 backdrop-blur-sm"
                             >
-                                Devenir professeur
+                                Devenir expert
                             </Button>
                         </div>
                     </div>

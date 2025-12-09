@@ -27,6 +27,26 @@ export async function getProfesseurById(id: string) {
   return { data, error };
 }
 
+export async function getReservationsByProfesseurId(professeurId: string) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabaseAdmin
+    .from("reservations_professeur")
+    .select("*")
+    .eq("professeur_id", professeurId)
+    .order("date_heure_debut", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching reservations by professeur ID:", error);
+    return { data: null, error };
+  }
+
+  return { data, error };
+}
+
 export async function getRelatedProfesseursBySpecialty(currentProfesseurId: string, specialties: string[]) {
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

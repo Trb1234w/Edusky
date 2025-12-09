@@ -188,20 +188,6 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
                                                     </span>
                                                 </div>
                                             </div>
-
-                                            {/* Capacité */}
-                                            {evenement.capacite && (
-                                                <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
-                                                    <Users className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                                                    <div className="flex-1">
-                                                        <span className="font-bold text-sm block mb-1">Places</span>
-                                                        <span className="text-muted-foreground text-sm">
-                                                            {inscriptions.length} / {evenement.capacite} inscrits
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            )}
-
                                             {/* Mode */}
                                             <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
                                                 <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
@@ -525,7 +511,7 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
                                 {/* Onglet 2 : Programme */}
                                 {programme && (
                                     <TabsContent value="programme" className="p-6 bg-background rounded-2xl shadow-lg">
-                                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Book className="h-6 w-6 text-primary" /> Programme de l'événement</h3>
+                                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Book className="h-6 w-6 text-primary" /> Programme </h3>
                                         {programme.agenda && programme.agenda.length > 0 ? (
                                             <div className="space-y-4">
                                                 {programme.agenda.map((item: any, index: number) => (

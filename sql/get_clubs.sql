@@ -50,6 +50,7 @@ RETURNS TABLE (
     partenaires jsonb,
     realisations jsonb,
     visibilite text,
+    est_visible boolean,
     langues text[],
     leader_full_name text,
     leader_avatar_url text,
@@ -102,6 +103,7 @@ BEGIN
         cl.partenaires,
         cl.realisations,
         cl.visibilite,
+        cl.est_visible,
         cl.langues::text[],
         pr.full_name AS leader_full_name,
         pr.avatar_url AS leader_avatar_url,
@@ -120,7 +122,8 @@ BEGIN
     LEFT JOIN
         public.quartiers as q ON cl.quartier_id = q.id
     WHERE
-        (statut_filter IS NULL OR cl.statut::text = statut_filter)
+        cl.est_visible = true
+        AND (statut_filter IS NULL OR cl.statut::text = statut_filter)
         AND (search_term IS NULL OR cl.nom ILIKE '%' || search_term || '%' OR cl.description ILIKE '%' || search_term || '%')
         AND (category_slug IS NULL OR c.slug = category_slug)
         AND (theme_filter IS NULL OR cl.theme_principal = theme_filter)

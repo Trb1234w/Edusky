@@ -34,6 +34,7 @@ returns table (
     duree_texte text,
     capacite integer,
     tags text[],
+    est_visible boolean,
     pays_id uuid,
     ville_id uuid,
     quartier_id uuid,
@@ -72,6 +73,7 @@ begin
         f.duree_texte,
         f.capacite,
         f.tags::text[],
+        f.est_visible,
         f.pays_id,
         f.ville_id,
         f.quartier_id,
@@ -94,6 +96,7 @@ begin
         public.quartiers as q on f.quartier_id = q.id
     where
         f.statut = 'publie'
+        and f.est_visible = true
         and (search_term is null or f.titre ilike '%' || search_term || '%' or f.description ilike '%' || search_term || '%')
         and (category_slug is null or c.slug = category_slug)
         and (niveau_filter is null or f.niveau = niveau_filter)

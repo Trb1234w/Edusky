@@ -57,7 +57,7 @@ export function ProfesseurSidebar({
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
                     <Input
-                        placeholder="Rechercher..."
+                        placeholder="Rechercher un expert..."
                         className="pl-10 h-11 rounded-xl border-border/50 bg-background/50 focus:bg-background transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                         value={filters.search}
                         onChange={e => handleFilterChange('search', e.target.value)}
@@ -71,7 +71,7 @@ export function ProfesseurSidebar({
                 {typeOptions.length > 0 && (
                     <AccordionItem value="type" className="border-none">
                         <AccordionTrigger className="text-base font-semibold hover:no-underline py-2 hover:text-primary transition-colors">
-                            Type de professeur
+                            Type d'expert
                         </AccordionTrigger>
                         <AccordionContent className="space-y-2 pt-2">
                             <div className="flex flex-wrap gap-2">

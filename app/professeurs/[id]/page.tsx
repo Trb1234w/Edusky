@@ -1,4 +1,4 @@
-import { getProfesseurById, getRelatedProfesseursBySpecialty } from "@/lib/data/professeurs.server";
+import { getProfesseurById, getRelatedProfesseursBySpecialty, getReservationsByProfesseurId } from "@/lib/data/professeurs.server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, Users, Briefcase, CheckCircle, Award, Mail, Phone, Globe, Linkedin, BookOpen, GraduationCap, Languages, Lightbulb, MapPin, User } from "lucide-react";
+import { ReservationDialog } from "@/components/professeurs/reservation-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ReservationForm } from "@/components/professeurs/reservation-form";
 
 // --- Helpers ---
 
@@ -41,6 +44,12 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
   if (error || !professeur) {
     console.error("Failed to fetch professeur or professeur not found:", error);
     notFound();
+  }
+
+  const { data: reservations, error: reservationsError } = await getReservationsByProfesseurId(professeur.id);
+
+  if (reservationsError) {
+    console.error("Failed to fetch reservations:", reservationsError);
   }
 
   const specialites = Array.isArray(professeur.specialites) ? professeur.specialites : [];
@@ -216,6 +225,26 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                       </div>
                     )}
                   </Card>
+                  <Card className="p-6 md:p-8 bg-white shadow-lg rounded-2xl">
+                    <h2 className="text-2xl md:text-3xl font-bold mb-4 text-foreground flex items-center gap-3">
+                      <BookOpen className="h-6 w-6 text-primary" /> Réservations
+                    </h2>
+                    {reservations && reservations.length > 0 ? (
+                      <div className="space-y-4">
+                        {reservations.map((reservation: any) => (
+                          <div key={reservation.id} className="p-4 border rounded-xl bg-muted/20">
+                            <h3 className="font-bold">{new Date(reservation.date_heure_debut).toLocaleString()} - {new Date(reservation.date_heure_fin).toLocaleString()}</h3>
+                            <p className="text-sm text-muted-foreground">{reservation.message_utilisateur}</p>
+                            <Badge className="mt-2" variant={reservation.statut === 'confirme' ? 'default' : 'secondary'}>{reservation.statut}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12 bg-muted/20 rounded-xl">
+                        <p className="text-muted-foreground">Aucune réservation pour le moment.</p>
+                      </div>
+                    )}
+                  </Card>
                 </TabsContent>
 
                 <TabsContent value="portfolio" className="space-y-6">
@@ -261,12 +290,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                         <span className="text-sm font-normal text-muted-foreground">/h</span>
                       </span>
                     </div>
-                    <Button className="w-full text-lg py-6 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
-                      Contacter ce professeur
-                    </Button>
-                    <Button variant="outline" className="w-full text-lg py-6 rounded-xl font-bold">
-                      Réserver un cours
-                    </Button>
+<ReservationDialog professeurId={professeur.id} professeurName={professeur.full_name} />
                   </div>
                 </Card>
 
