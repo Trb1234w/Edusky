@@ -431,7 +431,7 @@ export async function searchUsers(query: string, filters: SearchFilters = {}): P
         competences,
         pays_id,
         ville_id,
-        followers:suivis!suivis_suivi_id_fkey(count)
+        followers:suivis!followed_id(count)
       `, { count: 'exact' })
             .or(`full_name.ilike.%${query}%,username.ilike.%${query}%,bio.ilike.%${query}%`)
             .order('is_verified', { ascending: false })
@@ -1046,10 +1046,9 @@ export async function searchProfesseurs(query: string, filters: SearchFilters = 
         let queryBuilder = supabase
             .from('professeurs')
             .select('*', { count: 'exact' })
-            .eq('is_publie', true)
-            .or(`titre.ilike.%${query}%,presentation.ilike.%${query}%`)
-            .order('note_moyenne', { ascending: false })
-            .range(offset, offset + limit - 1)
+                    .eq('is_publie', true)
+                    .or(`titre.ilike.%${query}%,presentation.ilike.%${query}%,full_name.ilike.%${query}%`)
+                    .order('note_moyenne', { ascending: false })            .range(offset, offset + limit - 1)
 
         // Filtres
         if (filters.paysId) {
