@@ -540,6 +540,8 @@ export async function searchFormations(query: string, filters: SearchFilters = {
         nombre_inscrits,
         langue_enseignement,
         certificat,
+        duree_heures,
+        nombre_jours,
         pays:pays_id(nom),
         ville:ville_id(nom),
         quartier:quartier_id(nom)
@@ -613,7 +615,8 @@ export async function searchFormations(query: string, filters: SearchFilters = {
             formations.forEach((f: any) => {
                 f.title = f.titre // Map title
                 f.level = f.niveau
-                f.duration = f.duree_texte
+                f.duration = f.nombre_jours ? `${f.nombre_jours} jours` : f.duree_texte || ""
+                f.hoursPerDay = f.duree_heures ? `${f.duree_heures}h/j` : undefined
                 f.students = f.nombre_inscrits || 0
                 f.rating = f.note_moyenne || 0
                 f.price = f.prix_indicatif ? `${f.prix_indicatif.toLocaleString()} GNF` : 'Gratuit'
@@ -745,7 +748,7 @@ export async function searchEvents(query: string, filters: SearchFilters = {}): 
                 e.title = e.titre // Map title
                 e.date = e.date_debut
                 e.time = e.heure_ouverture_portes ? e.heure_ouverture_portes.substring(0, 5) : (e.date_debut ? new Date(e.date_debut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '')
-                e.location = e.lieu || 'En ligne'
+                e.location = [e.lieu, e.quartier?.nom, e.ville?.nom, e.pays?.nom].filter(Boolean).join(', ')
                 e.participants = e.nombre_participants || 0
                 e.maxParticipants = e.capacite || 0
                 e.image = e.image_url
