@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton" // Ensure Skeleton is imported
 import { useRouter } from "next/navigation"
 import {
     Search,
@@ -16,16 +16,20 @@ export function FormationsStickyHeaderStatic() {
     return (
         <div className="lg:hidden" data-static-header="formations">
             <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-                <div className="md:hidden px-4 py-2 border-b flex items-center">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
-                        onClick={() => router.back()}
-                    >
-                        <ArrowLeft size={16} />
-                    </Button>
-                    <span className="text-lg font-semibold ml-2">Formations</span>
+                <div className="md:hidden px-4 py-2 border-b flex items-center justify-between">
+                    <div className="flex items-center">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+                            onClick={() => router.back()}
+                        >
+                            <ArrowLeft size={16} />
+                        </Button>
+                        <span className="text-lg font-semibold ml-2">Formations</span>
+                    </div>
+                    {/* Skeleton for the button */}
+                    <Skeleton className="h-9 w-[110px] rounded-md" /> {/* Adjust width/height as needed */}
                 </div>
                 <div className="px-4 py-2 border-b">
                     <div className="relative">
