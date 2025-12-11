@@ -807,7 +807,8 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
         cotisation_annuelle,
         age_minimum,
         age_maximum,
-        is_verified,
+        lieu,
+        activites,
         pays:pays_id(nom),
         ville:ville_id(nom),
         quartier:quartier_id(nom)
@@ -882,7 +883,6 @@ export async function searchClubs(query: string, filters: SearchFilters = {}): P
                 c.activities = c.activites // Map activities (already JSONB)
                 c.members = c.nombre_membres || 0
                 c.image = c.image_url
-                c.verified = c.is_verified || false
                 c.lieu = c.lieu
                 c.pays_nom = c.pays?.nom
                 c.ville_nom = c.ville?.nom
