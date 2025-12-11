@@ -64,7 +64,10 @@ export async function getRegisteredFormations() {
           professeur:professeurs!professeur_id(*),
           pays:pays_id(*),
           ville:ville_id(*),
-          quartier:quartier_id(*)
+          quartier:quartier_id(*),
+          duree_heures,
+          nombre_jours,
+          duree_texte
         )
       `
     )
@@ -305,7 +308,10 @@ export async function getUserFavorites() {
         professeur:professeurs!professeur_id(*),
         pays:pays_id(*),
         ville:ville_id(*),
-        quartier:quartier_id(*)
+        quartier:quartier_id(*),
+        duree_heures,
+        nombre_jours,
+        duree_texte
       `)
       .in('id', formationIds)
 
@@ -319,7 +325,7 @@ export async function getUserFavorites() {
         author: f.professeur?.full_name,
         category: f.categorie?.nom,
         level: f.niveau,
-        duration: f.duree_texte,
+        // duration: f.duree_texte, // Removed, will be handled by CourseCard logic
         rating: f.note_moyenne,
         students: f.nb_avis,
         price: f.prix_indicatif,
@@ -330,6 +336,8 @@ export async function getUserFavorites() {
         ville_nom: f.ville?.nom,
         quartier_nom: f.quartier?.nom,
         inscriptionPrice: f.prix_inscription,
+        nombre_jours: f.nombre_jours,
+        duree_texte: f.duree_texte,
         // Preserve original data
         ...f
       }))
@@ -361,7 +369,7 @@ export async function getUserFavorites() {
         author: e.organisateur?.full_name,
         category: e.categorie?.nom,
         date: e.date_debut,
-        location: e.lieu || e.mode,
+        // location: e.lieu || e.mode,
         maxParticipants: e.capacite,
         price: e.prix,
         isFree: e.est_gratuit,

@@ -60,20 +60,23 @@ export function FavoritesList({ favorites, isLoading, onFavoriteToggle }: Favori
 
     switch (item.type) {
       case 'formation':
+        const hoursPerDay = item.duree_heures ? `${item.duree_heures}h/j` : undefined;
         return (
           <CourseCard
             {...commonProps}
             instructor={item.author || "N/A"}
             category={item.category || ""}
             level={item.level || "N/A"}
-            duration={item.duration || "N/A"}
+            duration={item.nombre_jours ? `${item.nombre_jours} jours` : item.duree_texte || "N/A"}
             students={item.students || 0}
             rating={item.rating || 0}
             price={item.price || "Gratuit"}
+            hoursPerDay={hoursPerDay}
             {...item}
           />
         );
       case 'evenement':
+        const fullLocation = [item.lieu, item.quartier_nom, item.ville_nom, item.pays_nom].filter(Boolean).join(', ');
         return (
           <EventCard
             {...commonProps}
@@ -81,16 +84,13 @@ export function FavoritesList({ favorites, isLoading, onFavoriteToggle }: Favori
             category={item.category || ""}
             date={new Date(item.date || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
             time={new Date(item.date || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-            location={item.location || "Lieu inconnu"}
+            location={fullLocation}
             participants={item.participants || 0}
             maxParticipants={item.maxParticipants || 0}
             status={item.status || "upcoming"}
             price={item.price}
             isFree={item.isFree}
             mode={item.mode}
-            pays_nom={item.pays?.nom}
-            ville_nom={item.ville?.nom}
-            quartier_nom={item.quartier?.nom}
           />
         );
       case 'club':

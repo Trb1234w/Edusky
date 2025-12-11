@@ -409,31 +409,31 @@ export default function DashboardPage() {
                   </div>
                 ) : registeredEvents.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {registeredEvents.map(event => (
-                      <EventCard
-                        key={event.id}
-                        id={event.id}
-                        title={event.titre || ""}
-                        description={event.extrait || event.description || ""}
-                        date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                        location={event.lieu || event.mode || ""}
-                        category={event.categorie?.nom || ""}
-                        participants={event.nombre_participants || 0}
-                        maxParticipants={event.capacite || 0}
-                        organizer={event.organisateur?.full_name || "Inconnu"}
-                        image={event.image_url || "/placeholder.png"}
-                        status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
-                        is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
-                        onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
-                        price={event.prix}
-                        isFree={event.est_gratuit}
-                        mode={event.mode}
-                        pays_nom={event.pays?.nom}
-                        ville_nom={event.ville?.nom}
-                        quartier_nom={event.quartier?.nom}
-                      />
-                    ))}
+                    {registeredEvents.map(event => {
+                      const fullLocation = [event.lieu, event.quartier?.nom, event.ville?.nom, event.pays?.nom].filter(Boolean).join(', ');
+                      return (
+                        <EventCard
+                          key={event.id}
+                          id={event.id}
+                          title={event.titre || ""}
+                          description={event.extrait || event.description || ""}
+                          date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          location={fullLocation}
+                          category={event.categorie?.nom || ""}
+                          participants={event.nombre_participants || 0}
+                          maxParticipants={event.capacite || 0}
+                          organizer={event.organisateur?.full_name || "Inconnu"}
+                          image={event.image_url || "/placeholder.png"}
+                          status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
+                          is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
+                          onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
+                          price={event.prix}
+                          isFree={event.est_gratuit}
+                          mode={event.mode}
+                        />
+                      )
+                    })}
                   </div>
                 ) : (
                   <Card className="p-8 text-center text-muted-foreground">
@@ -456,30 +456,33 @@ export default function DashboardPage() {
                   </div>
                 ) : registeredFormations.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {registeredFormations.map(formation => (
-                      <CourseCard
-                        key={formation.id}
-                        id={formation.id}
-                        title={formation.titre || ""}
-                        description={formation.extrait || ""}
-                        instructor={formation.professeur?.full_name || "Inconnu"}
-                        category={formation.categorie?.nom || ""}
-                        level={formation.niveau || ""}
-                        duration={formation.duree_texte || ""}
-                        students={formation.nb_avis || 0}
-                        rating={formation.note_moyenne || 0}
-                        price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
-                        image={formation.image_url || "/placeholder.png"}
-                        is_favorited={favorites.some(fav => fav.type === 'formation' && fav.id === formation.id)}
-                        onToggle={(status) => handleFavoriteToggle(formation.id, 'formation', status)}
-                        language={formation.langue_enseignement}
-                        certificate={formation.certificat}
-                        lieu={formation.lieu}
-                        pays_nom={formation.pays?.nom}
-                        ville_nom={formation.ville?.nom}
-                        quartier_nom={formation.quartier?.nom}
-                      />
-                    ))}
+                    {registeredFormations.map(formation => {
+                      const hoursPerDay = formation.duree_heures ? `${formation.duree_heures}h/j` : undefined;
+                      return (
+                        <CourseCard
+                          key={formation.id}
+                          id={formation.id}
+                          title={formation.titre || ""}
+                          description={formation.extrait || ""}
+                          instructor={formation.professeur?.full_name || "Inconnu"}
+                          category={formation.categorie?.nom || ""}
+                                                  level={formation.niveau || ""}
+                                                  duration={formation.nombre_jours ? `${formation.nombre_jours} jours` : formation.duree_texte || ""}
+                                                  students={formation.nb_avis || 0}                          rating={formation.note_moyenne || 0}
+                          price={formation.prix_indicatif ? `${formation.prix_indicatif} GNF` : "Gratuit"}
+                          image={formation.image_url || "/placeholder.png"}
+                          is_favorited={favorites.some(fav => fav.type === 'formation' && fav.id === formation.id)}
+                          onToggle={(status) => handleFavoriteToggle(formation.id, 'formation', status)}
+                          language={formation.langue_enseignement}
+                          certificate={formation.certificat}
+                          lieu={formation.lieu}
+                          pays_nom={formation.pays?.nom}
+                          ville_nom={formation.ville?.nom}
+                          quartier_nom={formation.quartier?.nom}
+                          hoursPerDay={hoursPerDay}
+                        />
+                      )
+                    })}
                   </div>
                 ) : (
                   <Card className="p-8 text-center text-muted-foreground">

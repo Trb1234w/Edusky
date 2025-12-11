@@ -126,7 +126,9 @@ export async function getAllFormations(): Promise<{ data: any[] | null; error: s
                     professeur:professeurs(*),
                     pays:pays_id(*),
                     ville:ville_id(*),
-                    quartier:quartier_id(*)
+                    quartier:quartier_id(*),
+                    duree_heures,
+                    nombre_jours
                 `)
                 .eq('statut', 'publie')
                 .eq('est_visible', true)

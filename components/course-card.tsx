@@ -31,6 +31,7 @@ interface CourseCardProps {
   ville_nom?: string
   quartier_nom?: string
   onToggle?: (newStatus: boolean) => void
+  hoursPerDay?: string
 }
 
 export function CourseCard({
@@ -54,6 +55,7 @@ export function CourseCard({
   ville_nom,
   quartier_nom,
   onToggle,
+  hoursPerDay,
 }: CourseCardProps) {
   const [optimisticIsFavorited, addOptimisticFavorite] = useOptimistic(
     initialIsFavorited,
@@ -176,6 +178,12 @@ export function CourseCard({
                       <Clock size={14} className="text-primary" />
                       <span>{duration}</span>
                     </div>
+                    {hoursPerDay && (
+                      <div className="flex items-center gap-1">
+                        <Clock size={14} className="text-primary" />
+                        <span>{hoursPerDay}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
