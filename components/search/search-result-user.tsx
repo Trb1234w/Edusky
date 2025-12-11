@@ -35,14 +35,7 @@ export function SearchResultUser({
     followers,
     isFollowing: initialFollowing = false
 }: SearchResultUserProps) {
-    const [isFollowing, setIsFollowing] = useState(initialFollowing)
     const followersCount = followers?.[0]?.count || 0
-
-    const handleFollow = async (e: React.MouseEvent) => {
-        e.preventDefault()
-        setIsFollowing(!isFollowing)
-        // TODO: Implémenter l'action de suivi
-    }
 
     const location = [ville?.nom, pays?.nom].filter(Boolean).join(', ')
     const truncatedBio = bio && bio.length > 120 ? bio.substring(0, 120) + '...' : bio
@@ -117,16 +110,6 @@ export function SearchResultUser({
                         </div>
                     )}
                 </div>
-
-                {/* Bouton Suivre */}
-                <Button
-                    onClick={handleFollow}
-                    variant={isFollowing ? "outline" : "default"}
-                    size="sm"
-                    className="shrink-0"
-                >
-                    {isFollowing ? 'Abonné' : 'S\'abonner'}
-                </Button>
             </div>
         </Card>
     )

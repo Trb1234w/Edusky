@@ -21,6 +21,7 @@ import {
     Users,
     CheckCircle,
     Globe,
+    UserPlus, // Added UserPlus
 } from "lucide-react"
 import {
     CustomBottomSheet,
@@ -33,6 +34,7 @@ import {
 import { ProfesseurSidebar } from "@/components/ui/professeur-sidebar"
 import { HorizontalSpecialtyNav } from "./professeurs/HorizontalSpecialtyNav"
 import { PaginationControls } from "@/components/ui/pagination-controls"
+import { ProfessionalInquiryDialog } from "@/components/professional-inquiry-dialog" // Corrected import
 
 const iconMap: { [key: string]: React.ElementType } = {
     Star,
@@ -280,16 +282,29 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
             {/* Mobile-only Filter UI - Fixed at top */}
             <div className="lg:hidden">
                 <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-                    <div className="md:hidden px-4 py-2 border-b flex items-center">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
-                            onClick={() => router.back()}
-                        >
-                            <ArrowLeft size={16} />
-                        </Button>
-                        <span className="text-lg font-semibold ml-2">Experts</span>
+                    <div className="md:hidden px-4 py-2 border-b flex items-center justify-between"> {/* Added justify-between */}
+                        <div className="flex items-center"> {/* New div to group back button and title */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+                                onClick={() => router.back()}
+                            >
+                                <ArrowLeft size={16} />
+                            </Button>
+                            <span className="text-lg font-semibold ml-2">Experts</span>
+                        </div>
+                        <ProfessionalInquiryDialog
+                            inquiryType="devenir_expert"
+                            dialogTitle="Devenir un expert sur EduSky"
+                            dialogDescription="Partagez votre passion et votre savoir. Remplissez ce formulaire pour rejoindre notre communauté d'experts."
+                            triggerButton={
+                                <Button size="sm">
+                                    <UserPlus size={16} className="mr-2" />
+                                    Devenir expert
+                                </Button>
+                            }
+                        />
                     </div>
                     <div className="px-4 py-2 border-b">
                         <form onSubmit={handleSearchSubmit} className="relative">

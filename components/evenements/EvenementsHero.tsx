@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Search, Calendar, MapPin, Clock, ArrowRight, Zap, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ProfessionalInquiryDialog } from '@/components/professional-inquiry-dialog'
 
 export function EvenementsHero() {
     const [isVisible, setIsVisible] = useState(false)
@@ -83,6 +84,30 @@ export function EvenementsHero() {
                                     <div className="text-xs text-muted-foreground font-medium">{stat.label}</div>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* CTA Buttons */}
+                        <div className="flex flex-col sm:flex-row items-start gap-3 pt-2">
+                            <Button
+                                size="lg"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 shadow-2xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105"
+                            >
+                                Explorer les événements
+                            </Button>
+                            <ProfessionalInquiryDialog
+                                inquiryType="sponsor_evenement"
+                                dialogTitle="Sponsoriser un événement"
+                                dialogDescription="Vous souhaitez associer votre marque à nos événements ? Remplissez ce formulaire et nous vous contacterons pour discuter des opportunités."
+                                triggerButton={
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        className="border-2 border-primary text-primary hover:bg-primary/10 font-semibold px-6 backdrop-blur-sm"
+                                    >
+                                        Sponsoriser un événement
+                                    </Button>
+                                }
+                            />
                         </div>
                     </div>
 

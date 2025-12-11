@@ -8,7 +8,9 @@ import {
     Search,
     SlidersHorizontal,
     ArrowLeft,
+    Handshake, // Added Handshake import
 } from "lucide-react"
+import { ProfessionalInquiryDialog } from "@/components/professional-inquiry-dialog" // Added Dialog import
 
 export function ClubsStickyHeaderStatic() {
     const router = useRouter();
@@ -16,16 +18,29 @@ export function ClubsStickyHeaderStatic() {
     return (
         <div className="lg:hidden" data-static-header="clubs">
             <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-                <div className="md:hidden px-4 py-2 border-b flex items-center">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
-                        onClick={() => router.back()}
-                    >
-                        <ArrowLeft size={16} />
-                    </Button>
-                    <span className="text-lg font-semibold ml-2">Clubs</span>
+                <div className="md:hidden px-4 py-2 border-b flex items-center justify-between"> {/* Added justify-between */}
+                    <div className="flex items-center"> {/* New div to group back button and title */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+                            onClick={() => router.back()}
+                        >
+                            <ArrowLeft size={16} />
+                        </Button>
+                        <span className="text-lg font-semibold ml-2">Clubs</span>
+                    </div>
+                    <ProfessionalInquiryDialog
+                        inquiryType="sponsor_club"
+                        dialogTitle="Parrainer un Club"
+                        dialogDescription="Soutenez la communauté et gagnez en visibilité en parrainant un club. Remplissez ce formulaire pour en savoir plus."
+                        triggerButton={
+                            <Button size="sm">
+                                <Handshake size={16} className="mr-2" />
+                                Parrainer
+                            </Button>
+                        }
+                    />
                 </div>
                 <div className="px-4 py-2 border-b">
                     <div className="relative">

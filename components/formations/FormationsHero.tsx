@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Search, Sparkles, BookOpen, Award, Users, GraduationCap, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ProfessionalInquiryDialog } from '@/components/professional-inquiry-dialog'
 
 export function FormationsHero() {
     const [isVisible, setIsVisible] = useState(false)

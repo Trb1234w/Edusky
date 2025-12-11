@@ -2,6 +2,7 @@
 
 import { GraduationCap, Users, Award, TrendingUp, Sparkles, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ProfessionalInquiryDialog } from '@/components/professional-inquiry-dialog'
 
 export function ProfesseursHero() {
     return (
@@ -96,13 +97,20 @@ export function ProfesseursHero() {
                             >
                                 Explorer les experts
                             </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="border-2 border-white text-white hover:bg-white/10 font-semibold px-6 backdrop-blur-sm"
-                            >
-                                Devenir expert
-                            </Button>
+                            <ProfessionalInquiryDialog
+                                inquiryType="devenir_expert"
+                                dialogTitle="Devenir un expert sur EduSky"
+                                dialogDescription="Partagez votre passion et votre savoir. Remplissez ce formulaire pour rejoindre notre communauté d'experts."
+                                triggerButton={
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        className="border-2 border-white text-white hover:bg-white/10 font-semibold px-6 backdrop-blur-sm"
+                                    >
+                                        Devenir expert
+                                    </Button>
+                                }
+                            />
                         </div>
                     </div>
 
