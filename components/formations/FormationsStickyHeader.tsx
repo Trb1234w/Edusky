@@ -18,7 +18,9 @@ import {
     Home,
     Tag,
     Users,
+    UserPlus, // Added UserPlus import
 } from "lucide-react"
+import { ProfessionalInquiryDialog } from "@/components/professional-inquiry-dialog" // Added Dialog import
 import {
     CustomBottomSheet,
     CustomBottomSheetContent,
@@ -86,16 +88,29 @@ export function FormationsStickyHeader({
     return (
         <div className="lg:hidden" data-dynamic-header="formations">
             <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
-                <div className="md:hidden px-4 py-2 border-b flex items-center">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
-                        onClick={() => router.back()}
-                    >
-                        <ArrowLeft size={16} />
-                    </Button>
-                    <span className="text-lg font-semibold ml-2">Formations</span>
+                <div className="md:hidden px-4 py-2 border-b flex items-center justify-between"> {/* Added justify-between */}
+                    <div className="flex items-center"> {/* New div to group back button and title */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="p-0 h-8 w-8 rounded-full bg-primary/20 hover:bg-primary/30 text-primary flex items-center justify-center"
+                            onClick={() => router.back()}
+                        >
+                            <ArrowLeft size={16} />
+                        </Button>
+                        <span className="text-lg font-semibold ml-2">Formations</span>
+                    </div>
+                    <ProfessionalInquiryDialog
+                        inquiryType="formation_entreprise"
+                        dialogTitle="Demande de Formation pour Entreprise"
+                        dialogDescription="Vous souhaitez former vos équipes ? Remplissez ce formulaire et nous vous contacterons pour discuter de vos besoins spécifiques."
+                        triggerButton={
+                            <Button size="sm">
+                                <UserPlus size={16} className="mr-2" />
+                                Form. entreprise
+                            </Button>
+                        }
+                    />
                 </div>
                 <div className="px-4 py-2 border-b">
                     <form onSubmit={handleSearchSubmit} className="relative">

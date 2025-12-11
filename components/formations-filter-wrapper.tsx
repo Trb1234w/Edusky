@@ -33,6 +33,8 @@ import { HorizontalCategoryNav } from "./categories/HorizontalCategoryNav"
 import { FormationSidebar } from "./ui/formation-sidebar"
 import { FormationsStickyHeader } from "./formations/FormationsStickyHeader"
 import { PaginationControls } from "@/components/ui/pagination-controls"
+import { ProfessionalInquiryDialog } from "@/components/professional-inquiry-dialog"
+import { UserPlus } from "lucide-react"
 
 const iconMap: { [key: string]: React.ElementType } = {
   BarChartHorizontal,
