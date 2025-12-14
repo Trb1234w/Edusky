@@ -124,7 +124,7 @@ export default async function HomePage() {
         {/* Blog Slider */}
         {articles.length > 0 && (
           <SectionSlider
-            title="Articles"
+            title="Découvrir"
             icon={<BookOpen className="w-5 h-5 text-primary" />}
             href="/blog"
           >
