@@ -2,7 +2,9 @@ import { getEvenementById, getRelatedEvenementsByCategory } from "@/lib/data/eve
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { RelatedEvenements } from "@/components/related-evenements";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +47,11 @@ const normalizeArray = (data: any) => {
 
 // --- Page Component (Redesigné) ---
 
+async function RelatedEvenementsSection({ evenementId, categoryId }: { evenementId: string, categoryId: number }) {
+    const { data: relatedEvenements } = await getRelatedEvenementsByCategory(evenementId, categoryId);
+    return <RelatedEvenements evenements={relatedEvenements || []} />;
+}
+
 export async function EvenementDetailsPageContent({ params }: { params: { id: string } }) {
     const resolvedParams = await params;
     const { data: evenement, error } = await getEvenementById(resolvedParams.id);
@@ -63,9 +70,6 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
 
     const lieuComplet = [evenement.lieu, evenement.quartier?.nom, evenement.ville?.nom, evenement.pays?.nom].filter(Boolean).join(', ');
     const hasLinks = evenement.lien_streaming || evenement.lien_billetterie || evenement.code_acces_streaming;
-
-    // Fetch related evenements
-    const { data: relatedEvenements } = await getRelatedEvenementsByCategory(evenement.id, evenement.categorie_id);
 
     return (
         <div className="min-h-screen flex flex-col bg-white">
@@ -628,7 +632,18 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
                 </div>
 
                 {/* Related Evenements Section */}
-                <RelatedEvenements evenements={relatedEvenements || []} />
+                <Suspense fallback={
+                    <div className="container mx-auto px-4 py-8">
+                        <Skeleton className="h-8 w-48 mb-6" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <Skeleton key={i} className="h-80 w-full rounded-2xl" />
+                            ))}
+                        </div>
+                    </div>
+                }>
+                    <RelatedEvenementsSection evenementId={evenement.id} categoryId={evenement.categorie_id} />
+                </Suspense>
             </main>
 
             <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-sm border-t z-40">

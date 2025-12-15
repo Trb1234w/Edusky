@@ -1,4 +1,7 @@
 import { Suspense } from "react"
+
+export const dynamic = 'force-dynamic';
+
 import { BlogHero } from "@/components/blog/BlogHero"
 import { BlogContent } from "./blog-content"
 import { Skeleton } from "@/components/ui/skeleton"

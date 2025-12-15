@@ -16,6 +16,9 @@ import { CommentsList } from "@/components/blog/CommentsList";
 import { CommentForm } from "@/components/blog/CommentForm";
 import { createClient } from "@/lib/supabase/server";
 
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
 // --- Helpers ---
 
 const formatDate = (dateString: string | null | undefined) => {
@@ -33,6 +36,11 @@ const calculateReadingTime = (content: string): number => {
 };
 
 // --- Page Component ---
+
+async function RelatedArticlesSection({ articleId, categoryId }: { articleId: string, categoryId: number }) {
+    const { data: relatedArticles } = await getRelatedArticlesByCategory(articleId, categoryId);
+    return <RelatedArticles articles={relatedArticles || []} />;
+}
 
 export async function ArticleDetailsPageContent({ params }: { params: { id: string } }) {
     const resolvedParams = await params;
@@ -55,16 +63,20 @@ export async function ArticleDetailsPageContent({ params }: { params: { id: stri
     const { liked: userLiked } = await checkUserLiked(resolvedParams.id);
 
     // Récupérer l'utilisateur connecté pour le formulaire
+    // Récupérer l'utilisateur connecté pour le formulaire
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    const userProfile = user ? await supabase
-        .from('profiles')
-        .select('full_name, avatar_url')
-        .eq('id', user.id)
-        .single() : null;
 
-    // Fetch related articles
-    const { data: relatedArticles } = await getRelatedArticlesByCategory(article.id, article.categorie_id);
+    // Fetch profile only if user exists
+    let userProfile = null;
+    if (user) {
+        const { data } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', user.id)
+            .single();
+        userProfile = data;
+    }
 
     return (
         <div className="min-h-screen flex flex-col bg-white">
@@ -184,8 +196,8 @@ export async function ArticleDetailsPageContent({ params }: { params: { id: stri
                             {/* Formulaire pour ajouter un commentaire */}
                             <CommentForm
                                 articleId={resolvedParams.id}
-                                userAvatar={userProfile?.data?.avatar_url}
-                                userFullName={userProfile?.data?.full_name}
+                                userAvatar={userProfile?.avatar_url}
+                                userFullName={userProfile?.full_name}
                             />
                         </div>
 
@@ -193,7 +205,18 @@ export async function ArticleDetailsPageContent({ params }: { params: { id: stri
                 </div>
 
                 {/* Related Articles Section */}
-                <RelatedArticles articles={relatedArticles || []} />
+                <Suspense fallback={
+                    <div className="container mx-auto px-4 py-8 max-w-7xl">
+                        <Skeleton className="h-8 w-48 mb-6" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <Skeleton key={i} className="h-96 w-full rounded-2xl" />
+                            ))}
+                        </div>
+                    </div>
+                }>
+                    <RelatedArticlesSection articleId={article.id} categoryId={article.categorie_id} />
+                </Suspense>
 
             </main>
 

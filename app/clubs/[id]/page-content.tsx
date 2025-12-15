@@ -18,6 +18,9 @@ import {
 import { ContentActions } from "@/components/content-actions";
 
 
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
 // --- Helpers ---
 
 const formatDate = (dateString: string | null | undefined) => {
@@ -37,6 +40,11 @@ const normalizeArray = (data: any) => {
 
 // --- Page Component (Redesigné) ---
 
+async function RelatedClubsSection({ clubId, categoryId }: { clubId: string, categoryId: number }) {
+    const { data: relatedClubs } = await getRelatedClubsByCategory(clubId, categoryId);
+    return <RelatedClubs clubs={relatedClubs || []} />;
+}
+
 export async function ClubDetailsPageContent({ params }: { params: { id: string } }) {
     const resolvedParams = await params;
     const { data: club, error } = await getClubById(resolvedParams.id);
@@ -48,9 +56,6 @@ export async function ClubDetailsPageContent({ params }: { params: { id: string 
 
     const inscriptions = Array.isArray(club.inscriptions) ? club.inscriptions : [];
     const leader = club.leader;
-
-    // Fetch related clubs
-    const { data: relatedClubs } = await getRelatedClubsByCategory(club.id, club.categorie_id);
 
     // Normalize data
     const partenaires = normalizeArray(club.partenaires);
@@ -658,7 +663,18 @@ export async function ClubDetailsPageContent({ params }: { params: { id: string 
 
                     {/* Related Clubs Section - Moved inside main container and adjusted spacing */}
                     <div className="mt-8 md:mt-16">
-                        <RelatedClubs clubs={relatedClubs || []} />
+                        <Suspense fallback={
+                            <div className="container mx-auto px-4 py-8">
+                                <Skeleton className="h-8 w-48 mb-6" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <Skeleton key={i} className="h-80 w-full rounded-2xl" />
+                                    ))}
+                                </div>
+                            </div>
+                        }>
+                            <RelatedClubsSection clubId={club.id} categoryId={club.categorie_id} />
+                        </Suspense>
                     </div>
 
                 </div>

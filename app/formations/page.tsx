@@ -1,4 +1,7 @@
 import { Suspense } from "react"
+
+export const dynamic = 'force-dynamic';
+
 import { FormationsHero } from "@/components/formations/FormationsHero"
 import { FormationsContent } from "./formations-content"
 import { Skeleton } from "@/components/ui/skeleton"

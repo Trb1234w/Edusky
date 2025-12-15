@@ -1,4 +1,7 @@
 import { Suspense } from "react"
+
+export const dynamic = 'force-dynamic';
+
 import { EvenementsHero } from "@/components/evenements/EvenementsHero"
 import { EvenementsContent } from "./evenements-content"
 import { Skeleton } from "@/components/ui/skeleton"
