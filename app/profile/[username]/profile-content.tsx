@@ -125,7 +125,7 @@ export function ProfileContent({
                     <span className="hidden lg:inline ml-2">Abonnés</span>
                 </TabsTrigger>
             </TabsList>
-            <TabsContent value="posts" className="mt-2 md:mt-6 px-0 md:px-0">
+            <TabsContent value="posts" className="mt-2 md:mt-4 px-0 md:px-0">
                 <div className="space-y-4 w-full">
                     {posts && posts.length > 0 ? (
                         posts.map(renderPost)
@@ -136,7 +136,7 @@ export function ProfileContent({
                     )}
                 </div>
             </TabsContent>
-            <TabsContent value="abonnements" className="mt-2 md:mt-6">
+            <TabsContent value="abonnements" className="mt-2 md:mt-4">
                 {followingWithStatus && followingWithStatus.length > 0 ? (
                     <FollowersList
                         profiles={followingWithStatus}
@@ -149,7 +149,7 @@ export function ProfileContent({
                     </Card>
                 )}
             </TabsContent>
-            <TabsContent value="abonnes" className="mt-2 md:mt-6">
+            <TabsContent value="abonnes" className="mt-2 md:mt-4">
                 {followersWithStatus && followersWithStatus.length > 0 ? (
                     <FollowersList
                         profiles={followersWithStatus}

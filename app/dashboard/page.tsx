@@ -310,14 +310,14 @@ export default function DashboardPage() {
                 <span className="hidden lg:inline ml-2">Favoris</span>
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="posts" className="mt-4 px-0 md:px-0">
+            <TabsContent value="posts" className="mt-2 md:mt-4 px-0 md:px-0">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-4">
                   <CreatePost profile={profile} />
 
                   {/* Section des posts de l'utilisateur */}
-                  <div className="space-y-2 mx-2">
-                    <h2 className="text-2xl font-bold">Mes publications</h2>
+                  <div className="space-y-2">
+                    <h2 className="text-2xl mx-2 font-bold">Mes publications</h2>
                     {postsLoading ? (
                       <div className="space-y-4">
                         {Array.from({ length: 2 }).map((_, i) => (
@@ -364,7 +364,7 @@ export default function DashboardPage() {
 
               </div>
             </TabsContent>
-            <TabsContent value="followers" className="mt-4 px-4 md:px-0">
+            <TabsContent value="followers" className="mt-2 md:mt-4 px-4 md:px-0">
               {followersLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -379,7 +379,7 @@ export default function DashboardPage() {
                 />
               )}
             </TabsContent>
-            <TabsContent value="following" className="mt-4 px-4 md:px-0">
+            <TabsContent value="following" className="mt-2 md:mt-4 px-4 md:px-0">
               {followingLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -394,7 +394,7 @@ export default function DashboardPage() {
                 />
               )}
             </TabsContent>
-            <TabsContent value="inscriptions" className="mt-4 space-y-12 px-4 md:px-0">
+            <TabsContent value="inscriptions" className="mt-2 md:mt-4 space-y-12 px-4 md:px-0">
               {/* Événements */}
               <section>
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -537,7 +537,7 @@ export default function DashboardPage() {
                 )}
               </section>
             </TabsContent>
-            <TabsContent value="favorites" className="mt-4 px-4 md:px-0">
+            <TabsContent value="favorites" className="mt-2 md:mt-4 px-4 md:px-0">
               {favoritesLoading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {Array.from({ length: 3 }).map((_, i) => (

@@ -303,7 +303,7 @@ export default function SearchPageContent() {
                                                 <FileText className="h-5 w-5 text-primary" />
                                                 Postes récents
                                             </h3>
-                                            <div className="space-y-4 max-w-2xl">
+                                            <div className="space-y-4 max-w-2xl -mx-4 md:mx-0">
                                                 {results.posts.map((post: any) => (
                                                     <PostCard key={post.id} {...post} />
                                                 ))}

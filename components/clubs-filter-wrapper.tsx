@@ -311,7 +311,7 @@ export function ClubsFilterWrapper({ initialClubs }: ClubsFilterWrapperProps) {
       icon: "Users",
       name: "placesDisponibles",
       options: [
-        { label: "Toutes", value: undefined },
+        { label: "Disponibilité", value: undefined },
         { label: "Places disponibles", value: true },
       ],
     },
@@ -319,7 +319,7 @@ export function ClubsFilterWrapper({ initialClubs }: ClubsFilterWrapperProps) {
       label: "Langue",
       name: "langues",
       options: [
-        { label: "Toutes les langues", value: undefined },
+        { label: "Langue", value: undefined },
         ...availableLangues.map(langue => ({ label: langue, value: langue }))
       ],
     },

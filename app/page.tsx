@@ -65,7 +65,7 @@ export default async function HomePage() {
         {/* Professeurs Slider */}
         {professeurs.length > 0 && (
           <SectionSlider
-            title="Professeurs"
+            title="Experts"
             icon={<Users className="w-5 h-5 text-primary" />}
             href="/professeurs"
           >
