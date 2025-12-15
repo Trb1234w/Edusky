@@ -7,7 +7,7 @@ import Link from 'next/link'
 const features = [
     {
         icon: GraduationCap,
-        title: "Professeurs Qualifiés",
+        title: "Experts Qualifiés",
         description: "Accédez à un réseau d'experts vérifiés pour un apprentissage d'excellence.",
         href: "/professeurs",
         cta: "Trouver un mentor",
@@ -52,8 +52,8 @@ const features = [
     },
     {
         icon: Newspaper,
-        title: "Blog Éducatif",
-        description: "Conseils et actualités pour réussir.",
+        title: "Autres",
+        description: "Conseils, actualités et offres d'emploi pour réussir.",
         href: "/blog",
         cta: "Lire",
         className: "md:col-span-1 md:row-span-1",

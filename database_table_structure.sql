@@ -87,6 +87,7 @@ CREATE TABLE public.clubs (
   realisations jsonb,
   visibilite text DEFAULT 'public'::text CHECK (visibilite = ANY (ARRAY['public'::text, 'prive'::text, 'sur_invitation'::text])),
   langues ARRAY,
+  est_visible boolean DEFAULT true,
   CONSTRAINT clubs_pkey PRIMARY KEY (id),
   CONSTRAINT clubs_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
   CONSTRAINT clubs_leader_id_fkey FOREIGN KEY (leader_id) REFERENCES public.profiles(id),
@@ -131,6 +132,19 @@ CREATE TABLE public.conversations (
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT conversations_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.demandes_pro (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  type_demande text NOT NULL,
+  nom_contact text NOT NULL,
+  email text NOT NULL,
+  telephone text,
+  nom_entreprise text,
+  message text NOT NULL,
+  statut text NOT NULL DEFAULT 'nouveau'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  metadata jsonb,
+  CONSTRAINT demandes_pro_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.evenements (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   titre text NOT NULL,
@@ -170,6 +184,7 @@ CREATE TABLE public.evenements (
   telephone_contact text,
   lien_billetterie text,
   statut_evenement text DEFAULT 'ouvert'::text CHECK (statut_evenement = ANY (ARRAY['ouvert'::text, 'complet'::text, 'annule'::text, 'reporte'::text, 'termine'::text])),
+  est_visible boolean DEFAULT true,
   CONSTRAINT evenements_pkey PRIMARY KEY (id),
   CONSTRAINT evenements_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
   CONSTRAINT evenements_organisateur_id_fkey FOREIGN KEY (organisateur_id) REFERENCES public.profiles(id),
@@ -231,6 +246,7 @@ CREATE TABLE public.formations (
   taux_reussite numeric,
   public_cible ARRAY,
   accessibilite jsonb,
+  est_visible boolean DEFAULT true,
   CONSTRAINT formations_pkey PRIMARY KEY (id),
   CONSTRAINT formations_categorie_id_fkey FOREIGN KEY (categorie_id) REFERENCES public.categories(id),
   CONSTRAINT formations_pays_id_fkey FOREIGN KEY (pays_id) REFERENCES public.pays(id),
