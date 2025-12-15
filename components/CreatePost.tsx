@@ -57,7 +57,7 @@ export function CreatePost({ profile }: CreatePostProps) {
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
     setPreviewUrls(previewUrls.filter((_, i) => i !== index));
-    if(fileInputRef.current) {
+    if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   }
@@ -85,7 +85,7 @@ export function CreatePost({ profile }: CreatePostProps) {
         const { data: { publicUrl } } = supabase.storage
           .from('posts-media')
           .getPublicUrl(filePath);
-        
+
         if (file.type.startsWith('image/')) {
           imageUrls.push(publicUrl);
         } else if (file.type.startsWith('video/')) {
@@ -123,8 +123,8 @@ export function CreatePost({ profile }: CreatePostProps) {
             <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name || 'User'} />
             <AvatarFallback>{userInitial}</AvatarFallback>
           </Avatar>
-          <button 
-            onClick={() => setIsOpen(true)} 
+          <button
+            onClick={() => setIsOpen(true)}
             className="flex-1 text-left bg-muted hover:bg-muted/80 transition-colors rounded-full px-4 py-3 text-muted-foreground"
           >
             Commencer un post...
@@ -133,12 +133,12 @@ export function CreatePost({ profile }: CreatePostProps) {
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-lg flex flex-col max-h-[90vh]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-lg flex flex-col max-h-[85vh] overflow-hidden p-0 gap-0">
+          <DialogHeader className="p-4 pb-2 border-b border-border/50">
             <DialogTitle>Créer une publication</DialogTitle>
           </DialogHeader>
-          
-          <div className="py-4 space-y-4 flex-1 overflow-y-auto">
+
+          <div className="p-4 space-y-4 flex-1 overflow-y-auto min-h-0">
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name || 'User'} />
@@ -153,7 +153,7 @@ export function CreatePost({ profile }: CreatePostProps) {
               </div>
             </div>
 
-            <Textarea 
+            <Textarea
               placeholder={`Quoi de neuf, ${profile.prenom || ''} ?`}
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -178,21 +178,21 @@ export function CreatePost({ profile }: CreatePostProps) {
 
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row sm:justify-between items-center">
+          <DialogFooter className="flex-col sm:flex-row sm:justify-between items-center p-4 pt-3 border-t border-border/50 bg-background/95 backdrop-blur-sm mt-auto shrink-0">
             <div className="flex gap-2 items-center">
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*,video/mp4,video/quicktime" className="hidden" id="file-upload" multiple />
-                <Button asChild variant="ghost" size="icon" className="rounded-full">
-                    <label htmlFor="file-upload" className="cursor-pointer">
-                        <ImageIcon className="text-green-500" />
-                    </label>
-                </Button>
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*,video/mp4,video/quicktime" className="hidden" id="file-upload" multiple />
+              <Button asChild variant="ghost" size="icon" className="rounded-full">
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <ImageIcon className="text-green-500" />
+                </label>
+              </Button>
             </div>
-            <Button 
-              onClick={handlePost} 
+            <Button
+              onClick={handlePost}
               disabled={(!content.trim() && files.length === 0) || isPending}
               className="w-full sm:w-auto"
             >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} 
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isPending ? 'Publication...' : 'Publier'}
             </Button>
           </DialogFooter>

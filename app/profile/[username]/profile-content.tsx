@@ -125,7 +125,7 @@ export function ProfileContent({
                     <span className="hidden lg:inline ml-2">Abonnés</span>
                 </TabsTrigger>
             </TabsList>
-            <TabsContent value="posts" className="mt-2 md:mt-6">
+            <TabsContent value="posts" className="mt-2 md:mt-6 px-0 md:px-0">
                 <div className="space-y-4 w-full">
                     {posts && posts.length > 0 ? (
                         posts.map(renderPost)

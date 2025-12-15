@@ -431,7 +431,7 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="posts" className="space-y-4 mt-0 max-w-2xl mx-auto">
+                                <TabsContent value="posts" className="space-y-4 mt-0 max-w-2xl mx-auto -mx-4 md:mx-auto">
                                     {results?.data?.map((post: any) => (
                                         <PostCard key={post.id} {...post} />
                                     ))}
