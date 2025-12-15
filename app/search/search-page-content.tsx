@@ -44,6 +44,14 @@ export default function SearchPageContent() {
         limit: 20,
         offset: 0
     })
+    const [favoritedItems, setFavoritedItems] = useState<Record<string, boolean>>({});
+
+    const handleFavoriteToggle = useCallback((id: string, isFavorited: boolean) => {
+        setFavoritedItems(prev => ({
+            ...prev,
+            [id]: isFavorited
+        }));
+    }, []);
 
     // Debounced search
     const performSearch = useCallback(async (searchQuery: string, tab: TabValue) => {
@@ -324,7 +332,12 @@ export default function SearchPageContent() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.formations.map((formation: any) => (
                                                     <div key={formation.id} className="h-full">
-                                                        <CourseCard {...formation} />
+                                                        <CourseCard
+                                                            {...formation}
+                                                            description={formation.description || formation.extrait || ""}
+                                                            is_favorited={favoritedItems[formation.id] ?? formation.is_favorited}
+                                                            onToggle={(newStatus) => handleFavoriteToggle(formation.id, newStatus)}
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>
@@ -339,7 +352,11 @@ export default function SearchPageContent() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.events.map((event: any) => (
                                                     <div key={event.id} className="h-full">
-                                                        <EventCard {...event} />
+                                                        <EventCard
+                                                            {...event}
+                                                            is_favorited={favoritedItems[event.id] ?? event.is_favorited}
+                                                            onToggle={(newStatus) => handleFavoriteToggle(event.id, newStatus)}
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>
@@ -354,7 +371,11 @@ export default function SearchPageContent() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {results.clubs.map((club: any) => (
                                                     <div key={club.id} className="h-full">
-                                                        <ClubCard {...club} />
+                                                        <ClubCard
+                                                            {...club}
+                                                            is_favorited={favoritedItems[club.id] ?? club.is_favorited}
+                                                            onToggle={(newStatus) => handleFavoriteToggle(club.id, newStatus)}
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>
@@ -372,11 +393,11 @@ export default function SearchPageContent() {
                                                         <BlogCard
                                                             id={article.id}
                                                             title={article.title || ""}
-                                                            description={article.description || ""}
+
                                                             image={article.image || "/placeholder.png"}
                                                             author={article.author || "N/A"}
                                                             category={article.category || ""}
-                                                            slug={article.slug || ""}
+
                                                             excerpt={article.excerpt || ""}
                                                             authorRole={article.authorRole || "Auteur"}
                                                             authorAvatar={article.authorAvatar || ""}
@@ -385,6 +406,8 @@ export default function SearchPageContent() {
                                                             views={article.views || 0}
                                                             likes={article.likes || 0}
                                                             comments={article.comments || 0}
+                                                            is_favorited={favoritedItems[article.id] ?? article.is_favorited}
+                                                            onToggle={(newStatus) => handleFavoriteToggle(article.id, newStatus)}
                                                         />
                                                     </div>
                                                 ))}
@@ -436,7 +459,12 @@ export default function SearchPageContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {results?.data?.map((formation: any) => (
                                             <div key={formation.id} className="h-full">
-                                                <CourseCard {...formation} />
+                                                <CourseCard
+                                                    {...formation}
+                                                    description={formation.description || formation.extrait || ""}
+                                                    is_favorited={favoritedItems[formation.id] ?? formation.is_favorited}
+                                                    onToggle={(newStatus) => handleFavoriteToggle(formation.id, newStatus)}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -451,7 +479,11 @@ export default function SearchPageContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {results?.data?.map((event: any) => (
                                             <div key={event.id} className="h-full">
-                                                <EventCard {...event} />
+                                                <EventCard
+                                                    {...event}
+                                                    is_favorited={favoritedItems[event.id] ?? event.is_favorited}
+                                                    onToggle={(newStatus) => handleFavoriteToggle(event.id, newStatus)}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -466,7 +498,11 @@ export default function SearchPageContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {results?.data?.map((club: any) => (
                                             <div key={club.id} className="h-full">
-                                                <ClubCard {...club} />
+                                                <ClubCard
+                                                    {...club}
+                                                    is_favorited={favoritedItems[club.id] ?? club.is_favorited}
+                                                    onToggle={(newStatus) => handleFavoriteToggle(club.id, newStatus)}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -481,7 +517,11 @@ export default function SearchPageContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {results?.data?.map((article: any) => (
                                             <div key={article.id} className="h-full">
-                                                <BlogCard {...article} />
+                                                <BlogCard
+                                                    {...article}
+                                                    is_favorited={favoritedItems[article.id] ?? article.is_favorited}
+                                                    onToggle={(newStatus) => handleFavoriteToggle(article.id, newStatus)}
+                                                />
                                             </div>
                                         ))}
                                     </div>

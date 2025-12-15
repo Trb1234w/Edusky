@@ -24,7 +24,7 @@ interface FormationListItem {
   langue_enseignement?: string;
   certificat?: boolean;
   duree_heures?: number;
-  nombre_jours?: number;
+
 }
 
 interface FormationsListProps {

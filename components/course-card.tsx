@@ -155,41 +155,45 @@ export function CourseCard({
             {title}
           </h3>
 
+          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+            {description}
+          </p>
+
           <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
             Par <span className="font-medium text-foreground">{instructor}</span>
           </p>
-          
+
           <div className="space-y-2 mt-auto">
             {fullLocation && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <MapPin size={14} className="text-primary shrink-0"/>
-                  <span className="truncate">{fullLocation}</span>
+                <MapPin size={14} className="text-primary shrink-0" />
+                <span className="truncate">{fullLocation}</span>
               </div>
             )}
-            
+
             <div className="pt-2 border-t border-border/50">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1">
-                      <Users size={14} className="text-primary" />
-                      <span>{students}</span>
-                    </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <Users size={14} className="text-primary" />
+                    <span>{students}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock size={14} className="text-primary" />
+                    <span>{duration}</span>
+                  </div>
+                  {hoursPerDay && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} className="text-primary" />
-                      <span>{duration}</span>
+                      <span>{hoursPerDay}</span>
                     </div>
-                    {hoursPerDay && (
-                      <div className="flex items-center gap-1">
-                        <Clock size={14} className="text-primary" />
-                        <span>{hoursPerDay}</span>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-bold text-primary">{price}</span>
-                  {inscriptionPrice && <span className="text-sm text-primary/80">Insc: {inscriptionPrice}</span>}
-                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-primary">{price}</span>
+                {inscriptionPrice && <span className="text-sm text-primary/80">Insc: {inscriptionPrice}</span>}
+              </div>
             </div>
           </div>
         </div>

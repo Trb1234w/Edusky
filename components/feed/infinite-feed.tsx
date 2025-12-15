@@ -99,12 +99,37 @@ export function InfiniteFeed({ initialPosts, currentUserId, followingIds, filter
         }
     }, [loadMorePosts, hasMore, isLoading])
 
+    const handleLikeChange = useCallback((postId: string, newLiked: boolean, newLikesCount: number) => {
+        setPosts(currentPosts =>
+            currentPosts.map(post => {
+                if (post.id === postId) {
+                    return { ...post, liked: newLiked, likes: newLikesCount }
+                }
+                if (post.sharedPost && post.sharedPost.id === postId) {
+                    return {
+                        ...post,
+                        sharedPost: {
+                            ...post.sharedPost,
+                            liked: newLiked,
+                            likes: newLikesCount
+                        }
+                    }
+                }
+                return post
+            })
+        )
+    }, [])
+
     const renderPost = (post: any) => {
         const props = {
             ...post,
             currentUserId,
             followingIds,
             authorUsername: post.authorUsername,
+            onLikeChange: (newLiked: boolean, newLikesCount: number) => {
+                const targetId = post.sharedPost ? post.sharedPost.id : post.id
+                handleLikeChange(targetId, newLiked, newLikesCount)
+            }
         }
         if (post.sharedPost) {
             return <SharedPostCard key={post.id} {...props} />
