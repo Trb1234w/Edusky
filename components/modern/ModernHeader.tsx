@@ -84,12 +84,13 @@ export function ModernHeader() {
     }, [pathname, user])
 
     const navLinks = [
-        { href: '/professeurs', label: 'Professeurs' },
+        { href: '/professeurs', label: 'Experts' },
         { href: '/formations', label: 'Formations' },
         { href: '/evenements', label: 'Événements' },
+        { href: '/feed', label: 'Réseau Social' },
         { href: '/clubs', label: 'Clubs' },
-        { href: '/blog', label: 'Blog' },
-        { href: '/feed', label: 'Réseau' },
+        { href: '/blog', label: 'Découvrir' },
+        { href: '/services', label: 'Services' },
     ]
 
     const handleSearch = () => {
@@ -206,8 +207,13 @@ export function ModernHeader() {
                     <div className="lg:hidden flex items-center gap-3">
                         {user ? (
                             <>
+                                {/* Info / About Us */}
+                                <Link href="/services" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                    <Info className="w-6 h-6" />
+                                </Link>
+
                                 {/* Notifications */}
-                                <div className="relative">
+                                <div className="relative ">
                                     <NotificationsDropdown />
                                 </div>
 
@@ -220,12 +226,6 @@ export function ModernHeader() {
                                         </span>
                                     )}
                                 </Link>
-
-                                {/* Info / About Us */}
-                                <Link href="/about-us" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
-                                    <Info className="w-6 h-6" />
-                                </Link>
-
                                 {/* User Profile */}
                                 <Link href="/dashboard" className="relative group">
                                     <div className="w-8 h-8 rounded-full overflow-hidden border border-border group-hover:border-primary transition-colors">
@@ -242,7 +242,7 @@ export function ModernHeader() {
                         ) : (
                             <>
                                 {/* Info / About Us */}
-                                <Link href="/about-us" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
+                                <Link href="/services" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
                                     <Info className="w-6 h-6" />
                                 </Link>
 

@@ -13,14 +13,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     return (
         <>
             {/* Header : Visible sur mobile UNIQUEMENT pour Accueil et Feed */}
-            <div className={pathname === '/' || pathname.startsWith('/feed') || pathname.startsWith('/about-us') ? "block" : "hidden lg:block"}>
+            <div className={pathname === '/' || pathname.startsWith('/feed') || pathname.startsWith('/services') ? "block" : "hidden lg:block"}>
                 <ModernHeader />
             </div>
 
             {children}
 
             {/* Footer : Visible sur mobile UNIQUEMENT pour Accueil et Feed */}
-            <div className={pathname === '/' || pathname.startsWith('/about-us') ? "block" : "hidden lg:block"}>
+            <div className={pathname === '/' || pathname.startsWith('/services') ? "block" : "hidden lg:block"}>
                 <ModernFooter />
             </div>
         </>
