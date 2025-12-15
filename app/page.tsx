@@ -146,9 +146,6 @@ export default async function HomePage() {
       {/* 6. Testimonials Section (New) */}
       <Testimonials />
 
-      {/* 7. Modern CTA */}
-      <ModernCTA />
-
     </main>
   );
 }
