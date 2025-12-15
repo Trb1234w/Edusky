@@ -33,6 +33,15 @@ const features = [
         gradient: "from-emerald-500/20 to-green-500/20 hover:from-emerald-500/30 hover:to-green-500/30"
     },
     {
+        icon: Sparkles,
+        title: "Nos Services",
+        description: "Solutions sur mesure pour projets EdTech.",
+        href: "/services",
+        cta: "Découvrir",
+        className: "md:col-span-1 md:row-span-1",
+        gradient: "from-red-500/20 to-orange-500/20 hover:from-red-500/30 hover:to-orange-500/30"
+    },
+    {
         icon: Calendar,
         title: "Événements Exclusifs",
         description: "Hackathons, conférences et ateliers en direct.",
