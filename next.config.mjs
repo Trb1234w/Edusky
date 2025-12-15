@@ -9,19 +9,7 @@ const nextConfig = {
     unoptimized: true,
   },
   turbopack: {},
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, max-age=0',
-          },
-        ],
-      },
-    ];
-  },
+
 };
 
 const pwaConfig = withPWA({

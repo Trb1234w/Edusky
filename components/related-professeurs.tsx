@@ -29,7 +29,7 @@ export function RelatedProfesseurs({ professeurs }: RelatedProfesseursProps) {
 
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-white">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Autres professeurs</h2>
+            <h2 className="text-1xl md:text-3xl font-bold text-foreground mb-6">Autres professeurs</h2>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory">
                 {professeurs.map((professeur) => (
                     <div key={professeur.id} className="flex-none w-[280px] md:w-[320px] snap-start">

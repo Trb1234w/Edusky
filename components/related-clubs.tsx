@@ -29,7 +29,7 @@ export function RelatedClubs({ clubs }: RelatedClubsProps) {
 
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-0 bg-white">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Autres clubs</h2>
+            <h2 className="text-1xl md:text-3xl font-bold text-foreground mb-6">Autres clubs</h2>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory">
                 {clubs.map((club) => (
                     <div key={club.id} className="flex-none w-[280px] md:w-[320px] snap-start">

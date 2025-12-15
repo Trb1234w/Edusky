@@ -12,9 +12,26 @@ export default function OfflinePage() {
             <p className="mb-8 text-muted-foreground">
                 Il semble que vous n'ayez pas de connexion internet. Vérifiez votre réseau et réessayez.
             </p>
-            <Button asChild>
-                <Link href="/">Réessayer</Link>
-            </Button>
+            <div className="flex flex-col gap-4">
+                <Button asChild>
+                    <Link href="/">Réessayer</Link>
+                </Button>
+                <Button
+                    variant="outline"
+                    onClick={() => {
+                        if ('serviceWorker' in navigator) {
+                            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                                for (let registration of registrations) {
+                                    registration.unregister();
+                                }
+                                window.location.reload();
+                            });
+                        }
+                    }}
+                >
+                    Réinitialiser l'application (Fix Problèmes)
+                </Button>
+            </div>
         </div>
     )
 }

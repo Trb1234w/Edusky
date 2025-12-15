@@ -51,8 +51,18 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
   const [error, setError] = React.useState<string | null>(null);
   const [activeLabels, setActiveLabels] = React.useState<Record<string, string>>({});
 
+  // Simple in-memory cache to prevent re-fetching on every mount
+  const globalCache = (globalThis as any)._categoryCache = (globalThis as any)._categoryCache || {};
+
   React.useEffect(() => {
     const fetchAndBuildTree = async () => {
+      // Check cache first
+      if (globalCache[scope]) {
+        setCategoryTree(globalCache[scope]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       try {
@@ -61,16 +71,24 @@ export function HorizontalCategoryNav({ scope, selectedSlugs, onCategorySelect }
           .select("id, nom, slug, parent_id")
           .eq("scope", scope)
           .order("nom", { ascending: true });
+
         if (error) throw new Error(`Erreur Supabase: ${error.message}`);
-        if (data) setCategoryTree(buildCategoryTree(data as Category[]));
+
+        if (data) {
+          const tree = buildCategoryTree(data as Category[]);
+          setCategoryTree(tree);
+          // Update cache
+          globalCache[scope] = tree;
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+
     fetchAndBuildTree();
-  }, [scope, supabase]);
+  }, [scope, supabase, globalCache]);
 
   const handleLabelSelect = (name: string, rootNodeId: string) => {
     setActiveLabels(prev => ({ ...prev, [rootNodeId]: name }));

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/accordion';
 import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Server Data
 import {
@@ -97,6 +98,11 @@ const dayMap: { [key: string]: string } = {
     lundi: 'Lundi', mardi: 'Mardi', mercredi: 'Mercredi', jeudi: 'Jeudi', vendredi: 'Vendredi', samedi: 'Samedi', dimanche: 'Dimanche'
 };
 
+async function RelatedFormationsSection({ formationId, categoryId }: { formationId: string, categoryId: number }) {
+    const { data: relatedFormations } = await getRelatedFormationsByCategory(formationId, categoryId);
+    return <RelatedFormations formations={relatedFormations || []} />;
+}
+
 export async function FormationDetailsPageContent({ params }: { params: { id: string } }) {
     const resolvedParams = await params;
     const { data: formation, error } = await getFormationById(resolvedParams.id);
@@ -111,9 +117,6 @@ export async function FormationDetailsPageContent({ params }: { params: { id: st
     const avis = Array.isArray(formation.avis) ? formation.avis : [];
     const nbModules = curriculum.length;
     const nbLecons = curriculum.reduce((acc: number, mod: any) => acc + (mod.lessons?.length || 0), 0);
-
-    // Fetch related formations
-    const { data: relatedFormations } = await getRelatedFormationsByCategory(formation.id, formation.categorie_id);
 
     return (
         <div className="min-h-screen flex flex-col bg-white">
@@ -340,7 +343,18 @@ export async function FormationDetailsPageContent({ params }: { params: { id: st
                 </div>
 
                 {/* Related Formations Section */}
-                <RelatedFormations formations={relatedFormations || []} />
+                <Suspense fallback={
+                    <div className="container mx-auto px-4 py-8">
+                        <Skeleton className="h-8 w-48 mb-6" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <Skeleton key={i} className="h-80 w-full rounded-2xl" />
+                            ))}
+                        </div>
+                    </div>
+                }>
+                    <RelatedFormationsSection formationId={formation.id} categoryId={formation.categorie_id} />
+                </Suspense>
 
             </main>
 
