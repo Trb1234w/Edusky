@@ -1,4 +1,4 @@
-import { getAllFormations } from "./get-locations"
+import { getAllFormations } from "../get-locations"
 import { FormationsFilterWrapper } from "@/components/formations-filter-wrapper"
 
 export async function FormationsContent() {

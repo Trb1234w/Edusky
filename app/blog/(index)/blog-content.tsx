@@ -1,4 +1,4 @@
-import { getAllArticles } from "./get-data"
+import { getAllArticles } from "../get-data"
 import { BlogFilterWrapper } from "@/components/blog-filter-wrapper"
 
 export async function BlogContent() {

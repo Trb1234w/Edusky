@@ -1,4 +1,4 @@
-import { getAllClubs } from "./get-data"
+import { getAllClubs } from "../get-data"
 import { ClubsFilterWrapper } from "@/components/clubs-filter-wrapper"
 
 export async function ClubsContent() {
