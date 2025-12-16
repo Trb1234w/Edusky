@@ -49,8 +49,6 @@ const iconMap: { [key: string]: React.ElementType } = {
     Globe,
 }
 
-interface ProfesseursFilterWrapperProps { }
-
 interface Location {
     id: string;
     nom: string;
@@ -64,20 +62,38 @@ interface Quartier extends Location {
     ville_id: string;
 }
 
-export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
+interface ProfesseursFilterWrapperProps {
+    initialProfesseurs: any[];
+    initialLocations: {
+        countries: Location[];
+        villes: Ville[];
+        quartiers: Quartier[];
+    };
+    initialTypes: string[];
+    initialSpecialties: string[];
+    initialLangues: string[];
+}
+
+export function ProfesseursFilterWrapper({
+    initialProfesseurs,
+    initialLocations,
+    initialTypes,
+    initialSpecialties,
+    initialLangues
+}: ProfesseursFilterWrapperProps) {
     const router = useRouter();
-    const [allProfesseurs, setAllProfesseurs] = useState<any[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const [allProfesseurs, setAllProfesseurs] = useState<any[]>(initialProfesseurs)
+    const [isLoading, setIsLoading] = useState(false)
 
     const [locations, setLocations] = useState<{
         countries: Location[];
         villes: Ville[];
         quartiers: Quartier[];
-    }>({ countries: [], villes: [], quartiers: [] })
+    }>(initialLocations)
 
-    const [availableTypes, setAvailableTypes] = useState<string[]>([])
-    const [availableSpecialties, setAvailableSpecialties] = useState<string[]>([])
-    const [availableLangues, setAvailableLangues] = useState<string[]>([])
+    const [availableTypes, setAvailableTypes] = useState<string[]>(initialTypes)
+    const [availableSpecialties, setAvailableSpecialties] = useState<string[]>(initialSpecialties)
+    const [availableLangues, setAvailableLangues] = useState<string[]>(initialLangues)
 
     const [filters, setFilters] = useState<Record<string, any>>({
         search: "",
@@ -99,48 +115,6 @@ export function ProfesseursFilterWrapper({ }: ProfesseursFilterWrapperProps) {
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 9
-
-    useEffect(() => {
-        const fetchProfesseursAndData = async () => {
-            setIsLoading(true)
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-
-            const { data: professeursData } = await getAllProfesseurs()
-            setAllProfesseurs(professeursData || []);
-            setIsLoading(false);
-        }
-        fetchProfesseursAndData();
-    }, [])
-
-    useEffect(() => {
-        const fetchFiltersData = async () => {
-            const [locationsResult, typesResult, specialtiesResult, languesResult] = await Promise.all([
-                getDistinctProfesseurLocations(),
-                getDistinctProfesseurTypes(),
-                getDistinctProfesseurSpecialties(),
-                getDistinctProfesseurLangues()
-            ]);
-
-            if (locationsResult.data) {
-                setLocations(locationsResult.data);
-            }
-
-            if (typesResult.data) {
-                setAvailableTypes(typesResult.data);
-            }
-
-            if (specialtiesResult.data) {
-                setAvailableSpecialties(specialtiesResult.data);
-            }
-
-            if (languesResult.data) {
-                setAvailableLangues(languesResult.data);
-            }
-        };
-
-        fetchFiltersData();
-    }, []);
 
     const handleFilterChange = (key: string, value: any) => {
         setFilters(prev => {
