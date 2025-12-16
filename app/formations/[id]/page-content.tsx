@@ -69,7 +69,7 @@ import { FormationActions } from '@/components/formations/formation-actions';
 const formatPrice = (price: number | null | undefined) => {
     if (price === null || price === undefined) return "Gratuit";
     if (price === 0) return "Gratuit";
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(price);
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'GNF' }).format(price);
 };
 
 const formatDate = (dateString: string | null | undefined) => {

@@ -52,7 +52,7 @@ export function SearchResultProfesseur({
         : presentation
 
     const tarif = tarif_horaire_min && tarif_horaire_max
-        ? `${tarif_horaire_min.toLocaleString()} - ${tarif_horaire_max.toLocaleString()} FCFA/h`
+        ? `${tarif_horaire_min.toLocaleString()} - ${tarif_horaire_max.toLocaleString()} GNF/h`
         : null
 
     return (

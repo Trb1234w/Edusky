@@ -92,7 +92,7 @@ export function SearchResultFormation(props: SearchResultFormationProps) {
                             {props.prix_indicatif && (
                                 <div className="ml-auto">
                                     <span className="text-sm font-semibold text-primary">
-                                        {props.prix_indicatif.toLocaleString()} FCFA
+                                        {props.prix_indicatif.toLocaleString()} GNF
                                     </span>
                                 </div>
                             )}
