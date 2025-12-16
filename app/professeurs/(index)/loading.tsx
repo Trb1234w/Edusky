@@ -3,6 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Card } from "@/components/ui/card"
 import { ProfesseursHero } from "@/components/professeurs/ProfesseursHero"
 
+import { ProfesseursStickyHeaderStatic } from "@/components/professeurs/ProfesseursStickyHeaderStatic"
+
 export default function Loading() {
     return (
         <main className="flex-1 pt-1 lg:pt-20">
@@ -11,18 +13,11 @@ export default function Loading() {
                 <ProfesseursHero />
             </div>
 
-            {/* Simulated Search Bar / Filter Area */}
-            <div className="container mx-auto px-4 lg:px-8 mt-4 mb-4 lg:hidden">
-                <Skeleton className="h-10 w-full rounded-xl" />
-                <div className="flex gap-2 mt-2 overflow-x-hidden">
-                    <Skeleton className="h-8 w-20 rounded-xl" />
-                    <Skeleton className="h-8 w-24 rounded-xl" />
-                    <Skeleton className="h-8 w-20 rounded-xl" />
-                </div>
-            </div>
+            {/* Static Sticky Header for Mobile - Shows immediately */}
+            <ProfesseursStickyHeaderStatic />
 
-            {/* Sidebar Skeleton (Desktop) */}
-            <div className="container mx-auto px-4 lg:px-8 lg:pt-0">
+            {/* Sidebar Skeleton (Desktop) & Mobile Content Padding */}
+            <div className="container mx-auto px-4 lg:px-8 pt-56 lg:pt-0">
                 <div className="flex gap-8">
                     <div className="hidden lg:block w-full max-w-xs mt-4">
                         <Card className="p-6 space-y-6">
