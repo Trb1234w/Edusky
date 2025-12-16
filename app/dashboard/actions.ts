@@ -291,7 +291,7 @@ export async function getUserFavorites() {
   const formationIds = favorites.filter(f => f.type_item === 'formation').map(f => f.item_id)
   const eventIds = favorites.filter(f => f.type_item === 'evenement').map(f => f.item_id)
   const clubIds = favorites.filter(f => f.type_item === 'club').map(f => f.item_id)
-  const blogIds = favorites.filter(f => f.type_item === 'article_blog').map(f => f.item_id)
+  const blogIds = favorites.filter(f => f.type_item === 'article').map(f => f.item_id)
 
 
   let normalizedFavorites: any[] = []
@@ -441,7 +441,7 @@ export async function getUserFavorites() {
     if (!articlesError && articles) {
       const formattedArticles = articles.map(a => ({
         id: a.id,
-        type: 'article_blog',
+        type: 'article',
         title: a.titre,
         description: a.extrait || a.contenu,
         image_url: a.image_url || a.image_couverture,
