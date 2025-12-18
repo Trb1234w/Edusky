@@ -17,7 +17,7 @@ export default function Loading() {
             <ProfesseursStickyHeaderStatic />
 
             {/* Sidebar Skeleton (Desktop) & Mobile Content Padding */}
-            <div className="container mx-auto px-4 lg:px-8 pt-56 lg:pt-0">
+            <div className="container mx-auto px-4 lg:px-8 pt-52 lg:pt-0">
                 <div className="flex gap-8">
                     <div className="hidden lg:block w-full max-w-xs mt-4">
                         <Card className="p-6 space-y-6">
