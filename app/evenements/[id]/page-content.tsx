@@ -105,7 +105,7 @@ export async function EvenementDetailsPageContent({ params }: { params: { id: st
 
                         <div className="lg:col-span-2 space-y-6">
 
-                            <Card className="p-6 md:p-8 bg-white backdrop-blur-sm shadow-2xl rounded-2xl border-none">
+                            <Card className="p-6 md:p-8 text-center bg-white backdrop-blur-sm shadow-2xl rounded-2xl border-none">
                                 {evenement.categorie && (
                                     <Link href={`/evenements?categorie=${evenement.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
                                         {evenement.categorie.nom}

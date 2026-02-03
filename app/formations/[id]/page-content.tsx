@@ -167,7 +167,7 @@ export async function FormationDetailsPageContent({ params }: { params: { id: st
                         <div className="lg:col-span-2 space-y-6">
 
                             {/* Carte Hero */}
-                            <Card className="p-6 md:p-8 bg-white backdrop-blur-sm shadow-2xl rounded-2xl border-none">
+                            <Card className="p-6 md:p-8 text-center bg-white backdrop-blur-sm shadow-2xl rounded-2xl border-none">
                                 {formation.categorie && (
                                     <Link href={`/formations?categorie=${formation.categorie.slug}`} className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
                                         {formation.categorie.nom}

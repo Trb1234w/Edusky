@@ -119,7 +119,7 @@ export function BlogCard({
             </Badge>
           </div>
 
-          <h3 className="text-xl font-bold text-foreground mb-1.5 line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+          <h3 className="text-xl font-bold text-foreground mb-1.5 line-clamp-1 group-hover:text-primary transition-colors leading-tight">
             {title}
           </h3>
 
