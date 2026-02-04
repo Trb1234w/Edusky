@@ -55,6 +55,7 @@ export default function TestNotificationsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="p-4 bg-muted rounded-md space-y-2">
+                        <p><strong>État Permission Navigateur :</strong> <span className="font-mono bg-yellow-100 px-1 rounded">{typeof Notification !== 'undefined' ? Notification.permission : 'Unknown'}</span></p>
                         <p><strong>Statut Abonnement Push :</strong> {isSubscribed ? "✅ Actif" : "❌ Inactif"}</p>
                         {!isSubscribed && (
                             <Button onClick={subscribeUser} disabled={pushLoading} variant="outline" className="w-full">
