@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { saveSubscription } from '@/app/actions/push-subscriptions';
 
 // VAPID Public Key from env
-const PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+const PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim();
 
 function urlBase64ToUint8Array(base64String: string) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
