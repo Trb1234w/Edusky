@@ -51,6 +51,9 @@ export function useWebPush() {
         setError(null);
 
         try {
+            if (!PUBLIC_KEY) throw new Error("VAPID Key is empty");
+            console.log("Subscribing with key:", PUBLIC_KEY.substring(0, 10) + "...");
+
             const registration = await navigator.serviceWorker.ready;
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
