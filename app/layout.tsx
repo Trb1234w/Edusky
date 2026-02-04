@@ -4,10 +4,11 @@ import { Poppins } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import AOSInitializer from "@/components/providers/AOSInitializer"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
 import { MobileNav } from "@/components/mobile-nav"
 import { LayoutWrapper } from "@/components/layout-wrapper"
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister"
+import { NotificationPermissionRequest } from "@/components/notification-permission-request"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -69,6 +70,7 @@ export default function RootLayout({
         </LayoutWrapper>
         <MobileNav />
         <ServiceWorkerRegister />
+        <NotificationPermissionRequest />
         <Toaster />
         <AOSInitializer />
         <Analytics />

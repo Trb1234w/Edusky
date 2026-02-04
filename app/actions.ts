@@ -5,6 +5,7 @@ import { createClient as createAdminClient } from "@supabase/supabase-js"; // Po
 import { revalidatePath } from "next/cache";
 
 import { createNotification } from "@/lib/notifications";
+import { sendPushNotification } from "@/lib/push";
 
 // La fonction accepte maintenant l'ID de l'auteur en argument
 export async function createPostAction(content: string, authorId: string, media: { images: string[], video: string | undefined }) {
@@ -97,25 +98,30 @@ export async function toggleLike(postId: string, userId: string) {
     }
     console.log("[toggleLike] Succès: Like ajouté.");
 
-    // --- NOTIFICATION START ---
-    // Récupérer l'auteur du post pour lui envoyer une notif (si ce n'est pas soi-même)
-    const { data: post } = await supabase.from('postes').select('auteur_id').eq('id', postId).single();
+    // --- NOTIFICATION HANDLED BY DB TRIGGER (For History) ---
 
-    if (post && post.auteur_id && post.auteur_id !== userId) {
-      // Récupérer les infos de celui qui like pour le message
-      const { data: liker } = await supabase.from('profiles').select('full_name').eq('id', userId).single();
-      const likerName = liker?.full_name || "Quelqu'un";
+    // --- DIRECT WEB PUSH (For Immediate Local/Prod functionality) ---
+    // On envoie le push directement depuis le serveur Next.js
+    if (!existingLike) { // New Like
+      // Récupérer l'auteur du post
+      const { data: post } = await supabase.from('postes').select('auteur_id').eq('id', postId).single();
 
-      await createNotification({
-        userId: post.auteur_id,
-        type: 'like',
-        content: `${likerName} a aimé votre publication.`,
-        refId: postId,
-        refTable: 'postes',
-        metadata: { liker_id: userId }
-      });
+      if (post && post.auteur_id && post.auteur_id !== userId) {
+        // Récupérer le nom du likeur
+        const { data: liker } = await supabase.from('profiles').select('full_name').eq('id', userId).single();
+        const likerName = liker?.full_name || "Quelqu'un";
+
+        // Envoyer le Push
+        sendPushNotification({
+          userId: post.auteur_id,
+          title: "Nouveau J'aime",
+          body: `${likerName} a aimé votre publication.`,
+          url: '/feed'
+        }).catch(err => console.error("Push Error (Direct):", err));
+      }
     }
-    // --- NOTIFICATION END ---
+    // -------------------------------------------------------------
+
   }
 
   // Étape 3: Revalidation du cache
@@ -146,24 +152,7 @@ export async function addComment(postId: string, authorId: string, content: stri
     return { error: "Une erreur est survenue lors de l'ajout du commentaire." };
   }
 
-  // --- NOTIFICATION START ---
-  // Récupérer l'auteur du post
-  const { data: post } = await supabase.from('postes').select('auteur_id').eq('id', postId).single();
-
-  if (post && post.auteur_id && post.auteur_id !== authorId) {
-    const { data: commenter } = await supabase.from('profiles').select('full_name').eq('id', authorId).single();
-    const commenterName = commenter?.full_name || "Quelqu'un";
-
-    await createNotification({
-      userId: post.auteur_id,
-      type: 'comment',
-      content: `${commenterName} a commenté votre publication.`,
-      refId: postId,
-      refTable: 'postes',
-      metadata: { commenter_id: authorId }
-    });
-  }
-  // --- NOTIFICATION END ---
+  // --- NOTIFICATION HANDLED BY DB TRIGGER ---
 
   revalidatePath("/feed");
   revalidatePath("/dashboard");
@@ -194,24 +183,7 @@ export async function sharePostAction(originalPostId: string, authorId: string) 
     return { error: "Une erreur est survenue lors du partage du post." };
   }
 
-  // --- NOTIFICATION START ---
-  // Récupérer l'auteur du post original
-  const { data: originalPost } = await supabaseAdmin.from('postes').select('auteur_id').eq('id', originalPostId).single();
-
-  if (originalPost && originalPost.auteur_id && originalPost.auteur_id !== authorId) {
-    const { data: sharer } = await supabaseAdmin.from('profiles').select('full_name').eq('id', authorId).single();
-    const sharerName = sharer?.full_name || "Quelqu'un";
-
-    await createNotification({
-      userId: originalPost.auteur_id,
-      type: 'share',
-      content: `${sharerName} a partagé votre publication.`,
-      refId: originalPostId,
-      refTable: 'postes',
-      metadata: { sharer_id: authorId }
-    });
-  }
-  // --- NOTIFICATION END ---
+  // --- NOTIFICATION HANDLED BY DB TRIGGER ---
 
   revalidatePath("/dashboard");
   revalidatePath("/feed");

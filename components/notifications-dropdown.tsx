@@ -14,14 +14,17 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { formatDistanceToNow } from "date-fns"
 import { fr } from "date-fns/locale"
+import { toast } from "sonner"
 
+// Update interface to match DB exactly
 interface Notification {
     id: string
     user_id: string
-    type: 'like' | 'comment' | 'share' | 'follow' | 'message'
+    type: string
     contenu: string
     ref_id?: string
     ref_table?: string
+    url?: string
     metadata?: any
     lu: boolean
     created_at: string
@@ -43,7 +46,8 @@ export function NotificationsDropdown() {
             setLoading(true)
             const { data, error } = await getNotifications(user.id)
             if (data) {
-                setNotifications(data as Notification[])
+                setNotifications(data as any[])
+                // Use 'lu' for unread count
                 setUnreadCount(data.filter((n: any) => !n.lu).length)
             }
             setLoading(false)
@@ -61,9 +65,29 @@ export function NotificationsDropdown() {
                     },
                     (payload) => {
                         console.log('New notification received:', payload)
-                        const newNotification = payload.new as Notification
+                        const newNotification = payload.new as any
+
+                        // Add to list
                         setNotifications((prev) => [newNotification, ...prev])
                         setUnreadCount((prev) => prev + 1)
+
+                        // Show Toast - Use 'contenu' directly
+                        toast.info(newNotification.contenu, {
+                            action: newNotification.url ? {
+                                label: 'Voir',
+                                onClick: () => router.push(newNotification.url)
+                            } : undefined,
+                            duration: 5000,
+                        })
+
+                        // Trigger Browser System Notification (OS Level) if permitted
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            new Notification("Edusky", {
+                                body: newNotification.contenu,
+                                icon: "/icons/icon-192x192.png", // Ensure this path exists or use a default
+                                tag: newNotification.id // prevents duplicate notifications
+                            });
+                        }
                     }
                 )
                 .subscribe()
@@ -74,7 +98,7 @@ export function NotificationsDropdown() {
         }
 
         fetchNotifications()
-    }, [supabase])
+    }, [supabase, router])
 
     const handleMarkAsRead = async (id: string) => {
         // Optimistic update
@@ -103,30 +127,18 @@ export function NotificationsDropdown() {
         }
         setIsOpen(false)
 
-        // Navigation logic based on type
-        if (notification.type === 'message') {
-            router.push(`/messages?conversation=${notification.ref_id}`)
-        } else if (notification.type === 'follow') {
-            router.push(`/profile/${notification.ref_id}`) // Assuming ref_id is user_id for follow
-            // Note: In my implementation ref_id was follower_id. 
-            // Ideally we should navigate to the follower's profile.
-            // Let's check metadata if available or fetch user.
-            // For now, let's assume ref_id points to the relevant resource.
-            // Actually ref_id for follow is follower_id.
-            // We need to fetch username to navigate to /profile/username.
-            // Or just navigate to /profile/id if supported (it's not usually).
-            // Let's rely on metadata if I put username there? I didn't.
-            // I'll just redirect to /feed for now or try to resolve.
-            // Wait, I can't easily resolve username here without fetching.
-            // Let's just go to /feed for now or maybe I should have stored username in metadata.
-            // Update: I'll just go to /feed for follow for now, or improve metadata later.
-            router.push('/feed')
-        } else if (['like', 'comment', 'share'].includes(notification.type)) {
-            // Navigate to the post
-            // Assuming we have a single post page or anchor
-            // If ref_table is 'postes', ref_id is post_id
-            // Maybe /feed?postId=... or just /feed
-            router.push(`/feed`)
+        if (notification.url) {
+            router.push(notification.url)
+        } else {
+            // Fallback legacy navigation logic
+            if (notification.type === 'message') {
+                router.push(`/messages?conversation=${notification.ref_id}`)
+            } else if (notification.type === 'follow') {
+                router.push(`/profile/${notification.ref_id}`)
+            } else {
+                // Default to feed or dashboard
+                router.push('/dashboard')
+            }
         }
     }
 
@@ -136,7 +148,7 @@ export function NotificationsDropdown() {
                 <Button variant="ghost" size="icon" className="relative">
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
-                        <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-600 border-2 border-background" />
+                        <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-600 border-2 border-background animate-pulse" />
                     )}
                 </Button>
             </PopoverTrigger>
@@ -161,27 +173,32 @@ export function NotificationsDropdown() {
                         <div className="p-4 text-center text-sm text-muted-foreground">Aucune notification</div>
                     ) : (
                         <div className="divide-y">
-                            {notifications.map((notification) => (
-                                <div
-                                    key={notification.id}
-                                    className={cn(
-                                        "p-4 hover:bg-muted/50 transition-colors cursor-pointer flex gap-3 items-start",
-                                        !notification.lu && "bg-muted/20"
-                                    )}
-                                    onClick={() => handleNotificationClick(notification)}
-                                >
-                                    <div className={cn(
-                                        "w-2 h-2 mt-2 rounded-full flex-shrink-0",
-                                        !notification.lu ? "bg-primary" : "bg-transparent"
-                                    )} />
-                                    <div className="flex-1 space-y-1">
-                                        <p className="text-sm leading-none">{notification.contenu}</p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: fr })}
-                                        </p>
+                            {notifications.map((notification) => {
+                                // Strictly use 'lu' and 'contenu'
+                                const isRead = notification.lu;
+                                const content = notification.contenu;
+                                return (
+                                    <div
+                                        key={notification.id}
+                                        className={cn(
+                                            "p-4 hover:bg-muted/50 transition-colors cursor-pointer flex gap-3 items-start",
+                                            !isRead && "bg-blue-50/50 dark:bg-blue-900/10"
+                                        )}
+                                        onClick={() => handleNotificationClick(notification)}
+                                    >
+                                        <div className={cn(
+                                            "w-2 h-2 mt-2 rounded-full flex-shrink-0",
+                                            !isRead ? "bg-primary" : "bg-transparent"
+                                        )} />
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm leading-snug">{content}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: fr })}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </div>

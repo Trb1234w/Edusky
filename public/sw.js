@@ -1,44 +1,25 @@
-const CACHE_NAME = 'edusky-v1';
-const urlsToCache = [
-    '/',
-    '/manifest.json',
-    '/icon-192x192.png',
-    '/icon-512x512.png'
-];
+self.addEventListener('push', function (event) {
+    if (event.data) {
+        const data = event.data.json()
+        const options = {
+            body: data.body,
+            icon: data.icon || '/icon.png', // Assurez-vous d'avoir une icône
+            badge: data.badge || '/badge.png',
+            vibrate: [100, 50, 100],
+            data: {
+                dateOfArrival: Date.now(),
+                primaryKey: '2',
+                url: data.url || '/' // URL de redirection
+            },
+        }
+        event.waitUntil(self.registration.showNotification(data.title, options))
+    }
+})
 
-self.addEventListener('install', (event) => {
+self.addEventListener('notificationclick', function (event) {
+    console.log('Notification click received.')
+    event.notification.close()
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                return cache.addAll(urlsToCache);
-            })
-    );
-    self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-    self.clients.claim();
-});
-
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request);
-            })
-    );
-});
+        clients.openWindow(event.notification.data.url)
+    )
+})
