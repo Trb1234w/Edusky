@@ -12,9 +12,6 @@ export async function saveSubscription(subscription: PushSubscription) {
 
     const subscriptionData = JSON.parse(JSON.stringify(subscription));
 
-    console.log('[saveSubscription] Received subscription for user:', user.id);
-    console.log('[saveSubscription] Endpoint:', subscriptionData.endpoint?.slice(0, 50) + '...');
-
     const { error } = await supabase
         .from('push_subscriptions')
         .upsert({

@@ -51,21 +51,10 @@ export function useWebPush() {
         setError(null);
 
         try {
-            if (!PUBLIC_KEY) throw new Error("VAPID Key is empty");
-            console.log("Subscribing with key:", PUBLIC_KEY.substring(0, 10) + "...");
-
-            const convertedKey = urlBase64ToUint8Array(PUBLIC_KEY);
-            console.log("VAPID Key Length (bytes):", convertedKey.length);
-
-            if (convertedKey.length !== 65) {
-                console.error("CRITICAL: VAPID Public Key must be exactly 65 bytes. Current:", convertedKey.length);
-                throw new Error(`VAPID Public Key is invalid (Length: ${convertedKey.length} bytes). Expected 65.`);
-            }
-
             const registration = await navigator.serviceWorker.ready;
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: convertedKey
+                applicationServerKey: urlBase64ToUint8Array(PUBLIC_KEY)
             });
 
             console.log('User is subscribed:', subscription);
