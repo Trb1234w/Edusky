@@ -33,11 +33,6 @@ export async function saveSubscription(subscription: PushSubscription) {
 
     console.log('[saveSubscription] Successfully saved subscription');
 
-    if (error) {
-        console.error('Error saving subscription:', error);
-        return { error: error.message };
-    }
-
     return { success: true };
 }
 

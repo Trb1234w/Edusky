@@ -7,9 +7,9 @@ if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY)
 } else {
     try {
         webPush.setVapidDetails(
-            `mailto:${process.env.VAPID_SUBJECT || 'test@example.com'}`,
-            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-            process.env.VAPID_PRIVATE_KEY
+            `mailto:${(process.env.VAPID_SUBJECT || 'test@example.com').trim()}`,
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY.trim(),
+            process.env.VAPID_PRIVATE_KEY.trim()
         );
     } catch (err) {
         console.error("Error setting VAPID details", err);
@@ -18,8 +18,8 @@ if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY)
 
 // Client Admin pour lire les souscriptions (contourner RLS)
 const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL!.trim(),
+    process.env.SUPABASE_SERVICE_ROLE_KEY!.trim()
 );
 
 interface SendPushParams {

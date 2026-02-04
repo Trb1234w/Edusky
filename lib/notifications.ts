@@ -2,8 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 
 // Utiliser le client ADMIN pour contourner les RLS lors de la création de notifications pour d'autres utilisateurs
 const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL!.trim(),
+    process.env.SUPABASE_SERVICE_ROLE_KEY!.trim()
 );
 
 export type NotificationType = 'like' | 'comment' | 'share' | 'follow' | 'message' | 'order' | 'new_formation' | 'new_event' | 'new_club' | 'new_blog' | 'inscription';
