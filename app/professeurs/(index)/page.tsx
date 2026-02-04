@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 
 import { ProfesseursHero } from "@/components/professeurs/ProfesseursHero"
 import { ProfesseursFilterWrapper } from "@/components/professeurs-filter-wrapper"
