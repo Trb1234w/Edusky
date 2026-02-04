@@ -1,20 +1,32 @@
 self.addEventListener('push', function (event) {
     if (event.data) {
-        const data = event.data.json()
+        let data;
+        try {
+            data = event.data.json();
+        } catch (e) {
+            // Fallback for non-JSON payloads (like DevTools test)
+            console.log('Push data is not JSON, using as text:', event.data.text());
+            data = {
+                title: 'Notification Edusky',
+                body: event.data.text(),
+                url: '/'
+            };
+        }
+
         const options = {
-            body: data.body,
-            icon: data.icon || '/icon.png', // Assurez-vous d'avoir une icône
-            badge: data.badge || '/badge.png',
+            body: data.body || 'Nouveau message',
+            icon: data.icon || '/icons/icon-192x192.png',
+            badge: data.badge || '/icons/badge-72x72.png',
             vibrate: [100, 50, 100],
             data: {
                 dateOfArrival: Date.now(),
-                primaryKey: '2',
-                url: data.url || '/' // URL de redirection
+                url: data.url || '/'
             },
-        }
-        event.waitUntil(self.registration.showNotification(data.title, options))
+        };
+
+        event.waitUntil(self.registration.showNotification(data.title || 'Edusky', options));
     }
-})
+});
 
 self.addEventListener('notificationclick', function (event) {
     console.log('Notification click received.')

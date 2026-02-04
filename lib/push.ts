@@ -9,7 +9,7 @@ if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY)
         webPush.setVapidDetails(
             `mailto:${(process.env.VAPID_SUBJECT || 'test@example.com').trim()}`,
             process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY.trim(),
-            process.env.VAPID_PRIVATE_KEY.trim()
+            process.env.VAPID_PRIVATE_KEY.trim().replace(/\\n/g, '\n')
         );
     } catch (err) {
         console.error("Error setting VAPID details", err);
