@@ -7,8 +7,8 @@ import AOSInitializer from "@/components/providers/AOSInitializer"
 import { Toaster } from "@/components/ui/sonner"
 import { MobileNav } from "@/components/mobile-nav"
 import { LayoutWrapper } from "@/components/layout-wrapper"
-import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister"
-import { NotificationPermissionRequest } from "@/components/notification-permission-request"
+import { OneSignalProvider } from "@/components/providers/onesignal-provider"
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -65,15 +65,15 @@ export default function RootLayout({
         <meta name="theme-color" content="#3B82F6" />
       </head>
       <body className={`${poppins.className} font-sans antialiased`}>
-        <LayoutWrapper>
-          {children}
-        </LayoutWrapper>
-        <MobileNav />
-        <ServiceWorkerRegister />
-        <NotificationPermissionRequest />
-        <Toaster />
-        <AOSInitializer />
-        <Analytics />
+        <OneSignalProvider>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+          <MobileNav />
+          <Toaster />
+          <AOSInitializer />
+          <Analytics />
+        </OneSignalProvider>
       </body>
     </html>
   )

@@ -152,7 +152,21 @@ export async function addComment(postId: string, authorId: string, content: stri
     return { error: "Une erreur est survenue lors de l'ajout du commentaire." };
   }
 
-  // --- NOTIFICATION HANDLED BY DB TRIGGER ---
+  // --- NOTIFICATION HANDLED BY DB TRIGGER (History) ---
+
+  // --- DIRECT PUSH (OneSignal) ---
+  const { data: postAuthor } = await supabase.from('postes').select('auteur_id').eq('id', postId).single();
+  if (postAuthor && postAuthor.auteur_id && postAuthor.auteur_id !== authorId) {
+    const { data: commenter } = await supabase.from('profiles').select('full_name').eq('id', authorId).single();
+    const commenterName = commenter?.full_name || "Quelqu'un";
+
+    sendPushNotification({
+      userId: postAuthor.auteur_id,
+      title: "Nouveau commentaire",
+      body: `${commenterName} a commenté votre publication.`,
+      url: `/feed`
+    }).catch(err => console.error("Push Error (Comment):", err));
+  }
 
   revalidatePath("/feed");
   revalidatePath("/dashboard");
@@ -183,7 +197,22 @@ export async function sharePostAction(originalPostId: string, authorId: string) 
     return { error: "Une erreur est survenue lors du partage du post." };
   }
 
-  // --- NOTIFICATION HANDLED BY DB TRIGGER ---
+  // --- NOTIFICATION HANDLED BY DB TRIGGER (History) ---
+
+  // --- DIRECT PUSH (OneSignal) ---
+  const { data: originalPost } = await supabaseAdmin.from('postes').select('auteur_id').eq('id', originalPostId).single();
+  if (originalPost && originalPost.auteur_id && originalPost.auteur_id !== authorId) {
+    const { data: sharer } = await supabaseAdmin.from('profiles').select('full_name').eq('id', authorId).single();
+    const sharerName = sharer?.full_name || "Quelqu'un";
+
+    sendPushNotification({
+      userId: originalPost.auteur_id,
+      title: "Publication partagée",
+      body: `${sharerName} a partagé votre publication.`,
+      url: `/feed`
+    }).catch(err => console.error("Push Error (Share):", err));
+  }
+
 
   revalidatePath("/dashboard");
   revalidatePath("/feed");
