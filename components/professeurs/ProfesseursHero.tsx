@@ -6,7 +6,7 @@ import { ProfessionalInquiryDialog } from '@/components/professional-inquiry-dia
 
 export function ProfesseursHero() {
     return (
-        <section className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 py-12 lg:py-16 overflow-hidden">
+        <section className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 pt-8 pb-8 lg:pt-10 lg:pb-10 overflow-hidden">
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
@@ -14,34 +14,15 @@ export function ProfesseursHero() {
                 <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
 
-            {/* Floating Icons */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-16 left-[10%] animate-float">
-                    <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
-                        <GraduationCap className="text-white" size={20} />
-                    </div>
-                </div>
-                <div className="absolute top-24 right-[15%] animate-float delay-300">
-                    <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
-                        <Award className="text-white" size={20} />
-                    </div>
-                </div>
-                <div className="absolute bottom-16 left-[20%] animate-float delay-700">
-                    <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
-                        <Star className="text-white" size={20} />
-                    </div>
-                </div>
-            </div>
-
             <div className="container mx-auto px-4 lg:px-8 relative z-10">
-                <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                <div className="grid lg:grid-cols-2 gap-10 items-center">
                     {/* Left Content */}
-                    <div className="space-y-6">
+                    <div className="space-y-3">
                         {/* Badge */}
                         <div className="flex justify-start animate-fade-in">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
-                                <Sparkles size={16} className="text-yellow-300" />
-                                <span className="text-sm font-medium text-white">Experts certifiés et passionnés</span>
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full border border-white/30 transition-all duration-700">
+                                <Sparkles size={14} className="text-yellow-300" />
+                                <span className="text-xs font-medium text-white">Experts certifiés</span>
                             </div>
                         </div>
 
@@ -52,60 +33,47 @@ export function ProfesseursHero() {
                                 <span className="relative z-10 bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
                                     expert idéal
                                 </span>
-                                <span className="absolute bottom-2 left-0 w-full h-3 bg-yellow-300/30 blur-sm" />
                             </span>
-                            {" "}pour vous
                         </h1>
 
                         {/* Description */}
-                        <p className="text-base lg:text-lg text-white/90 leading-relaxed">
-                            Découvrez des experts passionnés, certifiés et expérimentés prêts à vous accompagner dans votre parcours d'apprentissage, à domicile ou en ligne.
+                        <p className="text-base lg:text-lg text-white/90 leading-relaxed max-w-xl transition-all duration-700 delay-200">
+                            Découvrez des experts passionnés prêts à vous accompagner.
                         </p>
 
                         {/* Stats */}
-                        <div className="grid grid-cols-3 gap-3 lg:gap-4 pt-4">
-                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 lg:p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                                <div className="flex items-center justify-center gap-1 mb-1">
-                                    <Users className="text-yellow-300" size={18} />
-                                    <div className="text-2xl lg:text-3xl font-bold text-white">500+</div>
-                                </div>
-                                <div className="text-xs lg:text-sm text-white/80 text-center">Experts</div>
+                        <div className="grid grid-cols-3 gap-3 w-full max-w-lg transition-all duration-700 delay-300">
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                                <div className="text-xl lg:text-2xl font-bold text-white text-center">500+</div>
+                                <div className="text-[10px] text-white/80 text-center uppercase tracking-wider font-semibold">Experts</div>
                             </div>
-
-                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 lg:p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                                <div className="flex items-center justify-center gap-1 mb-1">
-                                    <Award className="text-green-300" size={18} />
-                                    <div className="text-2xl lg:text-3xl font-bold text-white">95%</div>
-                                </div>
-                                <div className="text-xs lg:text-sm text-white/80 text-center">Certifiés</div>
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                                <div className="text-xl lg:text-2xl font-bold text-white text-center">95%</div>
+                                <div className="text-[10px] text-white/80 text-center uppercase tracking-wider font-semibold">Certifiés</div>
                             </div>
-
-                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 lg:p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                                <div className="flex items-center justify-center gap-1 mb-1">
-                                    <TrendingUp className="text-blue-300" size={18} />
-                                    <div className="text-2xl lg:text-3xl font-bold text-white">4.8</div>
-                                </div>
-                                <div className="text-xs lg:text-sm text-white/80 text-center">Note moyenne</div>
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                                <div className="text-xl lg:text-2xl font-bold text-white text-center">4.8</div>
+                                <div className="text-[10px] text-white/80 text-center uppercase tracking-wider font-semibold">Note</div>
                             </div>
                         </div>
 
                         {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row items-start gap-3 pt-2">
+                        <div className="flex flex-col sm:flex-row items-start gap-3 lg:h-10 w-full">
                             <Button
-                                size="lg"
-                                className="bg-white text-purple-600 hover:bg-white/90 font-semibold px-6 shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
+                                size="sm"
+                                className="bg-white text-purple-600 hover:bg-white/90 font-semibold px-6 shadow-2xl transition-all duration-300 hover:scale-105 h-10"
                             >
-                                Explorer les experts
+                                Explorer
                             </Button>
                             <ProfessionalInquiryDialog
                                 inquiryType="devenir_expert"
-                                dialogTitle="Devenir un expert sur EduSky"
-                                dialogDescription="Partagez votre passion et votre savoir. Remplissez ce formulaire pour rejoindre notre communauté d'experts."
+                                dialogTitle="Devenir un expert"
+                                dialogDescription="Partagez votre passion."
                                 triggerButton={
                                     <Button
-                                        size="lg"
+                                        size="sm"
                                         variant="outline"
-                                        className="border-2 border-white text-white hover:bg-white/10 font-semibold px-6 backdrop-blur-sm"
+                                        className="border-2 border-white text-white hover:bg-white/10 font-semibold px-6 backdrop-blur-sm h-10"
                                     >
                                         Devenir expert
                                     </Button>
@@ -114,46 +82,55 @@ export function ProfesseursHero() {
                         </div>
                     </div>
 
-                    {/* Right Image */}
-                    <div className="hidden lg:block relative">
-                        <div className="relative animate-fade-in-up animation-delay-300">
-                            {/* Decorative Elements */}
-                            <div className="absolute -top-6 -right-6 w-24 h-24 bg-yellow-300/20 rounded-full blur-2xl" />
-                            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-pink-300/20 rounded-full blur-2xl" />
-
-                            {/* Main Image Container */}
-                            <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl">
-                                <div className="aspect-[4/5] bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-2xl overflow-hidden">
+                    {/* Right Image Container */}
+                    <div className="hidden lg:block relative h-[280px]">
+                        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden transform -rotate-3 hover:translate-x-2 transition-all duration-700">
+                            {/* Content Grid */}
+                            <div className="grid grid-cols-2 h-full gap-2 p-2">
+                                <div className="relative rounded-2xl overflow-hidden h-full">
                                     <img
-                                        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=750&fit=crop&q=80"
-                                        alt="Professeurs enseignant"
-                                        className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300"
+                                        src="https://images.unsplash.com/photo-1544717297-f86234f96420?w=400&q=80"
+                                        alt="Professional teaching"
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
-
-                                {/* Floating Badge on Image */}
-                                <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-4 shadow-2xl animate-float">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                                            <Users className="text-white" size={24} />
-                                        </div>
-                                        <div>
-                                            <div className="text-2xl font-bold text-gray-900">10k+</div>
-                                            <div className="text-xs text-gray-600">Étudiants formés</div>
-                                        </div>
+                                <div className="grid grid-rows-2 gap-2 h-full">
+                                    <div className="relative rounded-2xl overflow-hidden">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=400&q=80"
+                                            alt="Working together"
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
+                                    <div className="relative rounded-2xl overflow-hidden">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=80"
+                                            alt="Online class"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Floating Interaction UI */}
+                        <div className="absolute -bottom-4 right-8 bg-white p-3 rounded-2xl shadow-2xl animate-float">
+                            <div className="flex items-center gap-3">
+                                <div className="flex -space-x-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
+                                            <img src={`https://i.pravatar.cc/100?img=${i + 40}`} alt="Expert" className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex items-center gap-1 text-yellow-400">
+                                    <Star className="fill-current" size={12} />
+                                    <span className="text-slate-900 text-[10px] font-bold">4.8 (2k+)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Bottom Wave */}
-            <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
-                    <path d="M0 0L60 8C120 16 240 32 360 37.3C480 43 600 37 720 34.7C840 32 960 32 1080 37.3C1200 43 1320 53 1380 58.7L1440 64V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0V0Z" fill="currentColor" className="text-background" />
-                </svg>
             </div>
         </section>
     )
