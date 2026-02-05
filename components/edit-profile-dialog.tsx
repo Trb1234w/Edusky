@@ -18,10 +18,7 @@ type EditProfileDialogProps = {
         username: string | null;
         avatar_url: string | null;
         bio: string | null;
-        phone: string | null;
-        city: string | null;
-        region: string | null;
-        country: string | null;
+        telephone: string | null;
     };
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -34,10 +31,7 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
         full_name: profile.full_name || '',
         username: profile.username || '',
         bio: profile.bio || '',
-        phone: profile.phone || '',
-        city: profile.city || '',
-        region: profile.region || '',
-        country: profile.country || '',
+        telephone: profile.telephone || '',
     });
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.avatar_url);
@@ -57,23 +51,34 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Validation basique
+        if (!formData.username) {
+            toast({
+                title: "Erreur",
+                description: "Le nom d'utilisateur est requis.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         startTransition(async () => {
             const formDataToSend = new FormData();
-            formDataToSend.append('full_name', formData.full_name);
-            formDataToSend.append('username', formData.username);
-            formDataToSend.append('bio', formData.bio);
-            formDataToSend.append('phone', formData.phone);
-            formDataToSend.append('city', formData.city);
-            formDataToSend.append('region', formData.region);
-            formDataToSend.append('country', formData.country);
+
+            // On s'assure que les chaînes ne sont pas nulles avant l'envoi
+            formDataToSend.append('full_name', formData.full_name || '');
+            formDataToSend.append('username', formData.username || '');
+            formDataToSend.append('bio', formData.bio || '');
+            formDataToSend.append('telephone', formData.telephone || '');
 
             if (avatarFile) {
                 formDataToSend.append('avatar', avatarFile);
             }
 
+            console.log("Submitting profile update...");
             const result = await updateProfileAction(formDataToSend);
 
             if (result.error) {
+                console.error("Profile update error:", result.error);
                 toast({
                     title: "Erreur",
                     description: result.error,
@@ -85,7 +90,7 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
                     description: "Votre profil a été mis à jour avec succès",
                 });
                 onOpenChange(false);
-                // Refresh the page to show updated data
+                // Refresh to show updated data
                 window.location.reload();
             }
         });
@@ -150,42 +155,12 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="phone">Téléphone</Label>
+                            <Label htmlFor="telephone">Téléphone</Label>
                             <Input
-                                id="phone"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                id="telephone"
+                                value={formData.telephone}
+                                onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                                 placeholder="+224 XXX XXX XXX"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="city">Ville</Label>
-                            <Input
-                                id="city"
-                                value={formData.city}
-                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                placeholder="Conakry"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="region">Région</Label>
-                            <Input
-                                id="region"
-                                value={formData.region}
-                                onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                                placeholder="Région"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="country">Pays</Label>
-                            <Input
-                                id="country"
-                                value={formData.country}
-                                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                                placeholder="Guinée"
                             />
                         </div>
                     </div>

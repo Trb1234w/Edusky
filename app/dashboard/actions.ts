@@ -135,7 +135,7 @@ export async function updateProfileAction(formData: FormData) {
     const full_name = formData.get('full_name') as string
     const username = formData.get('username') as string
     const bio = formData.get('bio') as string
-    const phone = formData.get('phone') as string
+    const telephone = formData.get('telephone') as string
     const city = formData.get('city') as string
     const region = formData.get('region') as string
     const country = formData.get('country') as string
@@ -170,13 +170,10 @@ export async function updateProfileAction(formData: FormData) {
 
     // Update profile
     const updateData: any = {
-      full_name,
-      username,
-      bio,
-      phone,
-      city,
-      region,
-      country,
+      full_name: full_name?.trim() || null,
+      username: username?.trim() || null,
+      bio: bio?.trim() || null,
+      telephone: telephone?.trim() || null,
       updated_at: new Date().toISOString()
     }
 
@@ -454,6 +451,155 @@ export async function getUserFavorites() {
       normalizedFavorites = [...normalizedFavorites, ...formattedArticles]
     }
   }
-
   return { data: normalizedFavorites, error: null }
 }
+
+// --- ACTIONS PROFIL ELITE ---
+
+/**
+ * Récupère toutes les informations d'extension du profil
+ */
+export async function getProfileEliteInfos(profileId: string) {
+  const supabase = await createClient()
+
+  const [education, experience, portfolio, goals] = await Promise.all([
+    supabase.from('profile_education').select('*').eq('profile_id', profileId).order('start_date', { ascending: false }),
+    supabase.from('profile_experience').select('*').eq('profile_id', profileId).order('start_date', { ascending: false }),
+    supabase.from('profile_portfolio').select('*').eq('profile_id', profileId).order('created_at', { ascending: false }),
+    supabase.from('profile_learning_goals').select('*').eq('profile_id', profileId).order('created_at', { ascending: false })
+  ])
+
+  return {
+    education: education.data || [],
+    experience: experience.data || [],
+    portfolio: portfolio.data || [],
+    goals: goals.data || [],
+    errors: {
+      education: education.error,
+      experience: experience.error,
+      portfolio: portfolio.error,
+      goals: goals.error
+    }
+  }
+}
+
+// EDUCATION
+export async function addEducationAction(data: any) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_education').insert({ ...data, profile_id: user.id })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteEducationAction(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_education').delete().eq('id', id).eq('profile_id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+// EXPERIENCE
+export async function addExperienceAction(data: any) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_experience').insert({ ...data, profile_id: user.id })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteExperienceAction(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_experience').delete().eq('id', id).eq('profile_id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+// PORTFOLIO
+export async function addPortfolioAction(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const title = formData.get('title') as string
+  const description = formData.get('description') as string
+  const project_url = formData.get('project_url') as string
+  const skills = formData.get('skills') as string // CSV
+  const imageFile = formData.get('image') as File | null
+
+  let image_url = null
+
+  if (imageFile && imageFile.size > 0) {
+    const fileExt = imageFile.name.split('.').pop()
+    const fileName = `portfolio-${user.id}-${Date.now()}.${fileExt}`
+    const { error: uploadError } = await supabase.storage.from('profiles').upload(`portfolio/${fileName}`, imageFile)
+    if (!uploadError) {
+      const { data: { publicUrl } } = supabase.storage.from('profiles').getPublicUrl(`portfolio/${fileName}`)
+      image_url = publicUrl
+    }
+  }
+
+  const { error } = await supabase.from('profile_portfolio').insert({
+    profile_id: user.id,
+    title,
+    description,
+    project_url,
+    image_url,
+    skills_used: skills ? skills.split(',').map(s => s.trim()) : []
+  })
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deletePortfolioAction(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_portfolio').delete().eq('id', id).eq('profile_id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+// LEARNING GOALS
+export async function addLearningGoalAction(data: any) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_learning_goals').insert({ ...data, profile_id: user.id })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function updateLearningGoalStatusAction(id: string, status: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_learning_goals').update({ status }).eq('id', id).eq('profile_id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteLearningGoalAction(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non autorisé" }
+
+  const { error } = await supabase.from('profile_learning_goals').delete().eq('id', id).eq('profile_id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+

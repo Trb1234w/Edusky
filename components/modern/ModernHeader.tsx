@@ -189,12 +189,12 @@ export function ModernHeader() {
                             </>
                         ) : (
                             <>
-                                <Link href="auth/connexion">
+                                <Link href="/auth/connexion">
                                     <GlossyButton variant="outline" size="sm" className="text-sm md:text-base">
                                         Connexion
                                     </GlossyButton>
                                 </Link>
-                                <Link href="auth/inscription">
+                                <Link href="/auth/inscription">
                                     <GlossyButton variant="primary" size="sm" className="text-sm md:text-base">
                                         S'inscrire
                                     </GlossyButton>
@@ -247,10 +247,10 @@ export function ModernHeader() {
                                 </Link>
 
                                 {/* Connexion Button */}
-                                <Link href="auth/connexion">
+                                <Link href="/auth/connexion">
                                     <GlossyButton variant="primary" size="sm" className="rounded-full px-4 text-xs font-medium flex items-center gap-2">
                                         <LogIn className="w-3 h-3" />
-                                        <span>Connexion</span>
+                                        <span>Connexion / Inscription</span>
                                     </GlossyButton>
                                 </Link>
                             </>

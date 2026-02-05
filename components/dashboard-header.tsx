@@ -3,9 +3,23 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Settings, Edit } from "lucide-react";
+import { Settings, Edit, LogOut, Loader2 } from "lucide-react";
 import { EditProfileDialog } from "./edit-profile-dialog";
 import { NotificationsDropdown } from "@/components/notifications-dropdown";
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type DashboardHeaderProps = {
     profile: {
@@ -14,10 +28,7 @@ type DashboardHeaderProps = {
         username: string | null;
         avatar_url: string | null;
         bio: string | null;
-        phone: string | null;
-        city: string | null;
-        region: string | null;
-        country: string | null;
+        telephone: string | null;
     };
     postsCount: number;
     followersCount: number;
@@ -26,6 +37,26 @@ type DashboardHeaderProps = {
 
 export function DashboardHeader({ profile, postsCount, followersCount, followingCount }: DashboardHeaderProps) {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const router = useRouter();
+    const supabase = createClient();
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            router.push('/');
+            router.refresh();
+            toast.success("Déconnexion réussie");
+        } catch (error: any) {
+            toast.error("Erreur de déconnexion", {
+                description: error.message
+            });
+        } finally {
+            setIsLoggingOut(false);
+        }
+    };
 
     const StatItem = ({ count, label }: { count: number; label: string }) => (
         <div className="text-left">
@@ -54,15 +85,64 @@ export function DashboardHeader({ profile, postsCount, followersCount, following
                                     <Edit className="mr-2 h-4 w-4" />
                                     Modifier le profil
                                 </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            Déconnexion
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Vous allez être déconnecté de votre session EduSky.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                            <AlertDialogAction
+                                                onClick={handleLogout}
+                                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            >
+                                                {isLoggingOut ? <Loader2 className="animate-spin" /> : "Se déconnecter"}
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                                 <div className="flex items-center justify-center">
                                     <NotificationsDropdown />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Mobile: Username */}
-                        <div className="md:hidden">
+                        {/* Mobile: Username & Logout */}
+                        <div className="md:hidden flex items-center justify-between w-full">
                             <h1 className="text-base font-semibold">@{profile.username}</h1>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="text-destructive p-0 h-auto">
+                                        <LogOut className="h-4 w-4" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="w-[90%] rounded-xl">
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Déconnexion</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Voulez-vous vraiment vous déconnecter ?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="flex-row gap-2">
+                                        <AlertDialogCancel className="flex-1 mt-0">Non</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleLogout}
+                                            className="flex-1 bg-destructive"
+                                        >
+                                            {isLoggingOut ? <Loader2 className="animate-spin" /> : "Oui"}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
 
                         {/* Stats - Horizontal on mobile, same on desktop */}

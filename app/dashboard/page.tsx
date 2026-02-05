@@ -31,7 +31,9 @@ import {
 
 import { PostCard } from "@/components/post-card";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
-import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction, fetchUserPosts, getUserFavorites } from "@/app/dashboard/actions";
+import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction, fetchUserPosts, getUserFavorites, getProfileEliteInfos } from "@/app/dashboard/actions";
+import { Info } from "lucide-react";
+import { ProfileEliteInfos } from "@/components/dashboard/profile-elite-infos";
 import { EventCard } from "@/components/event-card";
 import { CourseCard } from "@/components/course-card";
 import { ClubCard } from "@/components/club-card";
@@ -49,6 +51,7 @@ export default function DashboardPage() {
   const [registeredFormations, setRegisteredFormations] = useState<any[]>([]);
   const [registeredClubs, setRegisteredClubs] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
+  const [eliteData, setEliteData] = useState<any>({ education: [], experience: [], portfolio: [], goals: [] });
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(true);
   const [followersLoading, setFollowersLoading] = useState(true);
@@ -57,6 +60,7 @@ export default function DashboardPage() {
   const [registeredFormationsLoading, setRegisteredFormationsLoading] = useState(true);
   const [registeredClubsLoading, setRegisteredClubsLoading] = useState(true);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
+  const [eliteLoading, setEliteLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -142,6 +146,11 @@ export default function DashboardPage() {
         setFavorites(favoritesData);
       }
       setFavoritesLoading(false);
+
+      // Charger les données Elite (Education, Expérience, etc.)
+      const eliteResults = await getProfileEliteInfos(profileData.id);
+      setEliteData(eliteResults);
+      setEliteLoading(false);
     };
 
     fetchUserAndProfile();
@@ -308,6 +317,13 @@ export default function DashboardPage() {
               >
                 <Heart className="h-6 w-6 lg:h-5 lg:w-5" />
                 <span className="hidden lg:inline ml-2">Favoris</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="infos"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+              >
+                <Info className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Infos</span>
               </TabsTrigger>
             </TabsList>
             <TabsContent value="posts" className="mt-2 md:mt-4 px-0 md:px-0">
@@ -549,6 +565,19 @@ export default function DashboardPage() {
                   favorites={favorites}
                   isLoading={favoritesLoading}
                   onFavoriteToggle={handleFavoriteToggle}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="infos" className="mt-2 md:mt-4 px-4 md:px-0">
+              {eliteLoading ? (
+                <div className="space-y-8">
+                  <Skeleton className="h-40 w-full rounded-xl" />
+                  <Skeleton className="h-40 w-full rounded-xl" />
+                </div>
+              ) : (
+                <ProfileEliteInfos
+                  profileId={profile.id}
+                  initialData={eliteData}
                 />
               )}
             </TabsContent>

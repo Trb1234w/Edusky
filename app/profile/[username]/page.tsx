@@ -5,6 +5,7 @@ import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
 import { notFound, redirect } from "next/navigation";
 import { ProfileHeader } from "@/components/profile-header";
 import { ProfileContent } from "./profile-content";
+import { getProfileEliteInfos } from "@/app/dashboard/actions";
 
 // On force le rendu dynamique pour que la page soit toujours à jour
 export const dynamic = 'force-dynamic';
@@ -76,6 +77,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     isFollowing: currentUserFollowingIds.has(p.id)
   })) || [];
 
+  // Récupérer les données Elite (Education, Expérience, Portfolio, Objectifs)
+  const eliteData = await getProfileEliteInfos(profile.id);
+
   const profileWithPostsCount = {
     ...profile,
     postsCount: posts?.length || 0,
@@ -95,6 +99,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           following={followingWithStatus}
           currentUserId={currentUser?.id || ''}
           currentUserFollowingIds={Array.from(currentUserFollowingIds)}
+          eliteData={eliteData}
         />
       </main>
     </div>

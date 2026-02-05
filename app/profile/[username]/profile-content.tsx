@@ -6,7 +6,8 @@ import { SharedPostCard } from "@/components/shared-post-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { FollowersList } from "@/components/FollowersList";
-import { Grid3x3, UserPlus, Users } from "lucide-react";
+import { Grid3x3, UserPlus, Users, Info } from "lucide-react";
+import { ProfileEliteView } from "@/components/profile/profile-elite-view";
 
 interface ProfileContentProps {
     posts: any[];
@@ -14,6 +15,12 @@ interface ProfileContentProps {
     following: any[];
     currentUserId: string;
     currentUserFollowingIds: string[];
+    eliteData: {
+        education: any[];
+        experience: any[];
+        portfolio: any[];
+        goals: any[];
+    };
 }
 
 export function ProfileContent({
@@ -22,6 +29,7 @@ export function ProfileContent({
     following: initialFollowing,
     currentUserId,
     currentUserFollowingIds: initialFollowingIds,
+    eliteData,
 }: ProfileContentProps) {
     const [posts, setPosts] = useState(initialPosts);
     const [following, setFollowing] = useState(initialFollowing);
@@ -124,6 +132,13 @@ export function ProfileContent({
                     <Users className="h-6 w-6 lg:h-5 lg:w-5" />
                     <span className="hidden lg:inline ml-2">Abonnés</span>
                 </TabsTrigger>
+                <TabsTrigger
+                    value="infos"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
+                >
+                    <Info className="h-6 w-6 lg:h-5 lg:w-5" />
+                    <span className="hidden lg:inline ml-2">Infos</span>
+                </TabsTrigger>
             </TabsList>
             <TabsContent value="posts" className="mt-2 md:mt-4 px-0 md:px-0">
                 <div className="space-y-4 w-full">
@@ -161,6 +176,9 @@ export function ProfileContent({
                         Cet utilisateur n'a aucun abonné.
                     </Card>
                 )}
+            </TabsContent>
+            <TabsContent value="infos" className="mt-2 md:mt-4">
+                <ProfileEliteView data={eliteData} />
             </TabsContent>
         </Tabs>
     );
