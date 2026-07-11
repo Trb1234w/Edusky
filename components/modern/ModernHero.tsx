@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+
 import { ChevronDown, Sparkles, TrendingUp, Users } from 'lucide-react'
 import { GlossyButton } from './GlossyButton'
 import { ImageCarousel } from './ImageCarousel'
@@ -47,35 +47,12 @@ const stats = [
  * - Stats animées
  */
 export function ModernHero() {
-    const [scrollY, setScrollY] = useState(0)
-
-    // Effet parallaxe au scroll
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrollY(window.scrollY)
-        }
-
-        window.addEventListener('scroll', handleScroll, { passive: true })
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
-
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-            {/* Background Layer 1: Gradient animé */}
-            <div
-                className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10"
-                style={{
-                    transform: `translateY(${scrollY * 0.5}px)`,
-                }}
-            />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10" />
 
             {/* Background Layer 2: Carousel d'images avec overlay */}
-            <div
-                className="absolute inset-0 opacity-20"
-                style={{
-                    transform: `translateY(${scrollY * 0.3}px)`,
-                }}
-            >
+            <div className="absolute inset-0 opacity-20">
                 <ImageCarousel
                     images={heroImages}
                     autoPlayInterval={6000}
@@ -94,7 +71,7 @@ export function ModernHero() {
             <div className="relative z-10 container mx-auto px-4 py-20 lg:py-32">
                 <div className="max-w-5xl mx-auto text-center">
                     {/* Badge "Nouveau" */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm mb-8 animate-fade-in-up">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm mb-8">
                         <Sparkles className="w-4 h-4 text-primary" />
                         <span className="text-sm font-medium text-primary">
                             Plateforme éducative nouvelle génération
@@ -102,7 +79,7 @@ export function ModernHero() {
                     </div>
 
                     {/* Titre principal avec gradient */}
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in-up animation-delay-100">
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
                         <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                             Votre Avenir
                         </span>
@@ -113,12 +90,12 @@ export function ModernHero() {
                     </h1>
 
                     {/* Sous-titre */}
-                    <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto animate-fade-in-up animation-delay-200">
+                    <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
                         Accédez à des formations de qualité, connectez-vous avec des experts et développez vos compétences sur la plateforme éducative la plus complète.
                     </p>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in-up animation-delay-300">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                         <Link href="/inscription">
                             <GlossyButton variant="primary" size="lg">
                                 <Sparkles className="w-5 h-5" />
@@ -133,7 +110,7 @@ export function ModernHero() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto animate-fade-in-up animation-delay-400">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
                         {stats.map((stat, index) => (
                             <div
                                 key={index}

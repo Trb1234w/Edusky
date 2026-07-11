@@ -265,7 +265,8 @@
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out;
+  animation: fade-in-up 0.6s ease-out both;
+  will-change: transform, opacity;
 }
 
 .animate-glow-pulse {
@@ -279,14 +280,25 @@
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-sparkle {
   animation: sparkle 1.5s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-twinkle {
   animation: twinkle 2s ease-in-out infinite;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Animation delays pour effets staggered */
@@ -310,10 +322,12 @@
   animation-delay: 500ms;
 }
 
-/* Custom Cursor Styling */
+/* Custom cursor désactivé car trop lourd en performances */
+/*
 * {
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>') 12 12, auto;
 }
+*/
 
 a,
 
