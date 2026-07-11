@@ -40,8 +40,17 @@ export default function ConnexionPage() {
     });
 
     if (error) {
+      let errorMessage = "Une erreur est survenue lors de la connexion.";
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Email ou mot de passe incorrect.";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Veuillez confirmer votre adresse email avant de vous connecter.";
+      } else if (error.message.includes("User not found")) {
+        errorMessage = "Aucun utilisateur trouvé avec cet email.";
+      }
+
       toast.error("Erreur de connexion", {
-        description: error.message,
+        description: errorMessage,
       });
       return;
     }

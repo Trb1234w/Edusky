@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
-import { User, Mail, Lock, ArrowRight, AtSign, FileText, CheckCircle2 } from "lucide-react"
+import { User, Mail, Lock, ArrowRight, FileText, CheckCircle2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -17,11 +17,10 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
-  username: z.string().min(3, { message: "Le nom d'utilisateur doit contenir au moins 3 caractères." }),
   firstName: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères." }),
   lastName: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   email: z.string().email({ message: "Veuillez entrer une adresse email valide." }),
-  bio: z.string().max(200, { message: "La bio ne doit pas dépasser 200 caractères." }).optional(),
+
   password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères." }),
   confirmPassword: z.string().min(6, { message: "Veuillez confirmer votre mot de passe." }),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -38,63 +37,78 @@ export default function InscriptionPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
       firstName: "",
       lastName: "",
       email: "",
-      bio: "",
       password: "",
       confirmPassword: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { username, firstName, lastName, email, password, bio } = values;
+    const { firstName, lastName, email, password } = values;
     const role = "utilisateur";
+
+    console.log("[INSCRIPTION] Tentative d'inscription avec:", { email, firstName, lastName, role });
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          username: username,
           full_name: `${firstName} ${lastName}`,
           prenom: firstName,
           nom: lastName,
           role: role,
-          bio: bio,
         },
       },
     });
 
     if (authError) {
+      console.error("[INSCRIPTION] Erreur auth.signUp:", {
+        message: authError.message,
+        status: authError.status,
+        code: (authError as any).code,
+        details: authError,
+      });
+
+      let errorMessage = "Une erreur est survenue lors de l'inscription.";
+
+      if (authError.message.includes("User already registered")) {
+        errorMessage = "Un compte avec cette adresse email existe déjà.";
+      } else if (authError.message.includes("Password should be at least")) {
+        errorMessage = "Le mot de passe doit contenir au moins 6 caractères.";
+      } else if (
+        authError.message.includes("rate limit") ||
+        authError.message.includes("over_email_send_rate_limit") ||
+        (authError as any).code === "over_email_send_rate_limit" ||
+        authError.status === 429
+      ) {
+        errorMessage = "Trop de tentatives d'inscription. Veuillez patienter quelques minutes avant de réessayer.";
+      } else if (authError.message.includes("invalid email")) {
+        errorMessage = "L'adresse email saisie est invalide.";
+      } else if (authError.message.includes("Database error")) {
+        errorMessage = "Erreur serveur lors de la création du compte. Veuillez réessayer.";
+      }
+
       toast.error("Erreur d'inscription", {
-        description: authError.message,
+        description: errorMessage,
       });
       return;
     }
 
-    if (authData.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          username: username,
-          prenom: firstName,
-          nom: lastName,
-          full_name: `${firstName} ${lastName}`,
-          email: email,
-          role: role,
-          bio: bio,
-        });
+    console.log("[INSCRIPTION] auth.signUp réponse:", authData);
 
-      if (profileError) {
-        toast.error("Erreur lors de la création du profil", {
-          description: profileError.message,
+    if (authData.user) {
+      // Supabase email enumeration protection: returns a fake user with empty identities if email exists
+      if (authData.user.identities && authData.user.identities.length === 0) {
+        toast.error("Erreur d'inscription", {
+          description: "Un compte avec cette adresse email existe déjà.",
         });
         return;
       }
 
+      // Le trigger handle_new_user crée le profil automatiquement côté Supabase
       setEmailSent(email);
       setIsSubmitted(true);
       toast.success("Inscription enregistrée", {
@@ -102,6 +116,8 @@ export default function InscriptionPage() {
       });
     }
   };
+
+
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -206,22 +222,7 @@ export default function InscriptionPage() {
             <p className="text-muted-foreground">Rejoignez la communauté EduSky</p>
           </div>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="username" className="text-xs uppercase tracking-wider font-semibold opacity-70">Nom d'utilisateur</Label>
-                <div className="relative">
-                  <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="pseudo"
-                    {...form.register("username")}
-                    className="pl-10 h-10"
-                  />
-                </div>
-                {form.formState.errors.username && (
-                  <p className="text-red-500 text-[10px] font-medium leading-tight">{form.formState.errors.username.message}</p>
-                )}
-              </div>
+
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
@@ -273,21 +274,7 @@ export default function InscriptionPage() {
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="bio" className="text-xs uppercase tracking-wider font-semibold opacity-70">Bio (optionnel)</Label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-3 text-muted-foreground" size={16} />
-                  <Textarea
-                    id="bio"
-                    placeholder="Parlez-nous un peu de vous..."
-                    {...form.register("bio")}
-                    className="pl-10 py-2 min-h-[80px] text-sm resize-none"
-                  />
-                </div>
-                {form.formState.errors.bio && (
-                  <p className="text-red-500 text-[10px] font-medium leading-tight">{form.formState.errors.bio.message}</p>
-                )}
-              </div>
+
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
@@ -348,41 +335,13 @@ export default function InscriptionPage() {
               </Button>
             </form>
 
-            <div className="mt-4">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase">
-                  <span className="bg-card px-2 text-muted-foreground font-medium">Ou continuer avec</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <Button variant="outline" type="button" size="sm" className="h-9 text-xs" onClick={() => handleSocialLogin('google')}>
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                  Google
-                </Button>
-                <Button variant="outline" type="button" size="sm" className="h-9 text-xs" onClick={() => handleSocialLogin('facebook')}>
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                  Facebook
-                </Button>
-              </div>
-            </div>
-
             <p className="text-center text-xs text-muted-foreground mt-6 font-medium">
               Déjà un compte ?{" "}
               <Link href="/auth/connexion" className="text-primary font-bold hover:underline">
                 Se connecter
               </Link>
             </p>
+
         </div>
       </div>
     </div>
