@@ -2,9 +2,8 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+
 import { useRouter } from "next/navigation";
-import { findOrCreateConversationAction } from "@/app/messages/actions";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { followUserAction } from "@/app/users/actions";
@@ -29,21 +28,6 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
   const { toast } = useToast();
   const [creatingConversationForUser, setCreatingConversationForUser] = useState<string | null>(null);
   const [loadingFollow, setLoadingFollow] = useState<string | null>(null);
-
-  const handleMessageUser = async (e: React.MouseEvent, otherUserId: string) => {
-    e.stopPropagation();
-    if (creatingConversationForUser === otherUserId) return;
-    setCreatingConversationForUser(otherUserId);
-
-    const { data: conversationId, error } = await findOrCreateConversationAction(otherUserId);
-
-    if (error) {
-      toast({ title: "Erreur de messagerie", description: error, variant: "destructive" });
-    } else if (conversationId) {
-      router.push(`/messages?conversation=${conversationId}`);
-    }
-    setCreatingConversationForUser(null);
-  };
 
   const handleFollowUser = async (e: React.MouseEvent, targetUserId: string, isFollowing: boolean) => {
     e.stopPropagation();
@@ -131,15 +115,6 @@ export function FollowersList({ profiles, currentUserId, onFollowChange }: Follo
                 )}
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => handleMessageUser(e, profile.id)}
-              disabled={creatingConversationForUser === profile.id}
-              className="flex-shrink-0 h-9 w-9"
-            >
-              <MessageCircle className="h-5 w-5" />
-            </Button>
           </div>
         </div>
       ))}

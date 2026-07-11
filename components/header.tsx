@@ -31,12 +31,9 @@ export function Header() {
   }, [supabase])
 
   const navLinks = [
-    { href: "/professeurs", label: "Professeurs" },
     { href: "/formations", label: "Formations" },
     { href: "/evenements", label: "Événements" },
-    { href: "/clubs", label: "Clubs" },
     { href: "/blog", label: "Blog" },
-    { href: "/feed", label: "Réseau" },
   ]
 
   const isHomepage = pathname === "/"

@@ -37,7 +37,6 @@ export function FormationsHero() {
                                 isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
                             )}
                         >
-                            <Sparkles className="w-3.5 h-3.5 fill-primary animate-pulse" />
                             <span>Excellence Académique</span>
                         </div>
 

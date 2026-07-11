@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight, CheckCircle2, Sparkles, Users, BookOpen, Award, Briefcase, Trophy, GraduationCap, Network, Search, Newspaper } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Users, BookOpen, Award, Briefcase, Trophy, GraduationCap, Network, Search, Newspaper } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { GlossyButton } from './modern/GlossyButton'
@@ -10,54 +10,36 @@ import { cn } from '@/lib/utils'
 // Slides avec le contenu spécifique demandé
 const heroSlides = [
     {
-        id: 'connexion',
-        title: 'Connexion & Mentorat',
-        description: 'Connectez-vous avec des professeurs, coachs et mentors qualifiés pour un suivi personnalisé.',
-        icon: Users,
-        image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80', // Meeting/Mentoring
-        color: 'from-violet-500 to-purple-600'
-    },
-    {
         id: 'formations',
         title: 'Formations Certifiées',
         description: 'Formations dans tous les domaines avec suivi IA de pointe et certification à la clé.',
         icon: Award,
-        image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80', // Studying/Certificate
+        image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80',
         color: 'from-blue-500 to-cyan-600'
-    },
-    {
-        id: 'clubs',
-        title: 'Clubs de Révision',
-        description: 'Rejoignez des clubs de révision et accédez à des modules spécialisés avec accompagnement.',
-        icon: BookOpen,
-        image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80', // Group study
-        color: 'from-emerald-500 to-green-600'
-    },
-    {
-        id: 'reseau',
-        title: 'Réseau Professionnel',
-        description: 'Espace social type LinkedIn pour connecter étudiants et entreprises (stages, emplois, bénévolat).',
-        icon: Briefcase,
-        image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80', // Professional network
-        color: 'from-orange-500 to-red-600'
     },
     {
         id: 'evenements',
         title: 'Événements Éducatifs',
         description: 'Participez à des hackathons, compétitions, conférences et événements exclusifs.',
         icon: Trophy,
-        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80', // Event/Conference
+        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
         color: 'from-pink-500 to-rose-600'
+    },
+    {
+        id: 'blog',
+        title: 'Blog & Actualités',
+        description: 'Restez informé des dernières actualités éducatives, conseils et opportunités.',
+        icon: Newspaper,
+        image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80',
+        color: 'from-indigo-500 to-blue-600'
     },
 ]
 
 // Chips pour l'accès rapide (remplace les CTA)
 const quickAccessChips = [
     { label: 'Formations', icon: BookOpen, href: '/formations', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-    { label: 'Experts', icon: GraduationCap, href: '/professeurs', color: 'bg-violet-500/10 text-violet-500 border-violet-500/20' },
-    { label: 'Clubs', icon: Users, href: '/clubs', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
     { label: 'Événements', icon: Trophy, href: '/evenements', color: 'bg-pink-500/10 text-pink-500 border-pink-500/20' },
-    { label: 'Autres', icon: Newspaper, href: '/blog', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
+    { label: 'Blog', icon: Newspaper, href: '/blog', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
 ]
 
 // Phrases pour l'effet typing
@@ -166,7 +148,6 @@ export function NewHero() {
                     <div className={`space-y-3 md:space-y-5 lg:space-y-6 transition-all duration-1000 w-full max-w-full overflow-hidden ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
                         {/* Redesigned Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border border-primary/20 text-primary text-sm font-semibold animate-fade-in-up shadow-sm backdrop-blur-sm">
-                            <Sparkles className="w-4 h-4 fill-primary" />
                             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 La plateforme éducative tout-en-un
                             </span>

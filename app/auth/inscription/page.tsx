@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
-import { GraduationCap, User, Mail, Lock, ArrowRight, AtSign, FileText, CheckCircle2 } from "lucide-react"
+import { User, Mail, Lock, ArrowRight, AtSign, FileText, CheckCircle2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -153,22 +153,58 @@ export default function InscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-secondary via-primary to-accent p-4 py-8">
-      <div className="w-full max-w-md my-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <GraduationCap size={24} className="text-white" />
-          </div>
-          <span className="text-xl font-bold text-white">EduSky</span>
-        </Link>
+    <div className="min-h-screen w-full flex flex-col md:flex-row">
+      {/* Left side - Branding (Hidden on small screens) */}
+      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-primary via-secondary to-accent p-12 flex-col justify-between relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-background/20 rounded-full blur-3xl" />
+        
 
-        <Card className="border-border/50 shadow-2xl">
-          <CardHeader className="space-y-1 py-4">
-            <CardTitle className="text-xl font-bold text-center">Créer un compte</CardTitle>
-            <CardDescription className="text-center text-sm">Rejoignez la communauté EduSky</CardDescription>
-          </CardHeader>
-          <CardContent>
+
+        {/* Text and Logo */}
+        <div className="relative z-10 space-y-6 max-w-lg mt-auto mb-auto flex flex-col">
+           {/* Logo */}
+           <Link href="/" className="relative z-10 flex items-center gap-3 group w-fit mb-2">
+               <div className="relative w-14 h-14 rounded-xl bg-gradient-to-br from-white/30 to-white/10 p-[2px] backdrop-blur-md transition-transform group-hover:scale-110 duration-300 shadow-xl">
+                   <div className="w-full h-full rounded-xl bg-white/20 flex items-center justify-center">
+                       <span className="text-3xl font-bold text-white">E</span>
+                   </div>
+               </div>
+               <span className="text-4xl font-bold text-white tracking-wide">EduSky</span>
+           </Link>
+
+           <h1 className="text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+             Rejoignez la plateforme éducative du futur.
+           </h1>
+           <p className="text-lg text-white/90 font-medium">
+             Accédez à des milliers de formations, participez à des événements exclusifs et boostez votre carrière dès aujourd'hui.
+           </p>
+        </div>
+        
+        <div className="relative z-10 text-white/70 text-sm">
+          © {new Date().getFullYear()} EduSky. Tous droits réservés.
+        </div>
+      </div>
+
+      {/* Right side - Form */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-background relative overflow-y-auto">
+        <div className="w-full max-w-md space-y-6 relative z-10 my-auto py-8">
+          
+          {/* Mobile Logo */}
+          <Link href="/" className="md:hidden flex items-center justify-center gap-3 mb-6 group">
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent p-[2px]">
+                  <div className="w-full h-full rounded-xl bg-background flex items-center justify-center">
+                      <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">E</span>
+                  </div>
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">EduSky</span>
+          </Link>
+
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold tracking-tight">Créer un compte</h2>
+            <p className="text-muted-foreground">Rejoignez la communauté EduSky</p>
+          </div>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
               <div className="space-y-1.5">
                 <Label htmlFor="username" className="text-xs uppercase tracking-wider font-semibold opacity-70">Nom d'utilisateur</Label>
@@ -341,14 +377,13 @@ export default function InscriptionPage() {
               </div>
             </div>
 
-            <p className="text-center text-xs text-muted-foreground mt-4 font-medium">
+            <p className="text-center text-xs text-muted-foreground mt-6 font-medium">
               Déjà un compte ?{" "}
               <Link href="/auth/connexion" className="text-primary font-bold hover:underline">
                 Se connecter
               </Link>
             </p>
-          </CardContent>
-        </Card>
+        </div>
       </div>
     </div>
   )

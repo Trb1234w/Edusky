@@ -168,7 +168,6 @@ export function EventCard({
 
                         <Button size="sm" className="h-9 text-sm rounded-full px-5 group/btn">
                             Réserver
-                            <Sparkles className="ml-2 w-3.5 h-3.5 transition-transform group-hover/btn:rotate-12" />
                         </Button>
                     </div>
                 </div>

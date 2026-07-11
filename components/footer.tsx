@@ -14,17 +14,14 @@ export function Footer() {
     {
       title: "Plateforme",
       links: [
-        { label: "Professeurs", href: "/professeurs" },
         { label: "Formations", href: "/formations" },
         { label: "Événements", href: "/evenements" },
-        { label: "Clubs", href: "/clubs" },
       ],
     },
     {
       title: "Ressources",
       links: [
         { label: "Blog", href: "/blog" },
-        { label: "Réseau", href: "/feed" },
         { label: "À propos", href: "/a-propos" },
         { label: "Contact", href: "/contact" },
       ],

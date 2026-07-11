@@ -1,6 +1,6 @@
 'use client'
 
-import { Sparkles } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 
 interface DiscoverSectionProps {
@@ -21,7 +21,6 @@ export function DiscoverSection({ children }: DiscoverSectionProps) {
                 {/* Section Header */}
                 <div className="flex flex-col items-center text-center mb-6 space-y-2">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium animate-fade-in-up">
-                        <Sparkles className="w-3 h-3" />
                         <span>Explorer le catalogue</span>
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70">

@@ -26,7 +26,6 @@ import { toggleLike, addComment, sharePostAction, reportContent } from "@/app/ac
 import { deletePostAction, updatePostStatusAction, updatePostVisibilityAction } from "@/app/dashboard/actions";
 import { Trash2, Eye, EyeOff, Archive, Globe, Lock } from "lucide-react";
 import { followUserAction } from "@/app/users/actions";
-import { findOrCreateConversationAction } from "@/app/messages/actions";
 import { useRouter } from "next/navigation";
 
 interface PostCardProps {
@@ -177,7 +176,6 @@ export function PostCard(props: PostCardProps) {
   const [isLiked, setIsLiked] = useState(liked);
   const [isFollowing, setIsFollowing] = useState(followingIds.includes(authorId));
   const [isSubmittingFollow, setIsSubmittingFollow] = useState(false);
-  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [newCommentContent, setNewCommentContent] = useState('');
   const [addingComment, setAddingComment] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -312,25 +310,6 @@ export function PostCard(props: PostCardProps) {
     setIsSubmittingFollow(false);
   };
 
-  const handleMessageUser = async () => {
-    console.log(`handleMessageUser: Starting conversation with user ${authorId}`);
-    if (isCreatingConversation) {
-      console.log("handleMessageUser: Conversation creation already in progress.");
-      return;
-    }
-    setIsCreatingConversation(true);
-    console.log("handleMessageUser: Calling findOrCreateConversationAction...");
-    const { data: conversationId, error } = await findOrCreateConversationAction(authorId);
-    console.log("handleMessageUser: findOrCreateConversationAction returned. Data:", conversationId, "Error:", error);
-    if (error) {
-      toast({ title: "Erreur de messagerie", description: error, variant: "destructive" });
-    } else {
-      console.log(`handleMessageUser: Redirecting to /messages?conversation=${conversationId}`);
-      router.push(`/messages?conversation=${conversationId}`);
-    }
-    setIsCreatingConversation(false);
-  };
-
   const handleReport = async () => {
     if (!currentUserId) return;
     setIsReporting(true);
@@ -375,9 +354,6 @@ export function PostCard(props: PostCardProps) {
                     {isSubmittingFollow ? <Loader2 className="h-4 w-4 animate-spin" /> : "Suivre"}
                   </Button>
                 )}
-                <Button size="icon" variant="ghost" onClick={handleMessageUser} disabled={isCreatingConversation}>
-                  {isCreatingConversation ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-5 w-5 text-muted-foreground" />}
-                </Button>
               </>
             )}
 

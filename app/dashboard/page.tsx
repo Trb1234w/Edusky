@@ -25,18 +25,16 @@ import {
   Grid3x3,
   UserPlus,
   GraduationCap,
-  Users2,
   Heart,
 } from "lucide-react";
 
 import { PostCard } from "@/components/post-card";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
-import { getRegisteredEvents, getRegisteredFormations, getRegisteredClubs, testServerAction, fetchUserPosts, getUserFavorites, getProfileEliteInfos } from "@/app/dashboard/actions";
+import { getRegisteredEvents, getRegisteredFormations, testServerAction, fetchUserPosts, getUserFavorites, getProfileEliteInfos } from "@/app/dashboard/actions";
 import { Info } from "lucide-react";
 import { ProfileEliteInfos } from "@/components/dashboard/profile-elite-infos";
 import { EventCard } from "@/components/event-card";
 import { CourseCard } from "@/components/course-card";
-import { ClubCard } from "@/components/club-card";
 import { FollowersList } from "@/components/FollowersList";
 import { FavoritesList } from "./favorites-list";
 import { DashboardHeader } from "@/components/dashboard-header";
@@ -49,7 +47,6 @@ export default function DashboardPage() {
   const [following, setFollowing] = useState<any[]>([]);
   const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
   const [registeredFormations, setRegisteredFormations] = useState<any[]>([]);
-  const [registeredClubs, setRegisteredClubs] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [eliteData, setEliteData] = useState<any>({ education: [], experience: [], portfolio: [], goals: [] });
   const [loading, setLoading] = useState(true);
@@ -58,7 +55,6 @@ export default function DashboardPage() {
   const [followingLoading, setFollowingLoading] = useState(true);
   const [registeredEventsLoading, setRegisteredEventsLoading] = useState(true);
   const [registeredFormationsLoading, setRegisteredFormationsLoading] = useState(true);
-  const [registeredClubsLoading, setRegisteredClubsLoading] = useState(true);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [eliteLoading, setEliteLoading] = useState(true);
   const router = useRouter();
@@ -130,15 +126,6 @@ export default function DashboardPage() {
         setRegisteredFormations(uniqueFormations);
       }
       setRegisteredFormationsLoading(false);
-
-      // Charger les clubs inscrits
-      const { data: registeredClubsData, error: registeredClubsError } = await getRegisteredClubs();
-      if (!registeredClubsError && registeredClubsData) {
-        // Dédupliquer les clubs basés sur leur 'id'
-        const uniqueClubs = Array.from(new Map((registeredClubsData as any[]).map((club: any) => [club.id, club])).values());
-        setRegisteredClubs(uniqueClubs);
-      }
-      setRegisteredClubsLoading(false);
 
       // Charger les favoris
       const { data: favoritesData, error: favoritesError } = await getUserFavorites();
@@ -226,19 +213,6 @@ export default function DashboardPage() {
             students: itemToAdd.nb_avis
           };
         }
-      } else if (itemType === 'club') {
-        itemToAdd = registeredClubs.find(c => c.id === itemId);
-        if (itemToAdd) {
-          itemToAdd = {
-            ...itemToAdd,
-            title: itemToAdd.nom,
-            description: itemToAdd.description,
-            author: itemToAdd.leader?.full_name,
-            category: itemToAdd.categorie?.nom,
-            fees: itemToAdd.cotisation_mensuelle || itemToAdd.cotisation_annuelle || itemToAdd.prix_inscription,
-            members: itemToAdd.capacite
-          };
-        }
       }
 
       if (itemToAdd && !favorites.some(fav => fav.id === itemId && fav.type === itemType)) {
@@ -281,29 +255,9 @@ export default function DashboardPage() {
         />
 
         <section className="container mx-auto px-0 md:px-4">
-          <Tabs defaultValue="posts" className="w-full">
+          <Tabs defaultValue="inscriptions" className="w-full">
             <TabsList className="flex w-full overflow-x-auto whitespace-nowrap justify-start gap-1 lg:gap-2 pb-2 px-4 md:px-0 border-b-2 border-gray-200 dark:border-gray-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <TabsTrigger
-                value="posts"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
-              >
-                <Grid3x3 className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Publications</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="followers"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
-              >
-                <Users className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Abonnés</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="following"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
-              >
-                <UserPlus className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Abonnements</span>
-              </TabsTrigger>
+
               <TabsTrigger
                 value="inscriptions"
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
@@ -326,138 +280,8 @@ export default function DashboardPage() {
                 <span className="hidden lg:inline ml-2">Infos</span>
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="posts" className="mt-2 md:mt-4 px-0 md:px-0">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
-                  <CreatePost profile={profile} />
 
-                  {/* Section des posts de l'utilisateur */}
-                  <div className="space-y-2">
-                    <h2 className="text-2xl mx-2 font-bold">Mes publications</h2>
-                    {postsLoading ? (
-                      <div className="space-y-4">
-                        {Array.from({ length: 2 }).map((_, i) => (
-                          <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                        ))}
-                      </div>) : posts.length > 0 ? (
-                        posts.map(post => {
-                          const commonProps = {
-                            id: post.id,
-                            authorId: post.authorId,
-                            author: post.author || "Utilisateur",
-                            authorRole: post.authorRole || "Membre",
-                            authorAvatar: post.authorAvatar,
-                            authorUsername: post.authorUsername,
-                            content: post.content,
-                            media: post.media,
-                            timestamp: post.timestamp,
-                            likes: post.likes || 0,
-                            comments: post.comments || 0,
-                            shares: post.shares || 0,
-                            liked: post.liked || false,
-                            currentUserId: profile.id,
-                            followingIds: followingIds,
-                            onLikeChange: (newLiked: boolean, newLikesCount: number) => handleLikeToggle(post.id, newLiked, newLikesCount),
-                          };
-
-                          if (post.sharedPost) {
-                            return <SharedPostCard
-                              key={post.id}
-                              {...commonProps}
-                              sharedPost={post.sharedPost}
-                              onLikeChange={(newLiked: boolean, newLikesCount: number) => handleLikeToggle(post.sharedPost.id, newLiked, newLikesCount)}
-                            />;
-                          }
-                          return <PostCard key={post.id} {...commonProps} />;
-                        })
-                      ) : (
-                      <Card className="p-8 text-center text-muted-foreground">
-                        Vous n'avez pas encore créé de publication.
-                      </Card>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            </TabsContent>
-            <TabsContent value="followers" className="mt-2 md:mt-4 px-4 md:px-0">
-              {followersLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton key={i} className="h-20 w-full rounded-lg" />
-                  ))}
-                </div>
-              ) : (
-                <FollowersList
-                  profiles={followersWithStatus}
-                  currentUserId={profile.id}
-                  onFollowChange={handleFollowToggle}
-                />
-              )}
-            </TabsContent>
-            <TabsContent value="following" className="mt-2 md:mt-4 px-4 md:px-0">
-              {followingLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton key={i} className="h-20 w-full rounded-lg" />
-                  ))}
-                </div>
-              ) : (
-                <FollowersList
-                  profiles={followingWithStatus}
-                  currentUserId={profile.id}
-                  onFollowChange={handleFollowToggle}
-                />
-              )}
-            </TabsContent>
             <TabsContent value="inscriptions" className="mt-2 md:mt-4 space-y-12 px-4 md:px-0">
-              {/* Événements */}
-              <section>
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  Événements
-                </h3>
-                {registeredEventsLoading ? (
-                  <div className="space-y-4">
-                    {Array.from({ length: 2 }).map((_, i) => (
-                      <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                    ))}
-                  </div>
-                ) : registeredEvents.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {registeredEvents.map(event => {
-                      const fullLocation = [event.lieu, event.quartier?.nom, event.ville?.nom, event.pays?.nom].filter(Boolean).join(', ');
-                      return (
-                        <EventCard
-                          key={event.id}
-                          id={event.id}
-                          title={event.titre || ""}
-                          description={event.extrait || event.description || ""}
-                          date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                          location={fullLocation}
-                          category={event.categorie?.nom || ""}
-                          participants={event.nombre_participants || 0}
-                          maxParticipants={event.capacite || 0}
-                          organizer={event.organisateur?.full_name || "Inconnu"}
-                          image={event.image_url || "/placeholder.png"}
-                          status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
-                          is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
-                          onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
-                          price={event.prix}
-                          isFree={event.est_gratuit}
-                          mode={event.mode}
-                        />
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <Card className="p-8 text-center text-muted-foreground">
-                    Vous n'êtes inscrit à aucun événement pour le moment.
-                  </Card>
-                )}
-              </section>
-
               {/* Formations */}
               <section>
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -507,51 +331,53 @@ export default function DashboardPage() {
                 )}
               </section>
 
-              {/* Clubs */}
+              {/* Événements */}
               <section>
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <Users2 className="h-5 w-5 text-primary" />
-                  Clubs
+                  <Calendar className="h-5 w-5 text-primary" />
+                  Événements
                 </h3>
-                {registeredClubsLoading ? (
+                {registeredEventsLoading ? (
                   <div className="space-y-4">
                     {Array.from({ length: 2 }).map((_, i) => (
                       <Skeleton key={i} className="h-32 w-full rounded-lg" />
                     ))}
                   </div>
-                ) : registeredClubs.length > 0 ? (
+                ) : registeredEvents.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {registeredClubs.map(club => (
-                      <ClubCard
-                        key={club.id}
-                        id={club.id}
-                        name={club.nom || ""}
-                        description={club.description || ""}
-                        category={club.categorie?.nom || ""}
-                        members={club.nombre_membres || 0}
-                        activities={club.activites ? JSON.stringify(club.activites) : ""}
-                        president={club.leader?.full_name || "Inconnu"}
-                        image={club.image_url || "/placeholder.png"}
-                        verified={club.is_verified || false}
-                        is_favorited={favorites.some(fav => fav.type === 'club' && fav.id === club.id)}
-                        onToggle={(status) => handleFavoriteToggle(club.id, 'club', status)}
-                        prix_inscription={club.prix_inscription}
-                        cotisation_mensuelle={club.cotisation_mensuelle}
-                        lieu={club.lieu}
-                        pays_nom={club.pays?.nom}
-                        ville_nom={club.ville?.nom}
-                        quartier_nom={club.quartier?.nom}
-                        age_min={club.age_minimum}
-                        age_max={club.age_maximum}
-                      />
-                    ))}
+                    {registeredEvents.map(event => {
+                      const fullLocation = [event.lieu, event.quartier?.nom, event.ville?.nom, event.pays?.nom].filter(Boolean).join(', ');
+                      return (
+                        <EventCard
+                          key={event.id}
+                          id={event.id}
+                          title={event.titre || ""}
+                          description={event.extrait || event.description || ""}
+                          date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          location={fullLocation}
+                          category={event.categorie?.nom || ""}
+                          participants={event.nombre_participants || 0}
+                          maxParticipants={event.capacite || 0}
+                          organizer={event.organisateur?.full_name || "Inconnu"}
+                          image={event.image_url || "/placeholder.png"}
+                          status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
+                          is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
+                          onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
+                          price={event.prix}
+                          isFree={event.est_gratuit}
+                          mode={event.mode}
+                        />
+                      )
+                    })}
                   </div>
                 ) : (
                   <Card className="p-8 text-center text-muted-foreground">
-                    Vous n'êtes inscrit à aucun club pour le moment.
+                    Vous n'êtes inscrit à aucun événement pour le moment.
                   </Card>
                 )}
               </section>
+
             </TabsContent>
             <TabsContent value="favorites" className="mt-2 md:mt-4 px-4 md:px-0">
               {favoritesLoading ? (

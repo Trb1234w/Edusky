@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Sparkles, BookOpen, Calendar, Users } from "lucide-react";
-import Link from "next/link";
+import { BookOpen, Calendar } from "lucide-react";
 import { DiscoverSection } from "@/components/modern/DiscoverSection";
 import { NewHero } from "@/components/new-hero";
 import {
@@ -16,9 +14,6 @@ import { createClient } from "@/lib/supabase/server";
 import { CourseCard } from "@/components/course-card";
 import { EventCard } from "@/components/event-card";
 import { BlogCard } from "@/components/blog-card";
-import { ClubCard } from "@/components/club-card";
-import { ProfesseurCard } from "@/components/professeur-card";
-import { HomePostCard } from "@/components/home/home-post-card";
 import { SectionSlider } from "@/components/home/section-slider";
 
 export default async function HomePage() {
@@ -31,25 +26,38 @@ export default async function HomePage() {
   const [
     formationsData,
     evenementsData,
-    clubsData,
     articlesData,
-    professeursData,
-    postesData
+    usersReq,
+    professeursReq,
+    formationsReq,
   ] = await Promise.all([
     supabase.rpc('get_home_page_formations', { p_user_id: currentUserId || null }),
-    supabase.rpc('get_home_page_evenements', { p_user_id: currentUserId || null }),
-    supabase.rpc('get_home_page_clubs', { p_user_id: currentUserId || null }),
+    supabase.rpc('get_evenements', {
+        search_term: null,
+        category_slug: null,
+        mode_filter: null,
+        pays_filter: null,
+        ville_filter: null,
+        quartier_filter: null,
+        type_filter: null,
+        sort_by: 'date_debut_asc'
+    }),
     supabase.rpc('get_home_page_articles', { p_user_id: currentUserId || null }),
-    supabase.rpc('get_home_page_professeurs', { p_user_id: currentUserId || null }),
-    supabase.rpc('get_home_page_postes')
+    supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'professeur'),
+    supabase.from('formations').select('id', { count: 'exact', head: true })
   ]);
+
+  const statsData = {
+    students: usersReq.count || 5000,
+    mentors: professeursReq.count || 200,
+    formations: formationsReq.count || 150,
+    successRate: 98
+  };
 
   const formations = formationsData.data || [];
   const evenements = evenementsData.data || [];
-  const clubs = clubsData.data || [];
   const articles = articlesData.data || [];
-  const professeurs = professeursData.data || [];
-  const postes = postesData.data || [];
 
   return (
     <main className="flex-1 pb-16 lg:pb-0">
@@ -60,22 +68,7 @@ export default async function HomePage() {
       <BentoFeatures />
 
       {/* 3. Discover Section (Sliders) */}
-      {/* 3. Discover Section (Sliders) */}
       <DiscoverSection>
-        {/* Professeurs Slider */}
-        {professeurs.length > 0 && (
-          <SectionSlider
-            title="Experts"
-            icon={<Users className="w-5 h-5 text-primary" />}
-            href="/professeurs"
-          >
-            {professeurs.map((prof: any) => (
-              <div key={prof.id} className="w-[280px] md:w-[300px] h-full snap-start">
-                <ProfesseurCard {...prof} />
-              </div>
-            ))}
-          </SectionSlider>
-        )}
         {/* Formations Slider */}
         {formations.length > 0 && (
           <SectionSlider
@@ -100,22 +93,18 @@ export default async function HomePage() {
           >
             {evenements.map((event: any) => (
               <div key={event.id} className="w-[280px] md:w-[320px] h-full snap-start">
-                <EventCard {...event} />
-              </div>
-            ))}
-          </SectionSlider>
-        )}
-
-        {/* Clubs Slider */}
-        {clubs.length > 0 && (
-          <SectionSlider
-            title="Clubs"
-            icon={<Users className="w-5 h-5 text-primary" />}
-            href="/clubs"
-          >
-            {clubs.map((club: any) => (
-              <div key={club.id} className="w-[280px] md:w-[320px] h-full snap-start">
-                <ClubCard {...club} />
+                <EventCard 
+                  {...event}
+                  title={event.titre || event.title}
+                  description={event.extrait || event.description}
+                  date={event.date_debut ? new Date(event.date_debut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : event.date}
+                  time={event.date_debut ? new Date(event.date_debut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : event.time}
+                  location={event.ville || event.location || "En ligne"}
+                  category={event.categorie?.nom || event.category_nom || event.category}
+                  price={event.prix || event.price} 
+                  isFree={event.est_gratuit || event.isFree} 
+                  image={event.image_url || event.image}
+                />
               </div>
             ))}
           </SectionSlider>
@@ -138,7 +127,7 @@ export default async function HomePage() {
       </DiscoverSection>
 
       {/* 4. Stats Section (Glassmorphism) */}
-      <GlassStats />
+      <GlassStats data={statsData} />
 
       {/* 5. How It Works (New) */}
       <HowItWorks />

@@ -10,7 +10,6 @@ import {
     Mail,
     Send,
     ArrowRight,
-    Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -36,17 +35,14 @@ export function ModernFooter() {
         {
             title: 'Plateforme',
             links: [
-                { label: 'Professeurs', href: '/professeurs' },
                 { label: 'Formations', href: '/formations' },
                 { label: 'Événements', href: '/evenements' },
-                { label: 'Clubs', href: '/clubs' },
             ],
         },
         {
             title: 'Ressources',
             links: [
                 { label: 'Blog', href: '/blog' },
-                { label: 'Réseau', href: '/feed' },
                 { label: 'À propos', href: '/a-propos' },
                 { label: 'Contact', href: '/contact' },
             ],
@@ -110,7 +106,6 @@ export function ModernFooter() {
                         {/* Newsletter */}
                         <div className="mb-8">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                <Sparkles className="w-5 h-5 text-primary" />
                                 Newsletter
                             </h3>
                             <p className="text-sm text-muted-foreground mb-4">

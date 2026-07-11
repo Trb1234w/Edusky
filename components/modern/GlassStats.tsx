@@ -3,35 +3,44 @@
 import { Users, GraduationCap, BookOpen, Award } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-const stats = [
-    {
-        icon: Users,
-        value: 5000,
-        label: "Étudiants Actifs",
-        suffix: "+"
-    },
-    {
-        icon: GraduationCap,
-        value: 200,
-        label: "Mentors Experts",
-        suffix: "+"
-    },
-    {
-        icon: BookOpen,
-        value: 150,
-        label: "Formations",
-        suffix: "+"
-    },
-    {
-        icon: Award,
-        value: 98,
-        label: "Taux de Réussite",
-        suffix: "%"
-    },
-]
+interface GlassStatsProps {
+    data?: {
+        students: number;
+        mentors: number;
+        formations: number;
+        successRate: number;
+    }
+}
 
-export function GlassStats() {
+export function GlassStats({ data }: GlassStatsProps) {
     const [isVisible, setIsVisible] = useState(false)
+
+    const stats = [
+        {
+            icon: Users,
+            value: data?.students || 5000,
+            label: "Étudiants Actifs",
+            suffix: "+"
+        },
+        {
+            icon: GraduationCap,
+            value: data?.mentors || 200,
+            label: "Mentors Experts",
+            suffix: "+"
+        },
+        {
+            icon: BookOpen,
+            value: data?.formations || 150,
+            label: "Formations",
+            suffix: "+"
+        },
+        {
+            icon: Award,
+            value: data?.successRate || 98,
+            label: "Taux de Réussite",
+            suffix: "%"
+        },
+    ]
 
     useEffect(() => {
         setIsVisible(true)

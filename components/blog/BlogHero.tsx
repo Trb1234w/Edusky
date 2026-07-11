@@ -41,7 +41,6 @@ export function BlogHero() {
                                 isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
                             )}
                         >
-                            <Lightbulb className="w-3.5 h-3.5 fill-purple-500 animate-pulse" />
                             <span>Inspiration quotidienne</span>
                         </div>
 

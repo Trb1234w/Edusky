@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, GraduationCap, BookOpen, Calendar, Users, Newspaper, Plus } from "lucide-react"
+import { Home, BookOpen, Calendar, Newspaper, Briefcase } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function MobileNav() {
@@ -11,11 +11,8 @@ export function MobileNav() {
   // Hide MobileNav on detail pages
   const isDetailPage =
     /^\/formations\/[^/]+$/.test(pathname) ||
-    /^\/professeurs\/[^/]+$/.test(pathname) ||
     /^\/evenements\/[^/]+$/.test(pathname) ||
-    /^\/clubs\/[^/]+$/.test(pathname) ||
     /^\/blog\/[^/]+$/.test(pathname)
-
 
   // Don't render if on detail page
   if (isDetailPage) {
@@ -24,11 +21,10 @@ export function MobileNav() {
 
   const navItems = [
     { href: "/", icon: Home, label: "Accueil", color: "from-blue-500 to-cyan-500" },
-    { href: "/professeurs", icon: GraduationCap, label: "Experts", color: "from-green-500 to-emerald-500" },
     { href: "/formations", icon: BookOpen, label: "Cours", color: "from-purple-500 to-pink-500" },
     { href: "/evenements", icon: Calendar, label: "Events", color: "from-orange-500 to-red-500" },
-    { href: "/clubs", icon: Users, label: "Clubs", color: "from-blue-500 to-indigo-500" },
     { href: "/blog", icon: Newspaper, label: "Découvrir", color: "from-violet-500 to-purple-500" },
+    { href: "/services", icon: Briefcase, label: "Services", color: "from-teal-500 to-emerald-500" },
   ]
 
   return (
@@ -41,81 +37,7 @@ export function MobileNav() {
 
           <div className="px-1 py-2 pt-3">
             <div className="flex items-center justify-around relative">
-              {navItems.slice(0, 3).map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "flex flex-col items-center justify-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-all duration-300 relative group",
-                      isActive ? "scale-105" : "scale-100 hover:scale-105 active:scale-95"
-                    )}
-                  >
-                    {/* Active Background with Gradient */}
-                    {isActive && (
-                      <div className={cn(
-                        "absolute inset-0 bg-gradient-to-br rounded-xl opacity-10",
-                        item.color
-                      )} />
-                    )}
-
-                    {/* Hover Effect */}
-                    <div className={cn(
-                      "absolute inset-0 bg-gradient-to-br rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300",
-                      item.color
-                    )} />
-
-                    {/* Icon Container */}
-                    <div className={cn(
-                      "relative z-10 transition-all duration-300",
-                      isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                    )}>
-                      <item.icon
-                        size={20}
-                        strokeWidth={isActive ? 2.5 : 2}
-                        className={cn(
-                          "transition-all duration-300",
-                          isActive && "drop-shadow-sm"
-                        )}
-                      />
-                    </div>
-
-                    {/* Label */}
-                    <span className={cn(
-                      "text-[9px] font-medium transition-all duration-300 relative z-10",
-                      isActive ? "text-foreground opacity-100" : "text-muted-foreground opacity-70 group-hover:opacity-100"
-                    )}>
-                      {item.label}
-                    </span>
-                  </Link>
-                )
-              })}
-
-              {/* Center FAB Button */}
-              <Link
-                href="/feed"
-                className="flex items-center justify-center -mt-8 relative group"
-              >
-                {/* Outer Glow Ring */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent rounded-full opacity-30 blur-md scale-110 group-hover:scale-125 group-active:scale-105 transition-transform duration-300" />
-
-                {/* Main Button */}
-                <div className="relative w-13 h-13 rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-2xl flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-all duration-300">
-                  {/* Inner Shine Effect */}
-                  <div className="absolute inset-[2px] rounded-full bg-gradient-to-br from-white/20 to-transparent" />
-
-                  {/* Icon */}
-                  <Plus size={24} className="text-white relative z-10 group-hover:rotate-90 transition-transform duration-300" strokeWidth={2.5} />
-                </div>
-
-                {/* Active Indicator */}
-                {pathname === "/feed" && (
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-secondary animate-pulse" />
-                )}
-              </Link>
-
-              {navItems.slice(3).map((item) => {
+              {navItems.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link

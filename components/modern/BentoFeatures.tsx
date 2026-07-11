@@ -1,39 +1,30 @@
 'use client'
 
-import { GraduationCap, BookOpen, Calendar, Users, Newspaper, TrendingUp, ArrowRight, Sparkles } from 'lucide-react'
+import { BookOpen, Calendar, Sparkles, Newspaper, TrendingUp, ArrowRight, Briefcase } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
 const features = [
     {
-        icon: GraduationCap,
-        title: "Experts Qualifiés",
-        description: "Accédez à un réseau d'experts vérifiés pour un apprentissage d'excellence.",
-        href: "/professeurs",
-        cta: "Trouver un mentor",
-        className: "md:col-span-2 md:row-span-2",
-        gradient: "from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30"
-    },
-    {
         icon: BookOpen,
         title: "Formations Certifiantes",
-        description: "Des parcours complets reconnus par les entreprises.",
+        description: "Des parcours complets reconnus par les entreprises dans tous les domaines.",
         href: "/formations",
         cta: "Explorer",
-        className: "md:col-span-1 md:row-span-1",
+        className: "md:col-span-2 md:row-span-2",
         gradient: "from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30"
     },
     {
-        icon: Users,
-        title: "Clubs Étudiants",
-        description: "Rejoignez des communautés passionnées.",
-        href: "/clubs",
-        cta: "Rejoindre",
-        className: "md:col-span-1 md:row-span-1",
-        gradient: "from-emerald-500/20 to-green-500/20 hover:from-emerald-500/30 hover:to-green-500/30"
+        icon: Calendar,
+        title: "Événements Exclusifs",
+        description: "Hackathons, conférences et ateliers en direct.",
+        href: "/evenements",
+        cta: "Voir l'agenda",
+        className: "md:col-span-2 md:row-span-1",
+        gradient: "from-pink-500/20 to-rose-500/20 hover:from-pink-500/30 hover:to-rose-500/30"
     },
     {
-        icon: Sparkles,
+        icon: Briefcase,
         title: "Nos Services",
         description: "Solutions sur mesure pour projets EdTech.",
         href: "/services",
@@ -42,27 +33,9 @@ const features = [
         gradient: "from-red-500/20 to-orange-500/20 hover:from-red-500/30 hover:to-orange-500/30"
     },
     {
-        icon: Calendar,
-        title: "Événements Exclusifs",
-        description: "Hackathons, conférences et ateliers en direct.",
-        href: "/evenements",
-        cta: "Voir l'agenda",
-        className: "md:col-span-1 md:row-span-2",
-        gradient: "from-pink-500/20 to-rose-500/20 hover:from-pink-500/30 hover:to-rose-500/30"
-    },
-    {
-        icon: TrendingUp,
-        title: "Réseau Pro",
-        description: "Connectez-vous aux opportunités de carrière.",
-        href: "/feed",
-        cta: "Réseauter",
-        className: "md:col-span-2 md:row-span-1",
-        gradient: "from-orange-500/20 to-amber-500/20 hover:from-orange-500/30 hover:to-amber-500/30"
-    },
-    {
         icon: Newspaper,
-        title: "Autres",
-        description: "Conseils, actualités et offres d'emploi pour réussir.",
+        title: "Blog & Actualités",
+        description: "Conseils, actualités et opportunités pour réussir.",
         href: "/blog",
         cta: "Lire",
         className: "md:col-span-1 md:row-span-1",
@@ -79,7 +52,6 @@ export function BentoFeatures() {
             <div className="container px-4 md:px-8">
                 <div className="text-center mb-10 space-y-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
-                        <Sparkles className="w-3 h-3" />
                         <span>Tout ce dont vous avez besoin</span>
                     </div>
                     <h2 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">

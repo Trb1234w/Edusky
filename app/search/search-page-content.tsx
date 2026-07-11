@@ -6,18 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, SlidersHorizontal, X, FileText, Users, GraduationCap, Calendar, UsersRound, BookmarkIcon, UserCheck } from 'lucide-react'
+import { Search, SlidersHorizontal, X, GraduationCap, Calendar, BookmarkIcon } from 'lucide-react'
 import {
     searchAll,
-    searchPosts,
-    searchUsers,
     searchFormations,
     searchEvents,
-    searchClubs,
     searchBlogArticles,
-    searchProfesseurs,
     SearchFilters
 } from '@/app/actions/search'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -25,12 +20,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CourseCard } from '@/components/course-card'
 import { EventCard } from '@/components/event-card'
 import { BlogCard } from '@/components/blog-card'
-import { ProfesseurCard } from '@/components/professeur-card'
-import { PostCard } from '@/components/post-card'
-import { ClubCard } from '@/components/club-card'
-import { SearchResultUser } from '@/components/search/search-result-user'
 
-type TabValue = 'all' | 'posts' | 'users' | 'formations' | 'events' | 'clubs' | 'articles' | 'professeurs'
+type TabValue = 'all' | 'formations' | 'events' | 'articles'
 
 export default function SearchPageContent() {
     const searchParams = useSearchParams()
@@ -65,20 +56,12 @@ export default function SearchPageContent() {
             let data
             if (tab === 'all') {
                 data = await searchAll(searchQuery, filters)
-            } else if (tab === 'posts') {
-                data = await searchPosts(searchQuery, filters)
-            } else if (tab === 'users') {
-                data = await searchUsers(searchQuery, filters)
             } else if (tab === 'formations') {
                 data = await searchFormations(searchQuery, filters)
             } else if (tab === 'events') {
                 data = await searchEvents(searchQuery, filters)
-            } else if (tab === 'clubs') {
-                data = await searchClubs(searchQuery, filters)
             } else if (tab === 'articles') {
                 data = await searchBlogArticles(searchQuery, filters)
-            } else if (tab === 'professeurs') {
-                data = await searchProfesseurs(searchQuery, filters)
             }
             setResults(data)
         } catch (error) {
@@ -137,7 +120,7 @@ export default function SearchPageContent() {
                             <Input
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Rechercher des postes, personnes, formations..."
+                                placeholder="Rechercher des formations, événements, articles..."
                                 className="pl-10 pr-10 h-12 text-base border-2 focus-visible:ring-2"
                                 autoFocus
                             />
@@ -212,7 +195,7 @@ export default function SearchPageContent() {
                         <Search className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
                         <h2 className="text-xl font-semibold mb-2">Rechercher sur EduSky</h2>
                         <p className="text-muted-foreground">
-                            Trouvez des postes, des personnes, des formations, des événements et plus encore
+                            Trouvez des formations, des événements et des articles
                         </p>
                     </Card>
                 ) : (
@@ -220,27 +203,13 @@ export default function SearchPageContent() {
                     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
                         {/* TABS LIST - STICKY BELOW HEADER */}
                         <div className="sticky top-[72px] lg:top-[180px] z-20 bg-background pb-4 -mx-4 px-4">
-                            <TabsList className="w-full grid grid-cols-8 h-auto p-1 overflow-x-auto scrollbar-hide bg-muted">
+                            <TabsList className="w-full grid grid-cols-4 h-auto p-1 bg-muted">
                                 <TabsTrigger
                                     value="all"
                                     className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                                 >
                                     <Search className="h-4 w-4" />
                                     <span className="hidden md:inline">Tous</span>
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="posts"
-                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                                >
-                                    <FileText className="h-4 w-4" />
-                                    <span className="hidden md:inline">Postes</span>
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="users"
-                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                                >
-                                    <Users className="h-4 w-4" />
-                                    <span className="hidden md:inline">Personnes</span>
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="formations"
@@ -257,25 +226,11 @@ export default function SearchPageContent() {
                                     <span className="hidden md:inline">Événements</span>
                                 </TabsTrigger>
                                 <TabsTrigger
-                                    value="clubs"
-                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                                >
-                                    <UsersRound className="h-4 w-4" />
-                                    <span className="hidden md:inline">Clubs</span>
-                                </TabsTrigger>
-                                <TabsTrigger
                                     value="articles"
                                     className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                                 >
                                     <BookmarkIcon className="h-4 w-4" />
                                     <span className="hidden md:inline">Articles</span>
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="professeurs"
-                                    className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                                >
-                                    <UserCheck className="h-4 w-4" />
-                                    <span className="hidden md:inline">Professeurs</span>
                                 </TabsTrigger>
                             </TabsList>
                         </div>
@@ -297,32 +252,6 @@ export default function SearchPageContent() {
                         ) : (
                             <>
                                 <TabsContent value="all" className="space-y-8 mt-0">
-                                    {results?.posts?.length > 0 && (
-                                        <div>
-                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                <FileText className="h-5 w-5 text-primary" />
-                                                Postes récents
-                                            </h3>
-                                            <div className="space-y-4 max-w-2xl -mx-4 md:mx-0">
-                                                {results.posts.map((post: any) => (
-                                                    <PostCard key={post.id} {...post} />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {results?.users?.length > 0 && (
-                                        <div>
-                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                <Users className="h-5 w-5 text-primary" />
-                                                Personnes
-                                            </h3>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {results.users.map((user: any) => (
-                                                    <SearchResultUser key={user.id} {...user} />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
                                     {results?.formations?.length > 0 && (
                                         <div>
                                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -362,25 +291,6 @@ export default function SearchPageContent() {
                                             </div>
                                         </div>
                                     )}
-                                    {results?.clubs?.length > 0 && (
-                                        <div>
-                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                <UsersRound className="h-5 w-5 text-primary" />
-                                                Clubs
-                                            </h3>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                {results.clubs.map((club: any) => (
-                                                    <div key={club.id} className="h-full">
-                                                        <ClubCard
-                                                            {...club}
-                                                            is_favorited={favoritedItems[club.id] ?? club.is_favorited}
-                                                            onToggle={(newStatus) => handleFavoriteToggle(club.id, newStatus)}
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
                                     {results?.articles?.length > 0 && (
                                         <div>
                                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -393,11 +303,9 @@ export default function SearchPageContent() {
                                                         <BlogCard
                                                             id={article.id}
                                                             title={article.title || ""}
-
                                                             image={article.image || "/placeholder.png"}
                                                             author={article.author || "N/A"}
                                                             category={article.category || ""}
-
                                                             excerpt={article.excerpt || ""}
                                                             authorRole={article.authorRole || "Auteur"}
                                                             authorAvatar={article.authorAvatar || ""}
@@ -414,43 +322,9 @@ export default function SearchPageContent() {
                                             </div>
                                         </div>
                                     )}
-                                    {results?.professeurs?.length > 0 && (
-                                        <div>
-                                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                <UserCheck className="h-5 w-5 text-primary" />
-                                                Professeurs
-                                            </h3>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                {results.professeurs.map((prof: any) => (
-                                                    <div key={prof.id} className="h-full">
-                                                        <ProfesseurCard {...prof} />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </TabsContent>
-
-                                <TabsContent value="posts" className="space-y-4 mt-0 max-w-2xl mx-auto -mx-4 md:mx-auto">
-                                    {results?.data?.map((post: any) => (
-                                        <PostCard key={post.id} {...post} />
-                                    ))}
-                                    {results?.data?.length === 0 && (
+                                    {results && !results?.formations?.length && !results?.events?.length && !results?.articles?.length && (
                                         <Card className="p-12 text-center">
-                                            <p className="text-muted-foreground">Aucun poste trouvé</p>
-                                        </Card>
-                                    )}
-                                </TabsContent>
-
-                                <TabsContent value="users" className="space-y-4 mt-0">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {results?.data?.map((user: any) => (
-                                            <SearchResultUser key={user.id} {...user} />
-                                        ))}
-                                    </div>
-                                    {results?.data?.length === 0 && (
-                                        <Card className="p-12 text-center">
-                                            <p className="text-muted-foreground">Aucune personne trouvée</p>
+                                            <p className="text-muted-foreground">Aucun résultat trouvé pour "{query}"</p>
                                         </Card>
                                     )}
                                 </TabsContent>
@@ -494,25 +368,6 @@ export default function SearchPageContent() {
                                     )}
                                 </TabsContent>
 
-                                <TabsContent value="clubs" className="space-y-4 mt-0">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {results?.data?.map((club: any) => (
-                                            <div key={club.id} className="h-full">
-                                                <ClubCard
-                                                    {...club}
-                                                    is_favorited={favoritedItems[club.id] ?? club.is_favorited}
-                                                    onToggle={(newStatus) => handleFavoriteToggle(club.id, newStatus)}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {results?.data?.length === 0 && (
-                                        <Card className="p-12 text-center">
-                                            <p className="text-muted-foreground">Aucun club trouvé</p>
-                                        </Card>
-                                    )}
-                                </TabsContent>
-
                                 <TabsContent value="articles" className="space-y-4 mt-0">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {results?.data?.map((article: any) => (
@@ -528,21 +383,6 @@ export default function SearchPageContent() {
                                     {results?.data?.length === 0 && (
                                         <Card className="p-12 text-center">
                                             <p className="text-muted-foreground">Aucun article trouvé</p>
-                                        </Card>
-                                    )}
-                                </TabsContent>
-
-                                <TabsContent value="professeurs" className="space-y-4 mt-0">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {results?.data?.map((prof: any) => (
-                                            <div key={prof.id} className="h-full">
-                                                <ProfesseurCard {...prof} />
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {results?.data?.length === 0 && (
-                                        <Card className="p-12 text-center">
-                                            <p className="text-muted-foreground">Aucun professeur trouvé</p>
                                         </Card>
                                     )}
                                 </TabsContent>

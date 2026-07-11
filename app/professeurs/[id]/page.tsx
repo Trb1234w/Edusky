@@ -9,9 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, Users, Briefcase, CheckCircle, Award, Mail, Phone, Globe, Linkedin, BookOpen, GraduationCap, Languages, Lightbulb, MapPin, User } from "lucide-react";
-import { ReservationDialog } from "@/components/professeurs/reservation-dialog";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ReservationForm } from "@/components/professeurs/reservation-form";
+
 
 // --- Helpers ---
 
@@ -290,7 +288,7 @@ export default async function ProfesseurDetailsPage({ params }: { params: { id: 
                         <span className="text-sm font-normal text-muted-foreground">/h</span>
                       </span>
                     </div>
-<ReservationDialog professeurId={professeur.id} professeurName={professeur.full_name} />
+
                   </div>
                 </Card>
 
