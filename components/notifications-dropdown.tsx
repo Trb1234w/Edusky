@@ -145,8 +145,8 @@ export function NotificationsDropdown() {
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
+                <Button variant="outline" size="icon" className="relative rounded-full bg-primary/5 border-primary/20 hover:bg-primary/10 text-primary shadow-sm transition-all hover:scale-105 active:scale-95">
+                    <Bell className="h-[22px] w-[22px]" />
                     {unreadCount > 0 && (
                         <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-600 border-2 border-background animate-pulse" />
                     )}

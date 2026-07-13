@@ -11,20 +11,13 @@ import { cn } from '@/lib/utils'
 const heroSlides = [
     {
         id: 'formations',
-        title: 'Formations Certifiées',
-        description: 'Formations dans tous les domaines avec suivi IA de pointe et certification à la clé.',
+        title: 'Formations de qualité',
+        description: 'Découvrez des formations dans divers domaines pour développer vos compétences.',
         icon: Award,
         image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80',
         color: 'from-blue-500 to-cyan-600'
     },
-    {
-        id: 'evenements',
-        title: 'Événements Éducatifs',
-        description: 'Participez à des hackathons, compétitions, conférences et événements exclusifs.',
-        icon: Trophy,
-        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-        color: 'from-pink-500 to-rose-600'
-    },
+
     {
         id: 'blog',
         title: 'Blog & Actualités',
@@ -38,15 +31,14 @@ const heroSlides = [
 // Chips pour l'accès rapide (remplace les CTA)
 const quickAccessChips = [
     { label: 'Formations', icon: BookOpen, href: '/formations', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-    { label: 'Événements', icon: Trophy, href: '/evenements', color: 'bg-pink-500/10 text-pink-500 border-pink-500/20' },
+
     { label: 'Blog', icon: Newspaper, href: '/blog', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
 ]
 
-// Phrases pour l'effet typing
 const typingPhrases = [
     "commence ici",
-    "se construit ici",
-    "s'illumine ici",
+    "se développe ici",
+    "prend son envol ici",
     "se transforme ici"
 ]
 
@@ -168,10 +160,9 @@ export function NewHero() {
                         </h1>
 
                         {/* Description */}
-                        {/* Description */}
                         <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed max-w-full md:max-w-xl break-words">
-                            Edusky révolutionne l'apprentissage en connectant étudiants, mentors et entreprises.
-                            Profitez d'un suivi personnalisé par IA, de formations certifiantes et d'un réseau professionnel actif.
+                            Développez vos compétences avec nos formations spécialisées et restez informé grâce à nos articles. 
+                            Une plateforme pensée pour votre réussite éducative et professionnelle.
                         </p>
 
                         {/* Quick Access Chips (Marquee) */}

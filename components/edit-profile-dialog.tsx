@@ -29,8 +29,6 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
     const [isPending, startTransition] = useTransition();
     const [formData, setFormData] = useState({
         full_name: profile.full_name || '',
-        username: profile.username || '',
-        bio: profile.bio || '',
         telephone: profile.telephone || '',
     });
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -51,23 +49,13 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validation basique
-        if (!formData.username) {
-            toast({
-                title: "Erreur",
-                description: "Le nom d'utilisateur est requis.",
-                variant: "destructive",
-            });
-            return;
-        }
+
 
         startTransition(async () => {
             const formDataToSend = new FormData();
 
             // On s'assure que les chaînes ne sont pas nulles avant l'envoi
             formDataToSend.append('full_name', formData.full_name || '');
-            formDataToSend.append('username', formData.username || '');
-            formDataToSend.append('bio', formData.bio || '');
             formDataToSend.append('telephone', formData.telephone || '');
 
             if (avatarFile) {
@@ -145,16 +133,6 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="username">Nom d'utilisateur</Label>
-                            <Input
-                                id="username"
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                placeholder="@username"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
                             <Label htmlFor="telephone">Téléphone</Label>
                             <Input
                                 id="telephone"
@@ -165,16 +143,7 @@ export function EditProfileDialog({ profile, open, onOpenChange }: EditProfileDi
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="bio">Biographie</Label>
-                        <Textarea
-                            id="bio"
-                            value={formData.bio}
-                            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                            placeholder="Parlez-nous de vous..."
-                            rows={4}
-                        />
-                    </div>
+
 
                     {/* Actions */}
                     <div className="flex justify-end gap-3">

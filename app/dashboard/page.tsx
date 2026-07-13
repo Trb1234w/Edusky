@@ -30,7 +30,7 @@ import {
 
 import { PostCard } from "@/components/post-card";
 import { getFollowers, getFollowing } from "@/lib/data/suivis.server";
-import { getRegisteredEvents, getRegisteredFormations, testServerAction, fetchUserPosts, getUserFavorites, getProfileEliteInfos } from "@/app/dashboard/actions";
+import { getRegisteredFormations, fetchUserPosts, getUserFavorites, getProfileEliteInfos } from "@/app/dashboard/actions";
 import { Info } from "lucide-react";
 import { ProfileEliteInfos } from "@/components/dashboard/profile-elite-infos";
 import { EventCard } from "@/components/event-card";
@@ -39,13 +39,13 @@ import { FollowersList } from "@/components/FollowersList";
 import { FavoritesList } from "./favorites-list";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { SharedPostCard } from "@/components/shared-post-card";
+import { NotificationsList } from "@/components/notifications-list";
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
-  const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
   const [registeredFormations, setRegisteredFormations] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [eliteData, setEliteData] = useState<any>({ education: [], experience: [], portfolio: [], goals: [] });
@@ -53,7 +53,6 @@ export default function DashboardPage() {
   const [postsLoading, setPostsLoading] = useState(true);
   const [followersLoading, setFollowersLoading] = useState(true);
   const [followingLoading, setFollowingLoading] = useState(true);
-  const [registeredEventsLoading, setRegisteredEventsLoading] = useState(true);
   const [registeredFormationsLoading, setRegisteredFormationsLoading] = useState(true);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [eliteLoading, setEliteLoading] = useState(true);
@@ -108,15 +107,6 @@ export default function DashboardPage() {
         setFollowing(followingData);
       }
       setFollowingLoading(false);
-
-      // Charger les événements inscrits
-      const { data: registeredEventsData, error: registeredEventsError } = await getRegisteredEvents();
-      if (!registeredEventsError && registeredEventsData) {
-        // Dédupliquer les événements basés sur leur 'id'
-        const uniqueEvents = Array.from(new Map((registeredEventsData as any[]).map((event: any) => [event.id, event])).values());
-        setRegisteredEvents(uniqueEvents);
-      }
-      setRegisteredEventsLoading(false);
 
       // Charger les formations inscrites
       const { data: registeredFormationsData, error: registeredFormationsError } = await getRegisteredFormations();
@@ -179,23 +169,7 @@ export default function DashboardPage() {
     if (isFavorited) {
       let itemToAdd = null;
 
-      if (itemType === 'evenement') {
-        itemToAdd = registeredEvents.find(e => e.id === itemId);
-        if (itemToAdd) {
-          itemToAdd = {
-            ...itemToAdd,
-            title: itemToAdd.titre,
-            description: itemToAdd.extrait || itemToAdd.description,
-            author: itemToAdd.organisateur?.full_name,
-            category: itemToAdd.categorie?.nom,
-            location: itemToAdd.lieu || itemToAdd.mode,
-            price: itemToAdd.prix,
-            isFree: itemToAdd.est_gratuit,
-            date: itemToAdd.date_debut,
-            maxParticipants: itemToAdd.capacite
-          };
-        }
-      } else if (itemType === 'formation') {
+      if (itemType === 'formation') {
         itemToAdd = registeredFormations.find(f => f.id === itemId);
         if (itemToAdd) {
           itemToAdd = {
@@ -273,11 +247,11 @@ export default function DashboardPage() {
                 <span className="hidden lg:inline ml-2">Favoris</span>
               </TabsTrigger>
               <TabsTrigger
-                value="infos"
+                value="notifications"
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-none px-2 lg:px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:hover:bg-transparent h-auto"
               >
-                <Info className="h-6 w-6 lg:h-5 lg:w-5" />
-                <span className="hidden lg:inline ml-2">Infos</span>
+                <Bell className="h-6 w-6 lg:h-5 lg:w-5" />
+                <span className="hidden lg:inline ml-2">Notifications</span>
               </TabsTrigger>
             </TabsList>
 
@@ -286,7 +260,7 @@ export default function DashboardPage() {
               <section>
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-primary" />
-                  Formations
+                  Mes inscriptions
                 </h3>
                 {registeredFormationsLoading ? (
                   <div className="space-y-4">
@@ -331,55 +305,14 @@ export default function DashboardPage() {
                 )}
               </section>
 
-              {/* Événements */}
-              <section>
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  Événements
-                </h3>
-                {registeredEventsLoading ? (
-                  <div className="space-y-4">
-                    {Array.from({ length: 2 }).map((_, i) => (
-                      <Skeleton key={i} className="h-32 w-full rounded-lg" />
-                    ))}
-                  </div>
-                ) : registeredEvents.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {registeredEvents.map(event => {
-                      const fullLocation = [event.lieu, event.quartier?.nom, event.ville?.nom, event.pays?.nom].filter(Boolean).join(', ');
-                      return (
-                        <EventCard
-                          key={event.id}
-                          id={event.id}
-                          title={event.titre || ""}
-                          description={event.extrait || event.description || ""}
-                          date={new Date(event.date_debut || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          time={new Date(event.date_debut || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                          location={fullLocation}
-                          category={event.categorie?.nom || ""}
-                          participants={event.nombre_participants || 0}
-                          maxParticipants={event.capacite || 0}
-                          organizer={event.organisateur?.full_name || "Inconnu"}
-                          image={event.image_url || "/placeholder.png"}
-                          status={new Date(event.date_debut) > new Date() ? "upcoming" : "past"}
-                          is_favorited={favorites.some(fav => fav.type === 'evenement' && fav.id === event.id)}
-                          onToggle={(status) => handleFavoriteToggle(event.id, 'evenement', status)}
-                          price={event.prix}
-                          isFree={event.est_gratuit}
-                          mode={event.mode}
-                        />
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <Card className="p-8 text-center text-muted-foreground">
-                    Vous n'êtes inscrit à aucun événement pour le moment.
-                  </Card>
-                )}
-              </section>
+
 
             </TabsContent>
             <TabsContent value="favorites" className="mt-2 md:mt-4 px-4 md:px-0">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-primary" />
+                  Vos favoris
+              </h3>
               {favoritesLoading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -394,18 +327,16 @@ export default function DashboardPage() {
                 />
               )}
             </TabsContent>
-            <TabsContent value="infos" className="mt-2 md:mt-4 px-4 md:px-0">
-              {eliteLoading ? (
-                <div className="space-y-8">
-                  <Skeleton className="h-40 w-full rounded-xl" />
-                  <Skeleton className="h-40 w-full rounded-xl" />
+            <TabsContent value="notifications" className="mt-2 md:mt-4 px-4 md:px-0">
+              <div className="bg-background p-6 rounded-xl border border-border shadow-sm">
+                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-primary" />
+                  Vos notifications
+                </h3>
+                <div className="w-full">
+                    <NotificationsList />
                 </div>
-              ) : (
-                <ProfileEliteInfos
-                  profileId={profile.id}
-                  initialData={eliteData}
-                />
-              )}
+              </div>
             </TabsContent>
           </Tabs>
         </section>

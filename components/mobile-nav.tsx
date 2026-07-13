@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, BookOpen, Calendar, Newspaper, Briefcase } from "lucide-react"
+import { Home, BookOpen, Calendar, Newspaper, Briefcase, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function MobileNav() {
@@ -11,7 +11,6 @@ export function MobileNav() {
   // Hide MobileNav on detail pages
   const isDetailPage =
     /^\/formations\/[^/]+$/.test(pathname) ||
-    /^\/evenements\/[^/]+$/.test(pathname) ||
     /^\/blog\/[^/]+$/.test(pathname)
 
   // Don't render if on detail page
@@ -22,9 +21,10 @@ export function MobileNav() {
   const navItems = [
     { href: "/", icon: Home, label: "Accueil", color: "from-blue-500 to-cyan-500" },
     { href: "/formations", icon: BookOpen, label: "Cours", color: "from-purple-500 to-pink-500" },
-    { href: "/evenements", icon: Calendar, label: "Events", color: "from-orange-500 to-red-500" },
+
     { href: "/blog", icon: Newspaper, label: "Découvrir", color: "from-violet-500 to-purple-500" },
     { href: "/services", icon: Briefcase, label: "Services", color: "from-teal-500 to-emerald-500" },
+    { href: "/dashboard", icon: User, label: "Espace", color: "from-blue-500 to-indigo-500" },
   ]
 
   return (
@@ -64,22 +64,22 @@ export function MobileNav() {
 
                     {/* Icon Container */}
                     <div className={cn(
-                      "relative z-10 transition-all duration-300",
-                      isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                      "relative z-10 transition-all duration-300 p-1.5 rounded-full flex items-center justify-center",
+                      isActive ? "text-primary bg-primary/10 border border-primary/20 shadow-sm" : "text-muted-foreground group-hover:text-foreground"
                     )}>
                       <item.icon
-                        size={20}
+                        size={isActive ? 24 : 20}
                         strokeWidth={isActive ? 2.5 : 2}
                         className={cn(
                           "transition-all duration-300",
-                          isActive && "drop-shadow-sm"
+                          isActive && "drop-shadow-sm scale-110"
                         )}
                       />
                     </div>
 
                     {/* Label */}
                     <span className={cn(
-                      "text-[9px] font-medium transition-all duration-300 relative z-10",
+                      "text-[10px] md:text-xs font-semibold transition-all duration-300 relative z-10",
                       isActive ? "text-foreground opacity-100" : "text-muted-foreground opacity-70 group-hover:opacity-100"
                     )}>
                       {item.label}

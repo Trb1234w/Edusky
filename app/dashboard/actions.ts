@@ -11,40 +11,6 @@ export async function fetchUserPosts(authorId: string) {
   return await getPostsByAuthorId(authorId, user?.id)
 }
 
-export async function getRegisteredEvents() {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { data: [], error: { message: "Utilisateur non authentifié." } }
-  }
-
-  const { data, error } = await supabase
-    .from('inscriptions_evenement')
-    .select(
-      `
-        evenement:evenement_id(*,
-          categorie:categorie_id(*),
-          organisateur:profiles!organisateur_id(*),
-          pays:pays_id(*),
-          ville:ville_id(*),
-          quartier:quartier_id(*)
-        )
-      `
-    )
-    .eq('user_id', user.id)
-
-  if (error) {
-    console.error("Erreur lors de la récupération des événements inscrits:", error)
-    return { data: [], error }
-  }
-
-  // Extrait les objets evenement de l'objet d'inscription
-  const registeredEvents = data.map(inscription => inscription.evenement)
-
-  return { data: registeredEvents, error: null }
-}
 
 export async function getRegisteredFormations() {
   const supabase = await createClient()

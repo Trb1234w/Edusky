@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card"
 
 interface FavoriteItem {
   id: string;
-  type: 'formation' | 'evenement' | 'club' | 'article' | 'professeur' | string;
+  type: 'formation' | 'club' | 'article' | 'professeur' | string;
   // All potential properties from the UNION in the SQL function
   title?: string;
   description?: string;
@@ -75,24 +75,7 @@ export function FavoritesList({ favorites, isLoading, onFavoriteToggle }: Favori
             {...item}
           />
         );
-      case 'evenement':
-        const fullLocation = [item.lieu, item.quartier_nom, item.ville_nom, item.pays_nom].filter(Boolean).join(', ');
-        return (
-          <EventCard
-            {...commonProps}
-            organizer={item.author || "N/A"}
-            category={item.category || ""}
-            date={new Date(item.date || "").toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-            time={new Date(item.date || "").toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-            location={fullLocation}
-            participants={item.participants || 0}
-            maxParticipants={item.maxParticipants || 0}
-            status={item.status || "upcoming"}
-            price={item.price}
-            isFree={item.isFree}
-            mode={item.mode}
-          />
-        );
+
       case 'club':
         return (
           <ClubCard

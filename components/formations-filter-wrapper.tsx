@@ -341,8 +341,21 @@ export function FormationsFilterWrapper({ initialFormations }: FormationsFilterW
                 <h2 className="text-2xl font-bold">Catalogue</h2>
                 <p className="text-muted-foreground text-sm">Explorez nos meilleures formations</p>
               </div>
-              <div className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
-                {filteredFormations.length} résultats
+              <div className="flex items-center gap-4">
+                <ProfessionalInquiryDialog
+                    inquiryType="formation_entreprise"
+                    dialogTitle="Demande de Formation pour Entreprise"
+                    dialogDescription="Vous souhaitez former vos équipes ? Remplissez ce formulaire et nous vous contacterons pour discuter de vos besoins spécifiques."
+                    triggerButton={
+                        <Button variant="outline" size="sm" className="bg-primary/5 border-primary/20 hover:bg-primary/10 text-primary">
+                            <UserPlus size={16} className="mr-2" />
+                            Form. entreprise
+                        </Button>
+                    }
+                />
+                <div className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                  {filteredFormations.length} résultats
+                </div>
               </div>
             </div>
 

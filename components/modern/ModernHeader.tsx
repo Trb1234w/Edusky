@@ -61,7 +61,6 @@ export function ModernHeader() {
 
     const navLinks = [
         { href: '/formations', label: 'Formations' },
-        { href: '/evenements', label: 'Événements' },
         { href: '/blog', label: 'Découvrir' },
         { href: '/services', label: 'Services' },
     ]
@@ -166,37 +165,15 @@ export function ModernHeader() {
                     <div className="lg:hidden flex items-center gap-3">
                         {user ? (
                             <>
-                                {/* Info / About Us */}
-                                <Link href="/services" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
-                                    <Info className="w-6 h-6" />
-                                </Link>
-
                                 {/* Notifications */}
                                 <div className="relative ">
                                     <NotificationsDropdown />
                                 </div>
 
 
-                                {/* User Profile */}
-                                <Link href="/dashboard" className="relative group">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden border border-border group-hover:border-primary transition-colors">
-                                        {user.user_metadata?.avatar_url ? (
-                                            <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
-                                                <UserIcon className="w-4 h-4" />
-                                            </div>
-                                        )}
-                                    </div>
-                                </Link>
                             </>
                         ) : (
                             <>
-                                {/* Info / About Us */}
-                                <Link href="/services" className="p-2 rounded-full hover:bg-primary/10 transition-colors text-foreground/80">
-                                    <Info className="w-6 h-6" />
-                                </Link>
-
                                 {/* Connexion Button */}
                                 <Link href="/auth/connexion">
                                     <GlossyButton variant="primary" size="sm" className="rounded-full px-4 text-xs font-medium flex items-center gap-2">

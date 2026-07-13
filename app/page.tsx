@@ -1,4 +1,4 @@
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { DiscoverSection } from "@/components/modern/DiscoverSection";
 import { NewHero } from "@/components/new-hero";
 import {
@@ -12,7 +12,6 @@ import {
 // Import Server Client and Card Components
 import { createClient } from "@/lib/supabase/server";
 import { CourseCard } from "@/components/course-card";
-import { EventCard } from "@/components/event-card";
 import { BlogCard } from "@/components/blog-card";
 import { SectionSlider } from "@/components/home/section-slider";
 
@@ -25,23 +24,12 @@ export default async function HomePage() {
 
   const [
     formationsData,
-    evenementsData,
     articlesData,
     usersReq,
     professeursReq,
     formationsReq,
   ] = await Promise.all([
     supabase.rpc('get_home_page_formations', { p_user_id: currentUserId || null }),
-    supabase.rpc('get_evenements', {
-        search_term: null,
-        category_slug: null,
-        mode_filter: null,
-        pays_filter: null,
-        ville_filter: null,
-        quartier_filter: null,
-        type_filter: null,
-        sort_by: 'date_debut_asc'
-    }),
     supabase.rpc('get_home_page_articles', { p_user_id: currentUserId || null }),
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'professeur'),
@@ -56,7 +44,6 @@ export default async function HomePage() {
   };
 
   const formations = formationsData.data || [];
-  const evenements = evenementsData.data || [];
   const articles = articlesData.data || [];
 
   return (
@@ -84,31 +71,7 @@ export default async function HomePage() {
           </SectionSlider>
         )}
 
-        {/* Événements Slider */}
-        {evenements.length > 0 && (
-          <SectionSlider
-            title="Événements"
-            icon={<Calendar className="w-5 h-5 text-primary" />}
-            href="/evenements"
-          >
-            {evenements.map((event: any) => (
-              <div key={event.id} className="w-[280px] md:w-[320px] h-full snap-start">
-                <EventCard 
-                  {...event}
-                  title={event.titre || event.title}
-                  description={event.extrait || event.description}
-                  date={event.date_debut ? new Date(event.date_debut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : event.date}
-                  time={event.date_debut ? new Date(event.date_debut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : event.time}
-                  location={event.ville || event.location || "En ligne"}
-                  category={event.categorie?.nom || event.category_nom || event.category}
-                  price={event.prix || event.price} 
-                  isFree={event.est_gratuit || event.isFree} 
-                  image={event.image_url || event.image}
-                />
-              </div>
-            ))}
-          </SectionSlider>
-        )}
+
 
         {/* Blog Slider */}
         {articles.length > 0 && (

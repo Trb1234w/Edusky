@@ -14,15 +14,7 @@ const features = [
         className: "md:col-span-2 md:row-span-2",
         gradient: "from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30"
     },
-    {
-        icon: Calendar,
-        title: "Événements Exclusifs",
-        description: "Hackathons, conférences et ateliers en direct.",
-        href: "/evenements",
-        cta: "Voir l'agenda",
-        className: "md:col-span-2 md:row-span-1",
-        gradient: "from-pink-500/20 to-rose-500/20 hover:from-pink-500/30 hover:to-rose-500/30"
-    },
+
     {
         icon: Briefcase,
         title: "Nos Services",

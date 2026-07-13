@@ -36,7 +36,6 @@ export function ModernFooter() {
             title: 'Plateforme',
             links: [
                 { label: 'Formations', href: '/formations' },
-                { label: 'Événements', href: '/evenements' },
             ],
         },
         {
